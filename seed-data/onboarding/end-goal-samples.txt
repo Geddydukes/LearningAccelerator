@@ -1,0 +1,43 @@
+AI / ML Engineer & Researcher
+- 6 mo (Hireable): Build, containerise, and deploy a transformer-based summarisation API on AWS GPU instances with CI/CD, tests, and monitoring; leverage the project to secure a mid-level ML engineer role.
+- 12 mo (Top 1 %): Publish a parameter-efficient fine-tuning paper at NeurIPS **or** open-source a model that ranks top-1 % on SuperGLUE and gains ≥ 3 k GitHub stars.
+
+Blockchain & Smart Contracts
+- 6 mo (Hireable): Design, audit (Slither + MythX), and deploy an ERC-721A NFT contract with a secure mint dApp; land a smart-contract engineer position.
+- 12 mo (Top 1 %): Launch a Layer-2 or DeFi protocol exceeding \$25 M TVL, cited by Messari—placing you in the ecosystem's top-tier contributors.
+
+Cybersecurity
+- 6 mo (Hireable): Earn CompTIA Security+ and build SIEM rule-sets that detect an ATT&CK chain; join a Tier-1 SOC analyst team.
+- 12 mo (Top 1 %): Achieve OSCP & OSCE3, rank top-100 on Hack-The-Box Pro, and publish a novel exploit CVE write-up referenced by MITRE.
+
+Data Engineering
+- 6 mo (Hireable): Implement Kafka → Flink → Iceberg pipeline with dbt & Great Expectations; obtain a Data Engineer role.
+- 12 mo (Top 1 %): Architect a petabyte-scale lakehouse adopted company-wide; present at Data + AI Summit as principal data architect.
+
+DevOps / Cloud Engineering
+- 6 mo (Hireable): Deploy blue-green GitOps Kubernetes (Argo CD) with SLO dashboards; step into an SRE position.
+- 12 mo (Top 1 %): Design a multi-region platform hitting 99.99 % uptime & <100 ms global P95 latency; keynote at KubeCon.
+
+Full-Stack Web Development
+- 6 mo (Hireable): Ship a production SaaS (Next 14, Prisma, Stripe) scoring ≥ 90 Lighthouse PWA; secure a full-stack dev role.
+- 12 mo (Top 1 %): Grow to 10 k MAU and open-source its UI kit (> 5 k stars); invited speaker at ReactConf.
+
+Game Development
+- 6 mo (Hireable): Release a Unity game on Steam with "Very Positive" reviews; join an indie studio.
+- 12 mo (Top 1 %): Launch a cross-platform title exceeding 1 M downloads and win an IndieCade award.
+
+Product Management
+- 6 mo (Hireable): Launch an MVP that lifts activation 20 %; step into an Associate PM role.
+- 12 mo (Top 1 %): Drive a product line to \$1 M ARR; keynote Product-Led Summit.
+
+Technical Writing
+- 6 mo (Hireable): Convert REST API docs to docs-as-code (OpenAPI, Hugo, Vale); become a documentation engineer.
+- 12 mo (Top 1 %): Publish a best-selling O'Reilly book **or** win Write-the-Docs "Best Contribution".
+
+UX / UI Design
+- 6 mo (Hireable): Redesign a SaaS dashboard to WCAG AA, boosting conversion 20 %; get hired as Product Designer.
+- 12 mo (Top 1 %): Win an Awwwards "Site of the Day" and release a design-token library adopted by Fortune 500 teams.
+
+AI Ethics & Policy
+- 6 mo (Hireable): Deploy fairness dashboards and complete a Responsible-AI audit; become an RA advisor.
+- 12 mo (Top 1 %): Draft an Algorithmic Impact Assessment cited in national legislation and serve on an IEEE standards body. 
