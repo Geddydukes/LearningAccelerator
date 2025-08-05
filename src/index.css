@@ -1,0 +1,80 @@
+/* Import Plus Jakarta Sans font */
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --toast-bg: #ffffff;
+  --toast-color: #374151;
+  
+  /* Design system CSS custom properties */
+  --color-primary-50: #eff6ff;
+  --color-primary-500: #3b82f6;
+  --color-primary-600: #2563eb;
+  --color-aqua-500: #06b6d4;
+  --color-glass-light: rgba(255, 255, 255, 0.8);
+  --color-glass-dark: rgba(30, 41, 59, 0.8);
+  
+  --motion-duration-fast: 150ms;
+  --motion-duration-normal: 300ms;
+  --motion-duration-ripple: 1200ms;
+  --motion-ease-out-sine: cubic-bezier(0.39, 0.575, 0.565, 1);
+  --motion-ripple-ease: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.dark {
+  --toast-bg: #1f2937;
+  --toast-color: #f3f4f6;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  
+  body {
+    @apply antialiased;
+    font-family: 'Plus Jakarta Sans', 'Inter', system-ui, sans-serif;
+  }
+  
+  * {
+    @apply focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2;
+  }
+}
+
+@layer components {
+  .gradient-text {
+    @apply bg-gradient-to-r from-blue-600 to-emerald-600 bg-clip-text text-transparent;
+  }
+  
+  .glass-morphism {
+    @apply bg-white/80 dark:bg-slate-800/80 backdrop-blur-md border border-white/20 dark:border-white/10;
+  }
+  
+  .ripple-shadow {
+    box-shadow: 0 4px 6px rgba(59, 130, 246, 0.07), 0 2px 4px rgba(59, 130, 246, 0.06);
+  }
+  
+  .text-display-xl {
+    font-size: clamp(3rem, 6vw, 4.5rem);
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-gray-100 dark:bg-gray-800;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-gray-300 dark:bg-gray-600 rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-gray-400 dark:bg-gray-500;
+}

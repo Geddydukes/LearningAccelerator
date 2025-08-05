@@ -1,0 +1,1749 @@
+openapi: 3.1.0
+info:
+  title: Learning Accelerator API
+  description: Multi-agent AI tutoring platform API
+  version: 1.0.0
+  contact:
+    name: Learning Accelerator Team
+    email: api@learningaccelerator.com
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: https://api.learningaccelerator.com/v1
+    description: Production server
+  - url: https://staging-api.learningaccelerator.com/v1
+    description: Staging server
+  - url: http://localhost:3000/v1
+    description: Development server
+
+security:
+  - BearerAuth: []
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        email:
+          type: string
+          format: email
+        name:
+          type: string
+        role:
+          type: string
+          enum: [learner, mentor, admin]
+        avatar_url:
+          type: string
+          format: uri
+          nullable: true
+        voice_preference:
+          type: string
+          default: alloy
+        learning_preferences:
+          type: object
+        last_active:
+          type: string
+          format: date-time
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+      required: [id, email, name, role]
+
+    Week:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        user_id:
+          type: string
+          format: uuid
+        week_number:
+          type: integer
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+          nullable: true
+        status:
+          type: string
+          enum: [pending, in_progress, complete, archived]
+        focus_area:
+          type: string
+          nullable: true
+        estimated_hours:
+          type: integer
+          default: 8
+        actual_hours:
+          type: integer
+          nullable: true
+        completion_percentage:
+          type: integer
+          default: 0
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+      required: [id, user_id, week_number, start_date, status]
+
+    CLONote:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        week_id:
+          type: string
+          format: uuid
+        module_title:
+          type: string
+        learning_objectives:
+          type: array
+          items:
+            type: string
+        key_concepts:
+          type: array
+          items:
+            type: string
+        estimated_duration:
+          type: integer
+          description: Duration in minutes
+        prerequisites:
+          type: array
+          items:
+            type: string
+        resources:
+          type: array
+          items:
+            type: object
+        assessment_criteria:
+          type: array
+          items:
+            type: string
+        content:
+          type: object
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+      required: [id, week_id, module_title, content]
+
+    EngineerNote:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        week_id:
+          type: string
+          format: uuid
+        repository_url:
+          type: string
+          format: uri
+          nullable: true
+        analysis_summary:
+          type: string
+          nullable: true
+        code_quality_score:
+          type: integer
+          minimum: 0
+          maximum: 100
+          nullable: true
+        recommendations:
+          type: array
+          items:
+            type: object
+        technical_debt_items:
+          type: array
+          items:
+            type: object
+        best_practices_followed:
+          type: array
+          items:
+            type: string
+        areas_for_improvement:
+          type: array
+          items:
+            type: string
+        content:
+          type: object
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+      required: [id, week_id, content]
+
+    SocraticSession:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        week_id:
+          type: string
+          format: uuid
+          nullable: true
+        user_id:
+          type: string
+          format: uuid
+        topic:
+          type: string
+          nullable: true
+        started_at:
+          type: string
+          format: date-time
+        ended_at:
+          type: string
+          format: date-time
+          nullable: true
+        total_questions:
+          type: integer
+          default: 0
+        insights_generated:
+          type: array
+          items:
+            type: string
+        voice_enabled:
+          type: boolean
+          default: false
+        session_metadata:
+          type: object
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+      required: [id, user_id]
+
+    Message:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        session_id:
+          type: string
+          format: uuid
+        role:
+          type: string
+          enum: [user, assistant, system]
+        content:
+          type: string
+        audio_url:
+          type: string
+          format: uri
+          nullable: true
+        has_transcript:
+          type: boolean
+          default: false
+        transcript:
+          type: string
+          nullable: true
+        metadata:
+          type: object
+        timestamp:
+          type: string
+          format: date-time
+        created_at:
+          type: string
+          format: date-time
+      required: [id, session_id, role, content]
+
+    BrandPackage:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        week_id:
+          type: string
+          format: uuid
+        mode:
+          type: string
+          default: standard
+        content_themes:
+          type: array
+          items:
+            type: string
+        kpi_metrics:
+          type: array
+          items:
+            type: object
+        social_content_suggestions:
+          type: array
+          items:
+            type: object
+        brand_voice_analysis:
+          type: string
+          nullable: true
+        engagement_strategies:
+          type: array
+          items:
+            type: string
+        assets:
+          type: object
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+      required: [id, week_id]
+
+    KPIMetric:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        week_id:
+          type: string
+          format: uuid
+          nullable: true
+        user_id:
+          type: string
+          format: uuid
+        metric_name:
+          type: string
+        metric_category:
+          type: string
+          nullable: true
+        current_value:
+          type: number
+        target_value:
+          type: number
+          nullable: true
+        previous_value:
+          type: number
+          nullable: true
+        delta:
+          type: number
+          nullable: true
+        trend:
+          type: string
+          enum: [up, down, stable]
+          nullable: true
+        unit:
+          type: string
+          nullable: true
+        recorded_at:
+          type: string
+          format: date-time
+        created_at:
+          type: string
+          format: date-time
+      required: [id, user_id, metric_name, current_value]
+
+    Review:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        week_id:
+          type: string
+          format: uuid
+          nullable: true
+        user_id:
+          type: string
+          format: uuid
+        github_url:
+          type: string
+          format: uri
+        depth:
+          type: string
+          enum: [standard, comprehensive, security_focused]
+          default: standard
+        status:
+          type: string
+          enum: [queued, analyzing, completed, failed]
+          default: queued
+        result_json:
+          type: object
+          nullable: true
+        error_message:
+          type: string
+          nullable: true
+        started_at:
+          type: string
+          format: date-time
+          nullable: true
+        completed_at:
+          type: string
+          format: date-time
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+      required: [id, user_id, github_url]
+
+    Plan:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          enum: [Free, Pro, Enterprise]
+        display_name:
+          type: string
+        description:
+          type: string
+          nullable: true
+        price_monthly:
+          type: integer
+          description: Price in cents
+        price_annual:
+          type: integer
+          description: Price in cents
+          nullable: true
+        features:
+          type: object
+        limits:
+          type: object
+        stripe_price_id_monthly:
+          type: string
+          nullable: true
+        stripe_price_id_annual:
+          type: string
+          nullable: true
+        is_active:
+          type: boolean
+          default: true
+        sort_order:
+          type: integer
+          default: 0
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+      required: [id, name, display_name, price_monthly]
+
+    Subscription:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        user_id:
+          type: string
+          format: uuid
+        plan_id:
+          type: string
+          format: uuid
+        stripe_subscription_id:
+          type: string
+          nullable: true
+        stripe_customer_id:
+          type: string
+          nullable: true
+        status:
+          type: string
+          enum: [active, past_due, canceled, unpaid, incomplete, trialing]
+          default: active
+        current_period_start:
+          type: string
+          format: date-time
+          nullable: true
+        current_period_end:
+          type: string
+          format: date-time
+          nullable: true
+        trial_start:
+          type: string
+          format: date-time
+          nullable: true
+        trial_end:
+          type: string
+          format: date-time
+          nullable: true
+        cancel_at_period_end:
+          type: boolean
+          default: false
+        canceled_at:
+          type: string
+          format: date-time
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+      required: [id, user_id, plan_id]
+
+    Invoice:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        subscription_id:
+          type: string
+          format: uuid
+        stripe_invoice_id:
+          type: string
+          nullable: true
+        amount_due:
+          type: integer
+          description: Amount in cents
+        amount_paid:
+          type: integer
+          description: Amount in cents
+          default: 0
+        amount_remaining:
+          type: integer
+          description: Amount in cents
+          default: 0
+        status:
+          type: string
+          enum: [draft, open, paid, void, uncollectible]
+          default: draft
+        invoice_date:
+          type: string
+          format: date
+        due_date:
+          type: string
+          format: date
+          nullable: true
+        pdf_url:
+          type: string
+          format: uri
+          nullable: true
+        hosted_invoice_url:
+          type: string
+          format: uri
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+      required: [id, subscription_id, amount_due, invoice_date]
+
+    Job:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        type:
+          type: string
+          enum: [deep_dive, branding, socratic, voice_synthesis, kpi_analysis]
+        user_id:
+          type: string
+          format: uuid
+          nullable: true
+        week_id:
+          type: string
+          format: uuid
+          nullable: true
+        payload:
+          type: object
+        status:
+          type: string
+          enum: [pending, running, completed, failed, cancelled]
+          default: pending
+        priority:
+          type: integer
+          default: 0
+        max_retries:
+          type: integer
+          default: 3
+        retry_count:
+          type: integer
+          default: 0
+        error_message:
+          type: string
+          nullable: true
+        scheduled_at:
+          type: string
+          format: date-time
+        started_at:
+          type: string
+          format: date-time
+          nullable: true
+        completed_at:
+          type: string
+          format: date-time
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+      required: [id, type, payload]
+
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+        message:
+          type: string
+        code:
+          type: string
+        details:
+          type: object
+      required: [error, message]
+
+    PaginatedResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items: {}
+        pagination:
+          type: object
+          properties:
+            page:
+              type: integer
+            per_page:
+              type: integer
+            total:
+              type: integer
+            total_pages:
+              type: integer
+          required: [page, per_page, total, total_pages]
+      required: [data, pagination]
+
+paths:
+  # Authentication & User Management
+  /auth/signup:
+    post:
+      tags: [Authentication]
+      summary: Create a new user account
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+                  minLength: 8
+                name:
+                  type: string
+              required: [email, password, name]
+      responses:
+        '201':
+          description: User created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user:
+                    $ref: '#/components/schemas/User'
+                  access_token:
+                    type: string
+                  refresh_token:
+                    type: string
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: Email already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /auth/login:
+    post:
+      tags: [Authentication]
+      summary: Authenticate user
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+              required: [email, password]
+      responses:
+        '200':
+          description: Authentication successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user:
+                    $ref: '#/components/schemas/User'
+                  access_token:
+                    type: string
+                  refresh_token:
+                    type: string
+        '401':
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /auth/me:
+    get:
+      tags: [Authentication]
+      summary: Get current user profile
+      responses:
+        '200':
+          description: User profile
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /auth/refresh:
+    post:
+      tags: [Authentication]
+      summary: Refresh access token
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                refresh_token:
+                  type: string
+              required: [refresh_token]
+      responses:
+        '200':
+          description: Token refreshed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  access_token:
+                    type: string
+                  refresh_token:
+                    type: string
+
+  # Weekly/CLO Flow
+  /weeks:
+    get:
+      tags: [Weeks]
+      summary: Get user's weeks
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [pending, in_progress, complete, archived]
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: per_page
+          in: query
+          schema:
+            type: integer
+            default: 20
+            maximum: 100
+      responses:
+        '200':
+          description: List of weeks
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/PaginatedResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Week'
+
+    post:
+      tags: [Weeks]
+      summary: Create a new week
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                start_date:
+                  type: string
+                  format: date
+                focus_area:
+                  type: string
+                estimated_hours:
+                  type: integer
+              required: [start_date]
+      responses:
+        '201':
+          description: Week created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Week'
+
+  /weeks/{id}:
+    get:
+      tags: [Weeks]
+      summary: Get week details
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Week details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  week:
+                    $ref: '#/components/schemas/Week'
+                  clo_notes:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/CLONote'
+                  engineer_notes:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/EngineerNote'
+                  brand_packages:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/BrandPackage'
+                  socratic_sessions:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/SocraticSession'
+
+    patch:
+      tags: [Weeks]
+      summary: Update week
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  type: string
+                  enum: [pending, in_progress, complete, archived]
+                actual_hours:
+                  type: integer
+                completion_percentage:
+                  type: integer
+      responses:
+        '200':
+          description: Week updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Week'
+
+  # Note-Taking
+  /weeks/{week_id}/clo_notes:
+    post:
+      tags: [Notes]
+      summary: Create CLO note
+      parameters:
+        - name: week_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                module_title:
+                  type: string
+                learning_objectives:
+                  type: array
+                  items:
+                    type: string
+                key_concepts:
+                  type: array
+                  items:
+                    type: string
+                estimated_duration:
+                  type: integer
+                prerequisites:
+                  type: array
+                  items:
+                    type: string
+                resources:
+                  type: array
+                  items:
+                    type: object
+                assessment_criteria:
+                  type: array
+                  items:
+                    type: string
+                content:
+                  type: object
+              required: [module_title, content]
+      responses:
+        '201':
+          description: CLO note created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CLONote'
+
+  /weeks/{week_id}/engineer_notes:
+    post:
+      tags: [Notes]
+      summary: Create engineer note
+      parameters:
+        - name: week_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                repository_url:
+                  type: string
+                  format: uri
+                analysis_summary:
+                  type: string
+                code_quality_score:
+                  type: integer
+                  minimum: 0
+                  maximum: 100
+                recommendations:
+                  type: array
+                  items:
+                    type: object
+                technical_debt_items:
+                  type: array
+                  items:
+                    type: object
+                best_practices_followed:
+                  type: array
+                  items:
+                    type: string
+                areas_for_improvement:
+                  type: array
+                  items:
+                    type: string
+                content:
+                  type: object
+              required: [content]
+      responses:
+        '201':
+          description: Engineer note created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EngineerNote'
+
+  /weeks/{week_id}/notes:
+    get:
+      tags: [Notes]
+      summary: Get all notes for a week
+      parameters:
+        - name: week_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Week notes
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  clo_notes:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/CLONote'
+                  engineer_notes:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/EngineerNote'
+
+  # Socratic Dialogues
+  /socratic/sessions:
+    post:
+      tags: [Socratic]
+      summary: Start a new Socratic session
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                week_id:
+                  type: string
+                  format: uuid
+                topic:
+                  type: string
+                voice_enabled:
+                  type: boolean
+                  default: false
+      responses:
+        '201':
+          description: Session created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SocraticSession'
+
+  /socratic/sessions/{session_id}/messages:
+    post:
+      tags: [Socratic]
+      summary: Send message in Socratic session
+      parameters:
+        - name: session_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: voice
+          in: header
+          schema:
+            type: boolean
+            default: false
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                content:
+                  type: string
+                metadata:
+                  type: object
+              required: [content]
+      responses:
+        '200':
+          description: Message sent and response received
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user_message:
+                    $ref: '#/components/schemas/Message'
+                  assistant_response:
+                    $ref: '#/components/schemas/Message'
+        '429':
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /socratic/sessions/{session_id}:
+    get:
+      tags: [Socratic]
+      summary: Get session details
+      parameters:
+        - name: session_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Session details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  session:
+                    $ref: '#/components/schemas/SocraticSession'
+                  messages:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Message'
+
+    patch:
+      tags: [Socratic]
+      summary: End Socratic session
+      parameters:
+        - name: session_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                insights_generated:
+                  type: array
+                  items:
+                    type: string
+      responses:
+        '200':
+          description: Session ended
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SocraticSession'
+
+  # Deep-Dive Review
+  /reviews:
+    post:
+      tags: [Reviews]
+      summary: Request code review
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                github_url:
+                  type: string
+                  format: uri
+                depth:
+                  type: string
+                  enum: [standard, comprehensive, security_focused]
+                  default: standard
+                week_id:
+                  type: string
+                  format: uuid
+              required: [github_url]
+      responses:
+        '201':
+          description: Review queued
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Review'
+        '402':
+          description: Payment required (Pro feature)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    get:
+      tags: [Reviews]
+      summary: Get user's reviews
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [queued, analyzing, completed, failed]
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: per_page
+          in: query
+          schema:
+            type: integer
+            default: 20
+      responses:
+        '200':
+          description: List of reviews
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/PaginatedResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Review'
+
+  /reviews/{id}:
+    get:
+      tags: [Reviews]
+      summary: Get review details
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Review details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Review'
+
+  # Branding
+  /branding:
+    post:
+      tags: [Branding]
+      summary: Generate brand package
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                week_id:
+                  type: string
+                  format: uuid
+                mode:
+                  type: string
+                  default: standard
+                business_context:
+                  type: string
+                current_metrics:
+                  type: object
+              required: [week_id]
+      responses:
+        '201':
+          description: Brand package generated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BrandPackage'
+        '402':
+          description: Payment required (Pro feature)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /branding/{id}:
+    get:
+      tags: [Branding]
+      summary: Get brand package
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Brand package details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BrandPackage'
+
+  # Dashboard & KPIs
+  /dashboard:
+    get:
+      tags: [Dashboard]
+      summary: Get dashboard data
+      parameters:
+        - name: weeks
+          in: query
+          schema:
+            type: integer
+            default: 4
+            description: Number of recent weeks to include
+      responses:
+        '200':
+          description: Dashboard data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  recent_weeks:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Week'
+                  kpi_summary:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/KPIMetric'
+                  completion_stats:
+                    type: object
+                    properties:
+                      total_weeks:
+                        type: integer
+                      completed_weeks:
+                        type: integer
+                      average_completion_time:
+                        type: number
+                      current_streak:
+                        type: integer
+                  recent_activity:
+                    type: array
+                    items:
+                      type: object
+
+  /kpis:
+    get:
+      tags: [KPIs]
+      summary: Get KPI metrics
+      parameters:
+        - name: week_id
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: metric_name
+          in: query
+          schema:
+            type: string
+        - name: from_date
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: to_date
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: per_page
+          in: query
+          schema:
+            type: integer
+            default: 50
+      responses:
+        '200':
+          description: KPI metrics
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/PaginatedResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/KPIMetric'
+
+    post:
+      tags: [KPIs]
+      summary: Record KPI metric
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                week_id:
+                  type: string
+                  format: uuid
+                metric_name:
+                  type: string
+                metric_category:
+                  type: string
+                current_value:
+                  type: number
+                target_value:
+                  type: number
+                unit:
+                  type: string
+              required: [metric_name, current_value]
+      responses:
+        '201':
+          description: KPI metric recorded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KPIMetric'
+
+  # Billing & Subscriptions
+  /plans:
+    get:
+      tags: [Billing]
+      summary: Get available plans
+      security: []
+      responses:
+        '200':
+          description: List of plans
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Plan'
+
+  /subscriptions:
+    post:
+      tags: [Billing]
+      summary: Create subscription
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                plan_id:
+                  type: string
+                  format: uuid
+                payment_method_id:
+                  type: string
+                  description: Stripe payment method ID
+                coupon:
+                  type: string
+                  description: Coupon code
+              required: [plan_id, payment_method_id]
+      responses:
+        '201':
+          description: Subscription created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  subscription:
+                    $ref: '#/components/schemas/Subscription'
+                  client_secret:
+                    type: string
+                    description: For 3D Secure authentication
+        '402':
+          description: Payment failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    get:
+      tags: [Billing]
+      summary: Get user's subscriptions
+      responses:
+        '200':
+          description: User subscriptions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Subscription'
+
+  /subscriptions/{id}:
+    get:
+      tags: [Billing]
+      summary: Get subscription details
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Subscription details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Subscription'
+
+    patch:
+      tags: [Billing]
+      summary: Update subscription
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                plan_id:
+                  type: string
+                  format: uuid
+                payment_method_id:
+                  type: string
+                cancel_at_period_end:
+                  type: boolean
+      responses:
+        '200':
+          description: Subscription updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Subscription'
+
+    delete:
+      tags: [Billing]
+      summary: Cancel subscription
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Subscription canceled
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Subscription'
+
+  /invoices:
+    get:
+      tags: [Billing]
+      summary: Get user's invoices
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [draft, open, paid, void, uncollectible]
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: per_page
+          in: query
+          schema:
+            type: integer
+            default: 20
+      responses:
+        '200':
+          description: User invoices
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/PaginatedResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Invoice'
+
+  /invoices/{id}:
+    get:
+      tags: [Billing]
+      summary: Get invoice details
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Invoice details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Invoice'
+
+  # Background Jobs & Webhooks
+  /jobs/deep_dive:
+    post:
+      tags: [Jobs]
+      summary: Enqueue deep-dive review job
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                github_url:
+                  type: string
+                  format: uri
+                depth:
+                  type: string
+                  enum: [standard, comprehensive, security_focused]
+                week_id:
+                  type: string
+                  format: uuid
+              required: [github_url]
+      responses:
+        '201':
+          description: Job queued
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Job'
+
+  /webhooks/stripe:
+    post:
+      tags: [Webhooks]
+      summary: Handle Stripe webhooks
+      security: []
+      parameters:
+        - name: stripe-signature
+          in: header
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Webhook processed
+        '400':
+          description: Invalid webhook
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /webhooks/review_complete:
+    post:
+      tags: [Webhooks]
+      summary: Handle review completion webhook
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                review_id:
+                  type: string
+                  format: uuid
+                status:
+                  type: string
+                  enum: [completed, failed]
+                result:
+                  type: object
+              required: [review_id, status]
+      responses:
+        '200':
+          description: Webhook processed
+        '400':
+          description: Invalid webhook
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+tags:
+  - name: Authentication
+    description: User authentication and authorization
+  - name: Weeks
+    description: Weekly learning sessions management
+  - name: Notes
+    description: CLO and Engineer notes
+  - name: Socratic
+    description: Socratic dialogue sessions
+  - name: Reviews
+    description: Code review management
+  - name: Branding
+    description: Brand strategy packages
+  - name: Dashboard
+    description: Dashboard and analytics
+  - name: KPIs
+    description: Key Performance Indicators
+  - name: Billing
+    description: Subscription and billing management
+  - name: Jobs
+    description: Background job management
+  - name: Webhooks
+    description: External webhook handlers

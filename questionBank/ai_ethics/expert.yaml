@@ -1,0 +1,29 @@
+- id: aieth-E1
+  type: mcq
+  prompt: "Counterfactual fairness requires that a model’s prediction be INVARIANT when:"
+  choices: ["All features change", "Only protected attribute changes, others fixed", "Noise is added to inputs", "Dataset size doubles"]
+  answer: "Only protected attribute changes, others fixed"
+
+- id: aieth-E2
+  type: mcq
+  prompt: "The **SHERPA** framework in EU H2020 focuses on:"
+  choices: ["Safe reinforcement learning", "Guidelines for responsible AI & robotics", "Quantum-secure cryptography", "Zero-trust cloud"]
+  answer: "Guidelines for responsible AI & robotics"
+
+- id: aieth-E3
+  type: mcq
+  prompt: "Which differential-privacy parameter combination offers the STRONGEST privacy guarantee?"
+  choices: ["ε = 8, δ = 1e-3", "ε = 1, δ = 1e-5", "ε = 4, δ = 1e-2", "ε = 2, δ = 1e-4"]
+  answer: "ε = 1, δ = 1e-5"
+
+- id: aieth-E4
+  type: mcq
+  prompt: "An ‘ALGORITHMIC IMPACT ASSESSMENT’ (AIA) is closest in structure to:"
+  choices: ["Pen-test report", "Environmental impact assessment", "Data-protection impact assessment (DPIA)", "SOC-2 audit"]
+  answer: "Data-protection impact assessment (DPIA)"
+
+- id: aieth-E5
+  type: mcq
+  prompt: "**Equalised Odds** can be simultaneously satisfied with **Predictive Parity** only when:"
+  choices: ["Base rates across groups are equal", "Model accuracy is 100 %", "Groups are balanced by sample size", "Calibration curve slope = 1"]
+  answer: "Base rates across groups are equal"

@@ -1,0 +1,17 @@
+# Game Dev - Beginner Question Bank
+# This file will be populated with structured questions for the Socratic agent
+# Format: YAML with categories and difficulty levels
+
+questions:
+  - category: "game_fundamentals"
+    difficulty: "beginner"
+    questions: []
+    # Will be populated with actual questions
+  - category: "programming_basics"
+    difficulty: "beginner"
+    questions: []
+    # Will be populated with actual questions
+  - category: "game_design_principles"
+    difficulty: "beginner"
+    questions: []
+    # Will be populated with actual questions

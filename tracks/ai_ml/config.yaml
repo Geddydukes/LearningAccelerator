@@ -1,0 +1,32 @@
+label: AI/ML Engineering
+description: Comprehensive AI and Machine Learning track for aspiring ML engineers
+levels:
+  - beginner
+  - intermediate
+  - expert
+competencies:
+  beginner:
+    - Basic Python programming
+    - Fundamental ML concepts
+    - Data preprocessing
+    - Simple model training
+  intermediate:
+    - Advanced ML algorithms
+    - Deep learning basics
+    - Model deployment
+    - MLOps fundamentals
+  expert:
+    - Advanced deep learning
+    - ML system design
+    - Research and innovation
+    - Production ML pipelines
+monthGoals:
+  "1":
+    focus: Python and ML basics
+    target: Complete first ML project
+  "2":
+    focus: Data preprocessing
+    target: Build data pipeline
+  "3":
+    focus: Model training
+    target: Deploy first model

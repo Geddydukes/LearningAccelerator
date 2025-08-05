@@ -1,0 +1,32 @@
+label: Data Engineering
+description: Data infrastructure and pipeline development for scalable data systems
+levels:
+  - beginner
+  - intermediate
+  - expert
+competencies:
+  beginner:
+    - SQL fundamentals
+    - Data modeling basics
+    - ETL concepts
+    - Basic data pipelines
+  intermediate:
+    - Advanced SQL and NoSQL
+    - Data pipeline orchestration
+    - Cloud data platforms
+    - Data quality and testing
+  expert:
+    - Distributed data systems
+    - Real-time processing
+    - Data architecture design
+    - Performance optimization
+monthGoals:
+  "1":
+    focus: SQL and data modeling
+    target: Design database schema
+  "2":
+    focus: ETL pipelines
+    target: Build data pipeline
+  "3":
+    focus: Cloud platforms
+    target: Deploy to cloud

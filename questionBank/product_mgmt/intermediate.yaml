@@ -1,0 +1,17 @@
+# Product Mgmt - Intermediate Question Bank
+# This file will be populated with structured questions for the Socratic agent
+# Format: YAML with categories and difficulty levels
+
+questions:
+  - category: "advanced_product_concepts"
+    difficulty: "intermediate"
+    questions: []
+    # Will be populated with actual questions
+  - category: "data_analytics"
+    difficulty: "intermediate"
+    questions: []
+    # Will be populated with actual questions
+  - category: "stakeholder_management"
+    difficulty: "intermediate"
+    questions: []
+    # Will be populated with actual questions

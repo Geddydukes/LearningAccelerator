@@ -1,0 +1,29 @@
+- id: cyber-I1
+  type: mcq
+  prompt: "A CVSS score of 9.8 denotes:"
+  choices: ["Low severity", "Medium severity", "High severity", "Critical severity"]
+  answer: "Critical severity"
+
+- id: cyber-I2
+  type: mcq
+  prompt: "Kerberos primarily mitigates which risk compared to NTLM?"
+  choices: ["Plain-text credential storage", "Replay attacks via ticket expiration", "SQL injection", "Client-side XSS"]
+  answer: "Replay attacks via ticket expiration"
+
+- id: cyber-I3
+  type: mcq
+  prompt: "Blue Team DEFENCE action after detecting C2 traffic is FIRST to:"
+  choices: ["Reimage the host immediately", "Block malicious domain/IP at firewall", "Notify law enforcement", "Disable user VPN access"]
+  answer: "Block malicious domain/IP at firewall"
+
+- id: cyber-I4
+  type: mcq
+  prompt: "An HMAC provides:"
+  choices: ["Symmetric encryption", "Integrity + authenticity", "Asymmetric key exchange", "Perfect forward secrecy"]
+  answer: "Integrity + authenticity"
+
+- id: cyber-I5
+  type: mcq
+  prompt: "Burp Suite’s ‘Repeater’ tool is MOST useful for:"
+  choices: ["Automated vulnerability scanning", "Manual manipulation & replaying of HTTP requests", "DNS enumeration", "Password cracking"]
+  answer: "Manual manipulation & replaying of HTTP requests"

@@ -1,0 +1,29 @@
+- id: block-E1
+  type: mcq
+  prompt: "**EIP-1559** introduces a BASE FEE mechanism that is burned; this aims to:"
+  choices: ["Provide miner bribes", "Create block size elasticity & fee predictability", "Enforce PoW difficulty", "Enable instant finality"]
+  answer: "Create block size elasticity & fee predictability"
+
+- id: block-E2
+  type: mcq
+  prompt: "The CHECK-EFFECTS-INTERACTIONS pattern prevents re-entrancy by:"
+  choices: ["Disabling fallback functions", "Updating state BEFORE external calls", "Using inline assembly", "Setting gas stipend to zero"]
+  answer: "Updating state BEFORE external calls"
+
+- id: block-E3
+  type: mcq
+  prompt: "zk-SNARK proof sizes remain CONSTANT regardless of:"
+  choices: ["Computation size proven", "Trusted setup size", "Verifier time", "Hash function choice"]
+  answer: "Computation size proven"
+
+- id: block-E4
+  type: mcq
+  prompt: "**Chainlink OCR** reduces oracle gas cost by:"
+  choices: ["Using anchor blocks", "Off-chain aggregator rounds with single on-chain submission", "Storing data on-IPFS", "Zero-knowledge compression"]
+  answer: "Off-chain aggregator rounds with single on-chain submission"
+
+- id: block-E5
+  type: mcq
+  prompt: "A ‘Replay Attack’ on Ethereum L2 rollups occurs when:"
+  choices: ["Transaction is re-submitted to L1 with same signature", "Merkle root mismatches", "Sequencer reorders transactions", "Bridge fee too high"]
+  answer: "Transaction is re-submitted to L1 with same signature"

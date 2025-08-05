@@ -1,0 +1,29 @@
+- id: deng-B1
+  type: mcq
+  prompt: "Which command previews the FIRST N rows of a DataFrame?"
+  choices: ["df.tail()", "df.sample()", "df.head()", "df.describe()"]
+  answer: "df.head()"
+
+- id: deng-B2
+  type: mcq
+  prompt: "A star schema contains:"
+  choices: ["Only fact tables", "Facts surrounded by dimension tables", "Only dimension tables", "No primary keys"]
+  answer: "Facts surrounded by dimension tables"
+
+- id: deng-B3
+  type: mcq
+  prompt: "Airflow stores metadata primarily in:"
+  choices: ["SQLite or Postgres DB", "Redis", "Flat files", "MongoDB"]
+  answer: "SQLite or Postgres DB"
+
+- id: deng-B4
+  type: mcq
+  prompt: "Kafka guarantees message ordering within:"
+  choices: ["Entire cluster", "A topic", "A partition", "A broker"]
+  answer: "A partition"
+  
+- id: deng-B5
+  type: mcq
+  prompt: "`dbt run` will:"
+  choices: ["Drop schemas", "Seed reference data", "Create/refresh models", "Run unit tests"]
+  answer: "Create/refresh models"

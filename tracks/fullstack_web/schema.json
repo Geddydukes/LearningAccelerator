@@ -1,0 +1,30 @@
+{
+  "type": "object",
+  "properties": {
+    "label": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "levels": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "competencies": {
+      "type": "object"
+    },
+    "monthGoals": {
+      "type": "object"
+    }
+  },
+  "required": [
+    "label",
+    "description",
+    "levels",
+    "competencies",
+    "monthGoals"
+  ]
+}

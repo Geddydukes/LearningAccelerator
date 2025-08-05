@@ -1,0 +1,32 @@
+label: Blockchain Development
+description: Blockchain technology, smart contracts, and decentralized applications
+levels:
+  - beginner
+  - intermediate
+  - expert
+competencies:
+  beginner:
+    - Blockchain fundamentals
+    - Cryptography basics
+    - Smart contracts intro
+    - Web3 basics
+  intermediate:
+    - DeFi protocols
+    - Consensus mechanisms
+    - Smart contract security
+    - DApp development
+  expert:
+    - Protocol design
+    - Scalability solutions
+    - Cross-chain development
+    - Blockchain architecture
+monthGoals:
+  "1":
+    focus: Blockchain fundamentals
+    target: Deploy smart contract
+  "2":
+    focus: DeFi protocols
+    target: Build DeFi application
+  "3":
+    focus: DApp development
+    target: Create full DApp

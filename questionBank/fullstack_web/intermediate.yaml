@@ -1,0 +1,29 @@
+- id: fsw-I1
+  type: mcq
+  prompt: "Which React hook avoids stale closure issues when passing callbacks to child components?"
+  choices: ["useState", "useMemo", "useCallback", "useRef"]
+  answer: "useCallback"
+
+- id: fsw-I2
+  type: mcq
+  prompt: "HTTP/2 multiplexing mainly solves:"
+  choices: ["TLS handshake time", "Head-of-line blocking", "Packet loss", "DNS round-trip"]
+  answer: "Head-of-line blocking"
+
+- id: fsw-I3
+  type: mcq
+  prompt: "‘Content Security Policy: default-src 'self'’ will:"
+  choices: ["Block inline scripts by default", "Allow any image source", "Disable cookies", "Force HTTPS"]
+  answer: "Block inline scripts by default"
+
+- id: fsw-I4
+  type: mcq
+  prompt: "Prisma ‘Migration Drift’ occurs when:"
+  choices: ["Schema version mismatches the database after manual edits", "Docker image tag is latest", "ORM generates too many SELECTs", "Index size exceeds 1 GB"]
+  answer: "Schema version mismatches the database after manual edits"
+
+- id: fsw-I5
+  type: mcq
+  prompt: "Next.js ISR (Incremental Static Regeneration) updates pages via:"
+  choices: ["getServerSideProps", "revalidate option in getStaticProps", "Client-side fetch only", "Serverless cron"]
+  answer: "revalidate option in getStaticProps"

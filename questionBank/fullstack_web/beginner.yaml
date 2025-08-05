@@ -1,0 +1,29 @@
+- id: fsw-B1
+  type: mcq
+  prompt: "Which HTTP method is IDEMPOTENT and commonly used for updates?"
+  choices: ["POST", "PUT", "PATCH", "OPTIONS"]
+  answer: "PUT"
+
+- id: fsw-B2
+  type: mcq
+  prompt: "In React, the `key` prop is required when rendering:"
+  choices: ["Fragment", "Styled components", "Lists of elements", "Custom hooks"]
+  answer: "Lists of elements"
+
+- id: fsw-B3
+  type: mcq
+  prompt: "Tailwind class `flex flex-col` sets:"
+  choices: ["Row layout", "Column layout", "Grid gap", "Inline flex"]
+  answer: "Column layout"
+
+- id: fsw-B4
+  type: mcq
+  prompt: "A 404 status code means:"
+  choices: ["Bad Request", "Unauthorized", "Not Found", "Gateway Timeout"]
+  answer: "Not Found"
+  
+- id: fsw-B5
+  type: mcq
+  prompt: "Which testing library is RECOMMENDED for React component tests?"
+  choices: ["Mocha", "Enzyme", "React Testing Library", "Tape"]
+  answer: "React Testing Library"

@@ -1,0 +1,29 @@
+- id: aiml-I1
+  type: mcq
+  prompt: "Which scheduler REDUCES learning rate linearly for the warm-up period, then decays proportionally to 1/√t?"
+  choices: ["Cosine Annealing", "Inverse Square Root", "Step Decay", "Polynomial"]
+  answer: "Inverse Square Root"
+
+- id: aiml-I2
+  type: mcq
+  prompt: "AUC-ROC is **NOT** an appropriate metric when:"
+  choices: ["Classes are highly imbalanced", "Operating point is fixed", "Threshold is variable", "Model outputs probabilities"]
+  answer: "Operating point is fixed"
+
+- id: aiml-I3
+  type: mcq
+  prompt: "DataLoader `num_workers` > 0 in PyTorch primarily speeds up:"
+  choices: ["GPU tensor operations", "CPU data pre-fetch & augmentation", "Back-propagation", "Checkpoint saving"]
+  answer: "CPU data pre-fetch & augmentation"
+
+- id: aiml-I4
+  type: mcq
+  prompt: "Which PEFT method injects trainable **rank-decomposition matrices** into existing weights?"
+  choices: ["BitFit", "LoRA", "Adapter-Tuning", "Prompt-Tuning"]
+  answer: "LoRA"
+
+- id: aiml-I5
+  type: mcq
+  prompt: "A confusion matrix with many FALSE NEGATIVES suggests you should:"
+  choices: ["Raise decision threshold", "Lower decision threshold", "Use label smoothing", "Decrease batch size"]
+  answer: "Lower decision threshold"

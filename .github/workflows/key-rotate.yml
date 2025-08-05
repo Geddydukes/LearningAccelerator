@@ -1,0 +1,44 @@
+name: Quarterly Key Rotation
+on:
+  schedule:
+    - cron: '0 2 1 */3 *' # First day of quarter at 2 AM
+  workflow_dispatch: # Manual trigger
+
+jobs:
+  rotate-keys:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Mask sensitive values
+        run: |
+          echo "::add-mask::${{ secrets.OPENAI_API_KEY }}"
+          echo "::add-mask::${{ secrets.ELEVENLABS_API_KEY }}"
+          echo "::add-mask::${{ secrets.SUPABASE_SERVICE_ROLE }}"
+
+      - name: Notify rotation start
+        run: |
+          curl -X POST ${{ secrets.SLACK_WEBHOOK }} \
+            -H 'Content-type: application/json' \
+            --data '{"text":"🔄 Starting quarterly API key rotation"}'
+
+      - name: Update Fly secrets
+        run: |
+          echo "${{ secrets.FLY_API_TOKEN }}" | flyctl auth token
+          flyctl secrets set OPENAI_API_KEY="${{ secrets.OPENAI_API_KEY_NEW }}" -a learning-accelerator-api
+          flyctl secrets set ELEVENLABS_API_KEY="${{ secrets.ELEVENLABS_API_KEY_NEW }}" -a learning-accelerator-api
+
+      - name: Update Vercel environment
+        run: |
+          npx vercel env add OPENAI_API_KEY production --token="${{ secrets.VERCEL_TOKEN }}"
+          npx vercel env add ELEVENLABS_API_KEY production --token="${{ secrets.VERCEL_TOKEN }}"
+
+      - name: Verify deployment health
+        run: |
+          sleep 30
+          curl -f https://api.learningaccelerator.com/healthz
+          curl -f https://app.learningaccelerator.com/api/health
+
+      - name: Notify completion
+        run: |
+          curl -X POST ${{ secrets.SLACK_WEBHOOK }} \
+            -H 'Content-type: application/json' \
+            --data '{"text":"✅ API key rotation completed successfully"}'

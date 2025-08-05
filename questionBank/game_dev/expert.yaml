@@ -1,0 +1,29 @@
+- id: gdev-E1
+  type: mcq
+  prompt: "Unity’s **Burst Compiler** provides performance gains by:"
+  choices: ["GPU tessellation", "High-level C# to LLVM IR native code", "Ray-tracing hardware", "Multithreaded physics"]
+  answer: "High-level C# to LLVM IR native code"
+
+- id: gdev-E2
+  type: mcq
+  prompt: "Using **Fixed Timestep 0.01** with `Time.maximumDeltaTime = 0.05` prevents:"
+  choices: ["Camera jitter", "Physics spiral of death during frame drops", "Audio desync", "Shader compilation stalls"]
+  answer: "Physics spiral of death during frame drops"
+
+- id: gdev-E3
+  type: mcq
+  prompt: "Addressables asset system helps MAINLY with:"
+  choices: ["Realtime GI", "Memory management & dynamic content downloading", "NavMesh baking", "Profiler sampling"]
+  answer: "Memory management & dynamic content downloading"
+
+- id: gdev-E4
+  type: mcq
+  prompt: "Entity-Component-System (ECS) outperforms OOP in Unity because:"
+  choices: ["Entities store references", "Data-oriented design enables cache-friendly linear memory access", "Monobehaviour is synchronous", "C# delegates are slower"]
+  answer: "Data-oriented design enables cache-friendly linear memory access"
+
+- id: gdev-E5
+  type: mcq
+  prompt: "RenderDoc captures a frame by:"
+  choices: ["Replacing GPU drivers", "Intercepting graphics API calls to record command buffers", "Instrumenting C# code", "Chunk-based logging"]
+  answer: "Intercepting graphics API calls to record command buffers"

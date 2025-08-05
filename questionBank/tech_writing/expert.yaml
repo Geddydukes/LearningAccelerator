@@ -1,0 +1,29 @@
+- id: techw-E1
+  type: mcq
+  prompt: "**DITA specialization** allows documentation teams to:"
+  choices: ["Create proprietary binary formats", "Extend base topic types with domain-specific semantics", "Remove all metadata", "Auto-translate using AI"]
+  answer: "Extend base topic types with domain-specific semantics"
+
+- id: techw-E2
+  type: mcq
+  prompt: "API docs ‘Try-It’ consoles present CSRF risk; mitigation is:"
+  choices: ["Use GET only", "Require user token & CORS preflight", "Inline scripts disabled", "JSON-P fallback"]
+  answer: "Require user token & CORS preflight"
+
+- id: techw-E3
+  type: mcq
+  prompt: "The **‘inverted pyramid’** writing style places:"
+  choices: ["Background first", "Key information first, details later", "Definitions last", "Procedures in footnotes"]
+  answer: "Key information first, details later"
+
+- id: techw-E4
+  type: mcq
+  prompt: "With Git-based doc deployment, **‘docs versioning’** is BEST handled by:"
+  choices: ["Branch per minor release with symlinked shared content", "Single branch only", "Forking repo per version", "SVN tags"]
+  answer: "Branch per minor release with symlinked shared content"
+
+- id: techw-E5
+  type: mcq
+  prompt: "**AsciiDoc** differs from Markdown by:"
+  choices: ["Supporting semantic structural components (e.g., admonitions, tables of contents) out-of-the-box", "Requiring HTML tags", "Being binary", "Lacking table syntax"]
+  answer: "Supporting semantic structural components (e.g., admonitions, tables of contents) out-of-the-box"

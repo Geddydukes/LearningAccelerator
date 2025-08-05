@@ -1,0 +1,29 @@
+- id: cyber-E1
+  type: mcq
+  prompt: "Elliptic-Curve Diffie-Hellman key exchange SECURITY level of curve P-256 is roughly:"
+  choices: ["64-bit", "128-bit", "192-bit", "256-bit"]
+  answer: "128-bit"
+
+- id: cyber-E2
+  type: mcq
+  prompt: "The MITRE ATT&CK technique **T1098.004 (Add Domain Account)** belongs to which tactic?"
+  choices: ["Initial Access", "Privilege Escalation", "Persistence", "Credential Access"]
+  answer: "Persistence"
+
+- id: cyber-E3
+  type: mcq
+  prompt: "A JWT with 'none' algorithm vulnerability allows:"
+  choices: ["SQL Injection", "Signature bypass by omitting signing", "XSS in headers", "Timing attacks"]
+  answer: "Signature bypass by omitting signing"
+
+- id: cyber-E4
+  type: mcq
+  prompt: "**DNSSEC** adds security by:"
+  choices: ["Encrypting DNS queries", "Digitally signing DNS records for authenticity", "Rate-limiting queries", "Blocking wildcard subdomains"]
+  answer: "Digitally signing DNS records for authenticity"
+
+- id: cyber-E5
+  type: mcq
+  prompt: "A pass-the-hash attack leverages:"
+  choices: ["NTLM hash reuse without cracking", "SQL credential stuffing", "Kerberos ticket reuse across realms", "Padding oracle on AES-CBC"]
+  answer: "NTLM hash reuse without cracking"

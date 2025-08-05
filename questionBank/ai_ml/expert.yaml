@@ -1,0 +1,29 @@
+- id: aiml-E1
+  type: mcq
+  prompt: "The Transformer **scaling law** by Kaplan et al. suggests cross-entropy loss scales approximately as:"
+  choices: ["N⁻¹ᐟ²", "N⁻¹ᐟ³", "log N", "Nᐟlog N"]
+  answer: "N⁻¹ᐟ²"
+
+- id: aiml-E2
+  type: mcq
+  prompt: "Sparsity in **Mixture-of-Experts** models primarily reduces:"
+  choices: ["Model FLOPs per token", "Parameter count", "Parameter update latency", "Gradient noise scale"]
+  answer: "Model FLOPs per token"
+
+- id: aiml-E3
+  type: mcq
+  prompt: "The term **‘zero-shot chain-of-thought’** relies on which prompting element?"
+  choices: ["Few-shot examples", "CoT trigger phrase like 'Let's think step by step'", "Temperature = 0", "RLHF preference optimisation"]
+  answer: "CoT trigger phrase like 'Let's think step by step'"
+
+- id: aiml-E4
+  type: mcq
+  prompt: "In distributed data-parallel training, **gradient norm clipping AFTER all-reduce** vs BEFORE affects:"
+  choices: ["GPU memory only", "Exact equivalence to single-GPU training", "Optimizer state size", "Batch-norm statistics"]
+  answer: "Exact equivalence to single-GPU training"
+
+- id: aiml-E5
+  type: mcq
+  prompt: "A **Mahalanobis distance**-based OOD detector assumes:"
+  choices: ["Feature covariance matrix is identity", "Class-conditional features follow multivariate Gaussian", "Ensemble of logits available", "Kernel density estimation in latent space"]
+  answer: "Class-conditional features follow multivariate Gaussian"

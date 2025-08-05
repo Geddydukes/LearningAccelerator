@@ -1,0 +1,29 @@
+- id: devops-B1
+  type: mcq
+  prompt: "Which CLI command INITIALISES a new Terraform working directory?"
+  choices: ["terraform apply", "terraform init", "terraform plan", "terraform destroy"]
+  answer: "terraform init"
+
+- id: devops-B2
+  type: mcq
+  prompt: "In Kubernetes, which object ensures a set number of pod replicas are running?"
+  choices: ["Service", "Deployment", "ConfigMap", "Ingress"]
+  answer: "Deployment"
+
+- id: devops-B3
+  type: mcq
+  prompt: "Docker’s UNION filesystem is MOST closely associated with:"
+  choices: ["Network overlay", "Layered image storage", "CPU throttling", "Container logs"]
+  answer: "Layered image storage"
+
+- id: devops-B4
+  type: mcq
+  prompt: "A CI pipeline that triggers on every PR is primarily intended to:"
+  choices: ["Speed up deployments", "Provide early feedback & prevent broken main", "Rotate secrets", "Optimise Docker layers"]
+  answer: "Provide early feedback & prevent broken main"
+
+- id: devops-B5
+  type: mcq
+  prompt: "Prometheus scrapes targets over which protocol by default?"
+  choices: ["gRPC", "HTTP", "MQTT", "WebSocket"]
+  answer: "HTTP"

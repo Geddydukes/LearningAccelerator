@@ -1,0 +1,29 @@
+- id: devops-I1
+  type: mcq
+  prompt: "Helm values.yaml overrides chart defaults using which precedence rule?"
+  choices: ["Chart > CLI --set > values.yaml", "values.yaml > CLI --set > chart", "CLI --set > values.yaml > chart", "Chart > values.yaml > CLI --set"]
+  answer: "CLI --set > values.yaml > chart"
+
+- id: devops-I2
+  type: mcq
+  prompt: "In Prometheus, a High cardinality label explosion impacts:"
+  choices: ["Scrape interval", "TSDB storage and query performance", "Alertmanager routing", "Service discovery"]
+  answer: "TSDB storage and query performance"
+
+- id: devops-I3
+  type: mcq
+  prompt: "Blue-Green deployment enables INSTANT rollback because:"
+  choices: ["DNS TTL default is 0", "Old version remains running and traffic can switch back immediately", "Kubernetes deletes old pods slowly", "It rebuilds the image each time"]
+  answer: "Old version remains running and traffic can switch back immediately"
+
+- id: devops-I4
+  type: mcq
+  prompt: "Which IaC guardrail tool enforces POLICIES such as 'S3 buckets must be private'?"
+  choices: ["tflint", "terrascan", "terraform graph", "packer"]
+  answer: "terrascan"
+
+- id: devops-I5
+  type: mcq
+  prompt: "GitHub Actions `matrix` strategy primarily helps to:"
+  choices: ["Parallelise jobs across multiple versions/environments", "Encrypt secrets", "Cache Docker layers", "Generate coverage badges"]
+  answer: "Parallelise jobs across multiple versions/environments"

@@ -1,0 +1,32 @@
+label: Technical Writing
+description: Technical documentation, content strategy, and user experience writing
+levels:
+  - beginner
+  - intermediate
+  - expert
+competencies:
+  beginner:
+    - Writing fundamentals
+    - Technical communication
+    - Documentation basics
+    - User guides
+  intermediate:
+    - Content strategy
+    - Information architecture
+    - User experience writing
+    - API documentation
+  expert:
+    - Content management
+    - Knowledge management
+    - Writing leadership
+    - Content automation
+monthGoals:
+  "1":
+    focus: Writing fundamentals
+    target: Create user guide
+  "2":
+    focus: Technical documentation
+    target: Write API docs
+  "3":
+    focus: Content strategy
+    target: Develop content plan

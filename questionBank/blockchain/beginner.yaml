@@ -1,0 +1,29 @@
+- id: block-B1
+  type: mcq
+  prompt: "Ethereum’s native cryptocurrency is called:"
+  choices: ["Bitcoin", "Ether (ETH)", "Litecoin", "Dogecoin"]
+  answer: "Ether (ETH)"
+
+- id: block-B2
+  type: mcq
+  prompt: "Gas fees are paid to:"
+  choices: ["Smart contracts", "Miners/validators", "Exchanges", "Wallet providers"]
+  answer: "Miners/validators"
+
+- id: block-B3
+  type: mcq
+  prompt: "A smart contract is MOST like:"
+  choices: ["A static web page", "An executable program stored on-chain", "A PDF document", "A private key"]
+  answer: "An executable program stored on-chain"
+
+- id: block-B4
+  type: mcq
+  prompt: "Solidity is a:"
+  choices: ["Database query language", "Smart-contract programming language", "CSS framework", "Consensus algorithm"]
+  answer: "Smart-contract programming language"
+
+- id: block-B5
+  type: mcq
+  prompt: "A Testnet is used PRIMARILY for:"
+  choices: ["High-frequency trading", "Experimenting without real monetary value", "Staking rewards", "Running full nodes cheaper"]
+  answer: "Experimenting without real monetary value"

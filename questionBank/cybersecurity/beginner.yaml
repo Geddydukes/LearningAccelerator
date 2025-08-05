@@ -1,0 +1,29 @@
+- id: cyber-B1
+  type: mcq
+  prompt: "The principle of LEAST PRIVILEGE means:"
+  choices: ["Users should share passwords", "Granting only minimum required access", "Keeping firewall ports open", "Storing credentials in code"]
+  answer: "Granting only minimum required access"
+
+- id: cyber-B2
+  type: mcq
+  prompt: "Which tool is commonly used for NETWORK scanning?"
+  choices: ["Burp Suite", "Nmap", "Metasploit", "Wireshark"]
+  answer: "Nmap"
+
+- id: cyber-B3
+  type: mcq
+  prompt: "A SQL injection vulnerability belongs to which OWASP Top 10 category?"
+  choices: ["Broken Access Control", "Security Misconfiguration", "Injection", "Insecure Design"]
+  answer: "Injection"
+
+- id: cyber-B4
+  type: mcq
+  prompt: "Two-factor authentication MOSTLY mitigates the risk of:"
+  choices: ["Phishing", "Password guessing/credential stuffing", "XSS", "DoS attacks"]
+  answer: "Password guessing/credential stuffing"
+
+- id: cyber-B5
+  type: mcq
+  prompt: "TLS primarily provides:"
+  choices: ["Obfuscation", "Data compression", "Transport-layer encryption", "Code signing"]
+  answer: "Transport-layer encryption"

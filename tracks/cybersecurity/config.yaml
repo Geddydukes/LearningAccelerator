@@ -1,0 +1,32 @@
+label: Cybersecurity
+description: Security analysis, threat detection, and defensive programming
+levels:
+  - beginner
+  - intermediate
+  - expert
+competencies:
+  beginner:
+    - Security fundamentals
+    - Network basics
+    - Threat modeling
+    - Basic penetration testing
+  intermediate:
+    - Advanced penetration testing
+    - Incident response
+    - Security tools and frameworks
+    - Vulnerability assessment
+  expert:
+    - Reverse engineering
+    - Malware analysis
+    - Security architecture
+    - Threat intelligence
+monthGoals:
+  "1":
+    focus: Security fundamentals
+    target: Complete security assessment
+  "2":
+    focus: Penetration testing
+    target: Conduct security audit
+  "3":
+    focus: Incident response
+    target: Handle security incident

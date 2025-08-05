@@ -1,0 +1,29 @@
+- id: devops-E1
+  type: mcq
+  prompt: "A Kubernetes **PodDisruptionBudget** with `maxUnavailable: 0` guarantees:"
+  choices: ["Zero downtime during voluntary disruptions", "HorizontalPodAutoscaler disabled", "Local PV affinity", "CRI-O runtime only"]
+  answer: "Zero downtime during voluntary disruptions"
+
+- id: devops-E2
+  type: mcq
+  prompt: "In Terraform, `for_each` on a resource with provider-managed IDs can cause:"
+  choices: ["Address drift after import", "Creation-order race", "Resource tainting", "Count index mismatch"]
+  answer: "Address drift after import"
+
+- id: devops-E3
+  type: mcq
+  prompt: "SLO burn-rate alert ‘4 × 1 hr’ corresponds to:"
+  choices: ["Four alerts per hour", "Error budget consumed 4× faster than objective, measured over 1 hr window", "CPU load 400 %", "Latency p99 > 4 s"]
+  answer: "Error budget consumed 4× faster than objective, measured over 1 hr window"
+
+- id: devops-E4
+  type: mcq
+  prompt: "Istio **mTLS STRICT mode** enforces:"
+  choices: ["Outbound traffic only", "All service-to-service traffic encrypted & authenticated", "Circuit breaking", "Client-side load balancing only"]
+  answer: "All service-to-service traffic encrypted & authenticated"
+
+- id: devops-E5
+  type: mcq
+  prompt: "Argo Rollouts **Canary analysis** can automatically promote if:"
+  choices: ["PodDisruptionBudget is met", "Metric thresholds stay within configured success criteria", "ReplicaSet hash changes", "StorageClass is 'canary'"]
+  answer: "Metric thresholds stay within configured success criteria"

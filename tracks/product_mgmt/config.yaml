@@ -1,0 +1,32 @@
+label: Product Management
+description: Product strategy, user research, and stakeholder management
+levels:
+  - beginner
+  - intermediate
+  - expert
+competencies:
+  beginner:
+    - Product fundamentals
+    - User research basics
+    - Market analysis
+    - Requirements gathering
+  intermediate:
+    - Data-driven decision making
+    - Stakeholder management
+    - Product strategy
+    - Agile methodologies
+  expert:
+    - Product vision and strategy
+    - Team leadership
+    - Go-to-market strategy
+    - Product portfolio management
+monthGoals:
+  "1":
+    focus: Product fundamentals
+    target: Define product vision
+  "2":
+    focus: User research
+    target: Conduct user interviews
+  "3":
+    focus: Product strategy
+    target: Create product roadmap

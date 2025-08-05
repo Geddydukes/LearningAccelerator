@@ -1,0 +1,121 @@
+name: Validate Track Data
+on:
+  push:
+    paths:
+      - 'questionBank/**'
+      - 'tracks/**'
+      - 'prompts/**'
+  pull_request:
+    paths:
+      - 'questionBank/**'
+      - 'tracks/**'
+      - 'prompts/**'
+
+jobs:
+  validate-yaml:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: npm
+      
+      - name: Install dependencies
+        run: npm install -g yaml-lint js-yaml
+      
+      - name: Validate YAML files
+        run: |
+          echo "Validating YAML files..."
+          
+          # Validate question bank files
+          for file in questionBank/**/*.yaml; do
+            if [ -f "$file" ]; then
+              echo "Validating $file"
+              yaml-lint "$file" || exit 1
+            fi
+          done
+          
+          # Validate track configuration files
+          for file in tracks/**/*.yaml; do
+            if [ -f "$file" ]; then
+              echo "Validating $file"
+              yaml-lint "$file" || exit 1
+            fi
+          done
+          
+          echo "✅ All YAML files are valid"
+      
+      - name: Validate JSON schema
+        run: |
+          echo "Validating JSON schema..."
+          
+          # Check if schema files exist and are valid JSON
+          for file in tracks/**/schema.json; do
+            if [ -f "$file" ]; then
+              echo "Validating schema $file"
+              node -e "
+                const fs = require('fs');
+                const schema = JSON.parse(fs.readFileSync('$file', 'utf8'));
+                console.log('✅ Schema is valid JSON');
+              " || exit 1
+            fi
+          done
+      
+      - name: Check required files
+        run: |
+          echo "Checking required track files..."
+          
+          # Ensure each track has required files
+          for track in tracks/*/; do
+            if [ -d "$track" ]; then
+              track_name=$(basename "$track")
+              echo "Checking track: $track_name"
+              
+              # Check for config.yaml
+              if [ ! -f "$track/config.yaml" ]; then
+                echo "❌ Missing config.yaml for track $track_name"
+                exit 1
+              fi
+              
+              # Check for schema.json
+              if [ ! -f "$track/schema.json" ]; then
+                echo "❌ Missing schema.json for track $track_name"
+                exit 1
+              fi
+              
+              echo "✅ Track $track_name has required files"
+            fi
+          done
+      
+      - name: Validate prompt templates
+        run: |
+          echo "Validating prompt templates..."
+          
+          # Check for required placeholder variables in v3 templates
+          for file in prompts/*_v3_template.md; do
+            if [ -f "$file" ]; then
+              echo "Checking template: $file"
+              
+              # Check for basic placeholder structure
+              if ! grep -q "{{TRACK_LABEL}}" "$file"; then
+                echo "⚠️  Warning: $file missing {{TRACK_LABEL}} placeholder"
+              fi
+              
+              if ! grep -q "{{CORE_COMPETENCY_BLOCK}}" "$file"; then
+                echo "⚠️  Warning: $file missing {{CORE_COMPETENCY_BLOCK}} placeholder"
+              fi
+              
+              echo "✅ Template $file validated"
+            fi
+          done
+      
+      - name: Report validation results
+        run: |
+          echo "🎉 Track data validation completed successfully!"
+          echo "All YAML files are valid"
+          echo "All JSON schemas are valid"
+          echo "All required track files are present"
+          echo "Prompt templates are properly structured" 

@@ -1,0 +1,29 @@
+- id: deng-E1
+  type: mcq
+  prompt: "In Apache Spark, the Cost-Based Optimiser uses **statistics** to:"
+  choices: ["Generate lineage DAG", "Choose join order & broadcast hints", "Compress parquet files", "Allocate executor memory"]
+  answer: "Choose join order & broadcast hints"
+
+- id: deng-E2
+  type: mcq
+  prompt: "**Change Data Capture** with Debezium relies on which database feature to stream row-level changes?"
+  choices: ["WAL / binlog", "Materialised views", "Prepared statements", "Foreign keys"]
+  answer: "WAL / binlog"
+
+- id: deng-E3
+  type: mcq
+  prompt: "LakeFS enables atomic data versioning by leveraging:"
+  choices: ["S3 object versioning and branching semantics", "Delta Lake transaction log", "Hive metastore snapshots", "Zookeeper locks"]
+  answer: "S3 object versioning and branching semantics"
+
+- id: deng-E4
+  type: mcq
+  prompt: "`spark.sql.adaptive.enabled = true` allows:"
+  choices: ["Dynamic partition selection", "Adaptive query execution based on runtime stats", "Column pruning in DataFrames", "GPU acceleration for MLlib"]
+  answer: "Adaptive query execution based on runtime stats"
+
+- id: deng-E5
+  type: mcq
+  prompt: "A Kafka consumer OFFSET commit interval TOO LARGE risks:"
+  choices: ["High duplicate processing on crash", "Segment deletion", "ZooKeeper overload", "Increased ISR lag"]
+  answer: "High duplicate processing on crash"

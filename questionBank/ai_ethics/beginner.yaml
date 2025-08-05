@@ -1,0 +1,29 @@
+- id: aieth-B1
+  type: mcq
+  prompt: "The EU’s upcoming AI Act classifies applications by:"
+  choices: ["Compute cost", "Risk level", "Model size", "Data residency"]
+  answer: "Risk level"
+
+- id: aieth-B2
+  type: mcq
+  prompt: "Bias in an ML model is typically defined as:"
+  choices: ["Variance of predictions", "Systematic error in predictions toward a group", "Random noise in labels", "Low GPU utilisation"]
+  answer: "Systematic error in predictions toward a group"
+
+- id: aieth-B3
+  type: mcq
+  prompt: "‘Right to explanation’ refers to:"
+  choices: ["GDPR requirement to justify automated decisions", "Patent law", "Creative Commons license", "Cloud provider SLA"]
+  answer: "GDPR requirement to justify automated decisions"
+
+- id: aieth-B4
+  type: mcq
+  prompt: "An example of a FAIRNESS metric is:"
+  choices: ["BLEU", "Equal Opportunity Difference", "Perplexity", "RMSE"]
+  answer: "Equal Opportunity Difference"
+
+- id: aieth-B5
+  type: mcq
+  prompt: "Model CARDs are used to:"
+  choices: ["Visualise gradients", "Document model limitations and intended use", "Optimise hyper-parameters", "Compress weights"]
+  answer: "Document model limitations and intended use"

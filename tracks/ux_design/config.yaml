@@ -1,0 +1,32 @@
+label: UX Design
+description: User experience design, research, and interface development
+levels:
+  - beginner
+  - intermediate
+  - expert
+competencies:
+  beginner:
+    - Design fundamentals
+    - User research basics
+    - Wireframing and prototyping
+    - Usability principles
+  intermediate:
+    - Advanced user research
+    - Design systems
+    - Interaction design
+    - Usability testing
+  expert:
+    - Design strategy
+    - Research methodology
+    - Design leadership
+    - Innovation and trends
+monthGoals:
+  "1":
+    focus: Design fundamentals
+    target: Create wireframes
+  "2":
+    focus: User research
+    target: Conduct usability study
+  "3":
+    focus: Design systems
+    target: Build design system

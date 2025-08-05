@@ -1,0 +1,17 @@
+# Data Eng - Intermediate Question Bank
+# This file will be populated with structured questions for the Socratic agent
+# Format: YAML with categories and difficulty levels
+
+questions:
+  - category: "advanced_data_concepts"
+    difficulty: "intermediate"
+    questions: []
+    # Will be populated with actual questions
+  - category: "data_pipelines"
+    difficulty: "intermediate"
+    questions: []
+    # Will be populated with actual questions
+  - category: "cloud_platforms"
+    difficulty: "intermediate"
+    questions: []
+    # Will be populated with actual questions

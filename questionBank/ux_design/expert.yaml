@@ -1,0 +1,29 @@
+- id: ux-E1
+  type: mcq
+  prompt: "P3 color space offers ~% wider gamut than sRGB:"
+  choices: ["5 %", "25 %", "50 %", "75 %"]
+  answer: "25 %"
+
+- id: ux-E2
+  type: mcq
+  prompt: "**Progressive disclosure** is used to:"
+  choices: ["Hide important info completely", "Show advanced options only when needed", "Increase cognitive load", "Improve SEO"]
+  answer: "Show advanced options only when needed"
+
+- id: ux-E3
+  type: mcq
+  prompt: "The **GOMS** model evaluates:"
+  choices: ["Visual hierarchy", "Expert user task time predictions", "Color blindness", "ARIA roles"]
+  answer: "Expert user task time predictions"
+
+- id: ux-E4
+  type: mcq
+  prompt: "When designing for accessibility, WCAG SUCCESS CRITERION 1.4.10 (Reflow) applies at viewport widths DOWN to:"
+  choices: ["1024 px", "768 px", "320 px", "160 px"]
+  answer: "320 px"
+
+- id: ux-E5
+  type: mcq
+  prompt: "Design tokens facilitate:"
+  choices: ["Hard-coding hex values", "Global, platform-agnostic representation of visual decisions", "Random color generation", "JSX-only styling"]
+  answer: "Global, platform-agnostic representation of visual decisions"

@@ -1,0 +1,74 @@
+{
+  "ripple": {
+    "hero-sequence": {
+      "initial-ripple": {
+        "duration": "1200ms",
+        "easing": "cubic-bezier(0.4, 0, 0.2, 1)",
+        "scale": "0 to 3",
+        "opacity": "0.8 to 0"
+      },
+      "camera-dolly": {
+        "duration": "1200ms",
+        "easing": "cubic-bezier(0.25, 0.46, 0.45, 0.94)",
+        "transform": "translateZ(0) to translateZ(-4)",
+        "delay": "200ms"
+      },
+      "ui-fade-in": {
+        "duration": "800ms",
+        "easing": "cubic-bezier(0.25, 0.46, 0.45, 0.94)",
+        "opacity": "0 to 1",
+        "delay": "600ms"
+      }
+    },
+    "micro-interactions": {
+      "button-hover": {
+        "duration": "150ms",
+        "easing": "cubic-bezier(0.25, 0.46, 0.45, 0.94)",
+        "scale": "1 to 1.02",
+        "shadow": "depth-1 to depth-2"
+      },
+      "card-hover": {
+        "duration": "300ms",
+        "easing": "cubic-bezier(0.25, 0.46, 0.45, 0.94)",
+        "transform": "translateY(0) to translateY(-2px)",
+        "shadow": "depth-1 to depth-3"
+      },
+      "ripple-click": {
+        "duration": "600ms",
+        "easing": "cubic-bezier(0.4, 0, 0.2, 1)",
+        "scale": "0 to 1",
+        "opacity": "0.6 to 0"
+      }
+    }
+  },
+  "page-transitions": {
+    "fade": {
+      "duration": "300ms",
+      "easing": "cubic-bezier(0.25, 0.46, 0.45, 0.94)"
+    },
+    "slide": {
+      "duration": "400ms",
+      "easing": "cubic-bezier(0.25, 0.46, 0.45, 0.94)"
+    },
+    "scale": {
+      "duration": "350ms",
+      "easing": "cubic-bezier(0.34, 1.56, 0.64, 1)"
+    }
+  },
+  "reduced-motion": {
+    "hero-fallback": {
+      "static-blur-pulse": {
+        "duration": "2000ms",
+        "easing": "ease-in-out",
+        "blur": "0px to 4px to 0px",
+        "opacity": "1 to 0.8 to 1"
+      }
+    },
+    "micro-fallbacks": {
+      "instant-feedback": {
+        "duration": "0ms",
+        "opacity-change": "immediate"
+      }
+    }
+  }
+}

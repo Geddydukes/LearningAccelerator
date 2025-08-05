@@ -1,0 +1,29 @@
+- id: gdev-I1
+  type: mcq
+  prompt: "Unity’s TIME.DELTATIME should be used when:"
+  choices: ["Applying frame-rate independent movement", "Measuring GPU time", "Saving player prefs", "Loading scenes additively"]
+  answer: "Applying frame-rate independent movement"
+
+- id: gdev-I2
+  type: mcq
+  prompt: "ScriptableObjects are BEST used to:"
+  choices: ["Store level geometry", "Hold serialisable data shared across scenes", "Render HDRP camera effects", "Manage thread pools"]
+  answer: "Hold serialisable data shared across scenes"
+
+- id: gdev-I3
+  type: mcq
+  prompt: "Baking lightmaps primarily improves:"
+  choices: ["Runtime physics", "Rendering performance by pre-computing lighting", "Audio mixing", "AI pathfinding"]
+  answer: "Rendering performance by pre-computing lighting"
+
+- id: gdev-I4
+  type: mcq
+  prompt: "In Unity’s Input System, an ‘Action Map’ allows:"
+  choices: ["Grouping related input actions for easy re-binding", "Spawning prefab instances", "Serialising meshes", "GPU instancing"]
+  answer: "Grouping related input actions for easy re-binding"
+
+- id: gdev-I5
+  type: mcq
+  prompt: "FixedUpdate() is called:"
+  choices: ["Every rendered frame", "At a constant physics timestep", "Only in edit mode", "After OnGUI"]
+  answer: "At a constant physics timestep"

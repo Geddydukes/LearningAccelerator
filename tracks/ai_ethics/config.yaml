@@ -1,0 +1,32 @@
+label: AI Ethics
+description: Ethical AI development, bias detection, and responsible AI practices
+levels:
+  - beginner
+  - intermediate
+  - expert
+competencies:
+  beginner:
+    - AI ethics fundamentals
+    - Bias detection basics
+    - Privacy principles
+    - Fairness concepts
+  intermediate:
+    - Algorithmic fairness
+    - Privacy protection
+    - Transparency methods
+    - Ethical frameworks
+  expert:
+    - Policy development
+    - Ethical AI governance
+    - Research methodology
+    - Industry standards
+monthGoals:
+  "1":
+    focus: AI ethics fundamentals
+    target: Audit AI system
+  "2":
+    focus: Bias detection
+    target: Implement fairness measures
+  "3":
+    focus: Privacy protection
+    target: Design privacy-first system

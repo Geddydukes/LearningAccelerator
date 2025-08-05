@@ -1,0 +1,29 @@
+- id: block-I1
+  type: mcq
+  prompt: "Solidity `require()` will:"
+  choices: ["Revert state & refund remaining gas", "Silently skip execution", "Consume all gas then revert", "Disable function visibility"]
+  answer: "Revert state & refund remaining gas"
+
+- id: block-I2
+  type: mcq
+  prompt: "EIP-1967 relates to:"
+  choices: ["Meta-transactions", "Proxy contract storage slots", "Gas token refunds", "ZK-SNARKs"]
+  answer: "Proxy contract storage slots"
+
+- id: block-I3
+  type: mcq
+  prompt: "The **Keccak-256** hash length in hexadecimal characters is:"
+  choices: ["32", "40", "64", "128"]
+  answer: "64"
+
+- id: block-I4
+  type: mcq
+  prompt: "In Hardhat, the `forking` option in `hardhat.config.js` allows:"
+  choices: ["Time-travel debugging", "Connecting to Infura", "Testing against live chain state locally", "Generating TypeChain typings"]
+  answer: "Testing against live chain state locally"
+
+- id: block-I5
+  type: mcq
+  prompt: "Slither vulnerability ‘re-entrancy’ is MOST effectively mitigated by:"
+  choices: ["Checks-Effects-Interactions pattern", "Increasing gas price", "Using `tx.origin`", "Fallback functions"]
+  answer: "Checks-Effects-Interactions pattern"

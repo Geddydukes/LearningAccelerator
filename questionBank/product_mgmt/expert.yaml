@@ -1,0 +1,29 @@
+- id: pmgt-E1
+  type: mcq
+  prompt: "Cohort Retention curve PLATEAUS around day 7 at 45 %. To move metric, PM should PRIORITISE:"
+  choices: ["Top-of-funnel ads", "Activation/onboarding improvements", "Lowering subscription price", "New payment gateways"]
+  answer: "Activation/onboarding improvements"
+
+- id: pmgt-E2
+  type: mcq
+  prompt: "Net Present Value (NPV) analysis requires selecting:"
+  choices: ["User persona", "Discount rate", "Scrum velocity", "Kano quadrant"]
+  answer: "Discount rate"
+
+- id: pmgt-E3
+  type: mcq
+  prompt: "A/B test MINIMUM sample size should be determined by:"
+  choices: ["Gut feeling", "Power analysis with effect size & alpha", "Number of variants", "Page views yesterday"]
+  answer: "Power analysis with effect size & alpha"
+
+- id: pmgt-E4
+  type: mcq
+  prompt: "If ARR is growing 50 % YoY but NPS drops from 60→20, PM should FIRST:"
+  choices: ["Ignore NPS", "Investigate churn reasons and quality issues", "Increase marketing spend", "Raise prices"]
+  answer: "Investigate churn reasons and quality issues"
+
+- id: pmgt-E5
+  type: mcq
+  prompt: "North-star metric for a two-sided marketplace is MOST likely:"
+  choices: ["Active users", "Take-rate × successful matches", "App downloads", "Survey responses"]
+  answer: "Take-rate × successful matches"

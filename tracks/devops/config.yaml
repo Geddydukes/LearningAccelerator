@@ -1,0 +1,32 @@
+label: DevOps Engineering
+description: Infrastructure automation and deployment pipeline development
+levels:
+  - beginner
+  - intermediate
+  - expert
+competencies:
+  beginner:
+    - Linux fundamentals
+    - Version control with Git
+    - Basic scripting
+    - CI/CD concepts
+  intermediate:
+    - Containerization with Docker
+    - Infrastructure as Code
+    - Cloud platforms
+    - Monitoring and logging
+  expert:
+    - Kubernetes orchestration
+    - Security and compliance
+    - Performance optimization
+    - Disaster recovery
+monthGoals:
+  "1":
+    focus: Linux and Git
+    target: Set up development environment
+  "2":
+    focus: Docker and containers
+    target: Containerize application
+  "3":
+    focus: CI/CD pipelines
+    target: Automate deployment

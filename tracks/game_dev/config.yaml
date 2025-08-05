@@ -1,0 +1,32 @@
+label: Game Development
+description: Game programming, design principles, and interactive media development
+levels:
+  - beginner
+  - intermediate
+  - expert
+competencies:
+  beginner:
+    - Game programming basics
+    - Game design principles
+    - Graphics fundamentals
+    - Physics simulation
+  intermediate:
+    - Game engines
+    - Multiplayer development
+    - Performance optimization
+    - Audio programming
+  expert:
+    - Game architecture
+    - Advanced graphics
+    - AI in games
+    - Platform optimization
+monthGoals:
+  "1":
+    focus: Game programming basics
+    target: Create simple game
+  "2":
+    focus: Game engines
+    target: Build 3D game
+  "3":
+    focus: Multiplayer development
+    target: Create multiplayer game

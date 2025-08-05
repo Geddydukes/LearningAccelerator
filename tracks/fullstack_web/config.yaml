@@ -1,0 +1,32 @@
+label: Fullstack Web Development
+description: Complete web development track covering frontend, backend, and deployment
+levels:
+  - beginner
+  - intermediate
+  - expert
+competencies:
+  beginner:
+    - HTML, CSS, JavaScript basics
+    - Responsive design principles
+    - Basic server-side programming
+    - Database fundamentals
+  intermediate:
+    - Modern JavaScript frameworks
+    - API design and development
+    - Database optimization
+    - Cloud deployment
+  expert:
+    - System architecture design
+    - Performance optimization
+    - Security best practices
+    - Scalable infrastructure
+monthGoals:
+  "1":
+    focus: Frontend fundamentals
+    target: Build responsive website
+  "2":
+    focus: Backend development
+    target: Create REST API
+  "3":
+    focus: Fullstack integration
+    target: Deploy complete application

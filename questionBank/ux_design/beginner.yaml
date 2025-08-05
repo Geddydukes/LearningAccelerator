@@ -1,0 +1,29 @@
+- id: ux-B1
+  type: mcq
+  prompt: "Which principle advocates placing related items close together?"
+  choices: ["Gestalt – Proximity", "Fitts’s Law", "Hick's Law", "Pareto Principle"]
+  answer: "Gestalt – Proximity"
+
+- id: ux-B2
+  type: mcq
+  prompt: "WCAG contrast ratio MINIMUM for body text (AA) is:"
+  choices: ["2.1:1", "3:1", "4.5:1", "7:1"]
+  answer: "4.5:1"
+
+- id: ux-B3
+  type: mcq
+  prompt: "A wireframe is:"
+  choices: ["High-fidelity pixel-perfect mock", "Low-fidelity skeletal layout", "Production CSS file", "Interactive prototype"]
+  answer: "Low-fidelity skeletal layout"
+
+- id: ux-B4
+  type: mcq
+  prompt: "Fitts’s Law relates to:"
+  choices: ["Perceived color brightness", "Speed–accuracy tradeoff for pointing tasks", "Cognitive load of forms", "Visual hierarchy levels"]
+  answer: "Speed–accuracy tradeoff for pointing tasks"
+
+- id: ux-B5
+  type: mcq
+  prompt: "In Figma, Auto-Layout primarily helps with:"
+  choices: ["Raster image cropping", "Responsive & consistent spacing", "Font hinting", "GIF export"]
+  answer: "Responsive & consistent spacing"

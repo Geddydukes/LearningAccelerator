@@ -1,0 +1,29 @@
+- id: aieth-I1
+  type: mcq
+  prompt: "Which fairness definition focuses on EQUAL false-positive rates across groups?"
+  choices: ["Demographic Parity", "Equal Opportunity", "Predictive Parity", "Equalised Odds"]
+  answer: "Equalised Odds"
+
+- id: aieth-I2
+  type: mcq
+  prompt: "The ‘Model Cards’ framework was introduced by:"
+  choices: ["Timnit Gebru & Margaret Mitchell", "Andrew Ng", "Yoshua Bengio", "Cynthia Rudin"]
+  answer: "Timnit Gebru & Margaret Mitchell"
+
+- id: aieth-I3
+  type: mcq
+  prompt: "Which technique BEST detects proxy variables that leak sensitive attributes?"
+  choices: ["SHAP feature attributions", "t-SNE visualisation", "Confusion matrix", "K-fold cross-validation"]
+  answer: "SHAP feature attributions"
+
+- id: aieth-I4
+  type: mcq
+  prompt: "In risk-based regulation, a ‘HIGH-RISK’ AI system generally requires:"
+  choices: ["Source-code open-sourcing", "Human-in-the-loop oversight & impact assessment", "Zero-cost public API", "100 % model accuracy"]
+  answer: "Human-in-the-loop oversight & impact assessment"
+
+- id: aieth-I5
+  type: mcq
+  prompt: "Differential privacy adds NOISE calibrated to:"
+  choices: ["Dataset size", "Sensitivity of the query function", "GPU memory", "Learning-rate schedule"]
+  answer: "Sensitivity of the query function"

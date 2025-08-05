@@ -1,0 +1,29 @@
+- id: techw-B1
+  type: mcq
+  prompt: "Markdown syntax for a top-level heading is:"
+  choices: ["###", "##", "#", "===="]
+  answer: "#"
+
+- id: techw-B2
+  type: mcq
+  prompt: "API reference docs SHOULD be generated from:"
+  choices: ["Random screenshots", "OpenAPI / Swagger spec", "Email threads", "Marketing brochures"]
+  answer: "OpenAPI / Swagger spec"
+
+- id: techw-B3
+  type: mcq
+  prompt: "The Flesch Reading Ease score measures:"
+  choices: ["SEO ranking", "Readability based on sentence & word length", "Grammar correctness", "Tone of voice consistency"]
+  answer: "Readability based on sentence & word length"
+
+- id: techw-B4
+  type: mcq
+  prompt: "In docs-as-code, content is stored in:"
+  choices: ["A CMS database", "Version control (Git) alongside source code", "Email attachments", "Google Docs only"]
+  answer: "Version control (Git) alongside source code"
+
+- id: techw-B5
+  type: mcq
+  prompt: "Vale is a tool for:"
+  choices: ["API load testing", "Static style checking of prose", "Database migrations", "Container orchestration"]
+  answer: "Static style checking of prose"

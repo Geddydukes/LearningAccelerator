@@ -1,0 +1,29 @@
+- id: pmgt-B1
+  type: mcq
+  prompt: "The MVP acronym stands for:"
+  choices: ["Most Valuable Product", "Minimal Viable Product", "Market-Value Proposition", "Metrics Validation Plan"]
+  answer: "Minimal Viable Product"
+
+- id: pmgt-B2
+  type: mcq
+  prompt: "Which prioritisation framework scores items on Reach, Impact, Confidence, Effort?"
+  choices: ["MoSCoW", "RICE", "Kano", "ICE"]
+  answer: "RICE"
+
+- id: pmgt-B3
+  type: mcq
+  prompt: "A product ROADMAP typically communicates:"
+  choices: ["Detailed task lists", "Strategic sequencing of themes/features", "Financial statements", "Release notes only"]
+  answer: "Strategic sequencing of themes/features"
+
+- id: pmgt-B4
+  type: mcq
+  prompt: "‘North Star Metric’ refers to:"
+  choices: ["KPI that best captures product’s core value", "Unit economics", "Financial burn rate", "User persona description"]
+  answer: "KPI that best captures product’s core value"
+
+- id: pmgt-B5
+  type: mcq
+  prompt: "During user interviews, the PM should PRIMARILY ask:"
+  choices: ["Leading yes/no questions", "Open-ended questions about problems", "Questions about solutions the PM designed", "Coding challenge questions"]
+  answer: "Open-ended questions about problems"

@@ -1,0 +1,29 @@
+- id: aiml-B1
+  type: mcq
+  prompt: "Which library is MOST commonly used for numerical array operations in Python?"
+  choices: ["Pandas", "NumPy", "Matplotlib", "Seaborn"]
+  answer: "NumPy"
+
+- id: aiml-B2
+  type: mcq
+  prompt: "The bias–variance trade-off illustrates the balance between:"
+  choices: ["Model size and GPU usage", "Underfitting and overfitting", "Batch size and learning rate", "Precision and recall"]
+  answer: "Underfitting and overfitting"
+
+- id: aiml-B3
+  type: mcq
+  prompt: "Which optimiser uses moving averages of BOTH gradients and squared gradients?"
+  choices: ["SGD", "RMSprop", "Adam", "Adagrad"]
+  answer: "Adam"
+
+- id: aiml-B4
+  type: mcq
+  prompt: "In NLP tokenisation, a *subword* unit helps mainly to:"
+  choices: ["Reduce GPU memory", "Handle out-of-vocabulary words", "Increase BLEU score artificially", "Compress word embeddings to INT8"]
+  answer: "Handle out-of-vocabulary words"
+  
+- id: aiml-B5
+  type: mcq
+  prompt: "Docker images are defined by which file?"
+  choices: ["Makefile", "requirements.txt", "Dockerfile", "compose.yaml"]
+  answer: "Dockerfile"

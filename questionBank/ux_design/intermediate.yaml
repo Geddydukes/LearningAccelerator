@@ -1,0 +1,29 @@
+- id: ux-I1
+  type: mcq
+  prompt: "Hick’s Law states that decision time increases:"
+  choices: ["Linearly with number of choices", "Logarithmically with number of choices", "When contrast decreases", "When font size is large"]
+  answer: "Logarithmically with number of choices"
+
+- id: ux-I2
+  type: mcq
+  prompt: "WCAG 2.1’s ‘2.5.3 Label in Name’ ensures:"
+  choices: ["Media alternatives", "Visual labels match accessible names", "Keyboard focus visibility", "Color contrast"]
+  answer: "Visual labels match accessible names"
+
+- id: ux-I3
+  type: mcq
+  prompt: "A SUS (System Usability Scale) score above ____ is generally considered ‘Good’."
+  choices: ["50", "68", "80", "90"]
+  answer: "68"
+
+- id: ux-I4
+  type: mcq
+  prompt: "In Figma, components with **variants** allow designers to:"
+  choices: ["Animate auto-layout", "Maintain multiple stateful versions (e.g., hover, disabled) in one asset", "Auto-generate CSS", "Export PDF"]
+  answer: "Maintain multiple stateful versions (e.g., hover, disabled) in one asset"
+
+- id: ux-I5
+  type: mcq
+  prompt: "Color blindness simulation tools help achieve which UX goal?"
+  choices: ["Performance optimisation", "Inclusive design ensuring information is not conveyed by color alone", "SEO ranking", "Legal compliance for GDPR"]
+  answer: "Inclusive design ensuring information is not conveyed by color alone"

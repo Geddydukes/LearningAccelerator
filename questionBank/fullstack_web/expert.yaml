@@ -1,0 +1,29 @@
+- id: fsw-E1
+  type: mcq
+  prompt: "CSR hydration bottlenecks can be alleviated MOST by:"
+  choices: ["Increasing bundle size", "Islands/partial hydration architecture", "Inlining more CSS", "Switching to hash routing"]
+  answer: "Islands/partial hydration architecture"
+
+- id: fsw-E2
+  type: mcq
+  prompt: "A 103 Early-Hints HTTP status enables:"
+  choices: ["Preloading critical resources before final response", "WebSocket upgrade", "HSTS preload list", "CORS preflight caching"]
+  answer: "Preloading critical resources before final response"
+
+- id: fsw-E3
+  type: mcq
+  prompt: "When using Prisma with Postgres, **‘SELECT … FOR UPDATE SKIP LOCKED’** is used to:"
+  choices: ["Avoid deadlocks in job queues", "Perform pagination", "Implement soft deletes", "Enforce check constraints"]
+  answer: "Avoid deadlocks in job queues"
+
+- id: fsw-E4
+  type: mcq
+  prompt: "GraphQL **APQ (Automatic Persisted Queries)** improves performance by:"
+  choices: ["Compressing JSON", "Reducing request size by sending hash instead of full query", "Batching resolvers", "Using HTTP/3"]
+  answer: "Reducing request size by sending hash instead of full query"
+
+- id: fsw-E5
+  type: mcq
+  prompt: "Web Vitals CLS > 0.1 often indicates:"
+  choices: ["Long main-thread task", "Cumulative layout shift; fix with element size placeholders", "Slow TLS handshake", "Large First Input Delay"]
+  answer: "Cumulative layout shift; fix with element size placeholders"
