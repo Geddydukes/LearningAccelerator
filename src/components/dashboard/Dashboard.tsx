@@ -13,6 +13,7 @@ import { DatabaseService } from '../../lib/database';
 import { AgentOrchestrator } from '../../lib/agents';
 import { AgentCard } from './AgentCard';
 import { WeeklyProgress } from './WeeklyProgress';
+import { CertificateCard } from './CertificateCard';
 import { AgentModal } from '../agents/AgentModal';
 import { Button } from '../ui/Button';
 import { Card } from '../ui/Card';
@@ -152,7 +153,7 @@ export const Dashboard: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900" data-testid="dashboard">
       <OfflineIndicator />
       <div className="max-w-7xl mx-auto px-6 py-8">
         <motion.div
@@ -239,6 +240,17 @@ export const Dashboard: React.FC = () => {
             </div>
           </motion.div>
         </div>
+
+        {/* Certificate Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+          className="mt-8"
+          data-testid="certificate-section"
+        >
+          <CertificateCard />
+        </motion.div>
 
         {/* Quick Actions */}
         <motion.div

@@ -135,4 +135,36 @@ Cron → `/functions/v1/career-match` → Remotive API → Gemini embeddings →
 ---
 
 **Last Updated**: 2025-01-19  
-**Next Review**: After implementing security audit and portfolio curator 
+**Next Review**: After implementing security audit and portfolio curator
+
+## 9. ✅ Certificate System
+
+**Employment-Ready Certificate Flow**: ✅ Complete
+User Dashboard → Certificate Generation → PDF Creation → QR Code → Verification API
+
+**Certificate Components**:
+- ✅ Database migration (`20250809_certificates.sql`)
+- ✅ Edge Function (`functions/certificate/generate/index.ts`)
+- ✅ Verification API (`src/pages/api/verify/[cert_id].ts`)
+- ✅ Dashboard UI (`components/dashboard/CertificateCard.tsx`)
+- ✅ Unit tests (`test/unit/certificate.test.ts`)
+- ✅ E2E tests (`e2e/certificateIssue.e2e.ts`)
+
+**Certificate Criteria** (Placeholder until gamification core):
+1. CLO competency ≥ 4 (placeholder: always true)
+2. Learning months ≥ 6 (placeholder: 6 months)
+3. Portfolio Lighthouse score ≥ 90 (placeholder: 95)
+4. Career match similarity ≥ 0.80 (placeholder: 0.85)
+
+**Verification Endpoint**: `/api/verify/{cert_id}`
+- Returns certificate data with digital signature
+- Includes verification hash for authenticity
+- Public access for certificate verification
+
+**PDF Features**:
+- Landscape A4 format with professional design
+- QR code linking to verification endpoint
+- Digital signature and verification hash
+- File size > 10KB for authenticity
+
+**Note**: Certificate system uses placeholder logic for employability criteria until gamification core (streaks table, profiles.xp) is implemented. 
