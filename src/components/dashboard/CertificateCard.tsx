@@ -3,7 +3,7 @@ import { Card } from '../ui/Card'
 import { Button } from '../ui/Button'
 import { Download, Share2, ExternalLink, CheckCircle } from 'lucide-react'
 import { useAuth } from '../../contexts/AuthContext'
-import { createClient } from '@supabase/supabase-js'
+import { supabase } from '../../lib/supabase'
 import toast from 'react-hot-toast'
 
 interface Certificate {
@@ -23,10 +23,7 @@ export const CertificateCard: React.FC<CertificateCardProps> = ({ className }) =
   const [loading, setLoading] = useState(false)
   const [generating, setGenerating] = useState(false)
 
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  )
+
 
   useEffect(() => {
     if (user) {
@@ -35,16 +32,33 @@ export const CertificateCard: React.FC<CertificateCardProps> = ({ className }) =
   }, [user])
 
   const fetchCertificate = async () => {
+    if (!user?.id) {
+      console.warn('No user ID available for fetching certificate')
+      return
+    }
+
     try {
       const { data, error } = await supabase
         .from('certificates')
         .select('*')
-        .eq('user_id', user?.id)
+        .eq('user_id', user.id)
         .single()
 
-      if (error && error.code !== 'PGRST116') {
-        console.error('Error fetching certificate:', error)
-        return
+      if (error) {
+        // If the table doesn't exist, just return without error
+        if (error.code === '42P01') {
+          console.warn('Certificates table not found')
+          return
+        }
+        // Handle 406 error specifically
+        if (error.code === '406') {
+          console.warn('Authentication issue with certificates table')
+          return
+        }
+        if (error.code !== 'PGRST116') {
+          console.error('Error fetching certificate:', error)
+          return
+        }
       }
 
       if (data) {

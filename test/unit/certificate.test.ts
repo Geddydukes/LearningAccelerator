@@ -1,6 +1,9 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { createClient } from '@supabase/supabase-js'
 
+// Mock fetch
+global.fetch = vi.fn()
+
 // Mock Supabase client
 vi.mock('@supabase/supabase-js', () => ({
   createClient: vi.fn(() => ({
@@ -35,6 +38,9 @@ describe('Certificate System', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     mockSupabase = createClient('test-url', 'test-key')
+    
+    // Reset fetch mock
+    ;(global.fetch as any).mockReset()
   })
 
   describe('Certificate Generation', () => {
@@ -85,6 +91,16 @@ describe('Certificate System', () => {
         error: null
       })
 
+      // Mock fetch response
+      ;(global.fetch as any).mockResolvedValue({
+        ok: true,
+        json: () => Promise.resolve({
+          success: true,
+          cert_id: 'test-cert-id',
+          url: 'https://example.com/certificate.pdf'
+        })
+      })
+
       // Test certificate generation
       const response = await fetch('/api/functions/v1/certificate/generate', {
         method: 'POST',
@@ -112,6 +128,15 @@ describe('Certificate System', () => {
       mockSupabase.rpc.mockResolvedValue({
         data: false,
         error: null
+      })
+
+      // Mock fetch response for failure
+      ;(global.fetch as any).mockResolvedValue({
+        ok: false,
+        status: 403,
+        json: () => Promise.resolve({
+          error: 'User does not meet employment criteria'
+        })
       })
 
       const response = await fetch('/api/functions/v1/certificate/generate', {
@@ -152,6 +177,16 @@ describe('Certificate System', () => {
         error: null
       })
 
+      // Mock fetch response for duplicate
+      ;(global.fetch as any).mockResolvedValue({
+        ok: false,
+        status: 409,
+        json: () => Promise.resolve({
+          error: 'Certificate already exists',
+          cert_id: 'existing-cert-id'
+        })
+      })
+
       const response = await fetch('/api/functions/v1/certificate/generate', {
         method: 'POST',
         headers: {
@@ -188,6 +223,27 @@ describe('Certificate System', () => {
         error: null
       })
 
+      // Mock fetch response for verification
+      ;(global.fetch as any).mockResolvedValue({
+        ok: true,
+        status: 200,
+        json: () => Promise.resolve({
+          success: true,
+          certificate: {
+            cert_id: certId,
+            track: 'Software Engineering',
+            issued_at: '2024-01-01T00:00:00Z',
+            user_name: 'Test User',
+            url: 'https://example.com/certificate.pdf'
+          },
+          verification: {
+            signature: 'test-signature',
+            verification_hash: 'test-hash',
+            verified_at: '2024-01-01T00:00:00Z'
+          }
+        })
+      })
+
       const response = await fetch(`/api/verify/${certId}`)
       const result = await response.json()
 
@@ -205,6 +261,15 @@ describe('Certificate System', () => {
       mockSupabase.from().select().eq().single.mockResolvedValue({
         data: null,
         error: { code: 'PGRST116' }
+      })
+
+      // Mock fetch response for not found
+      ;(global.fetch as any).mockResolvedValue({
+        ok: false,
+        status: 404,
+        json: () => Promise.resolve({
+          error: 'Certificate not found'
+        })
       })
 
       const response = await fetch(`/api/verify/${certId}`)

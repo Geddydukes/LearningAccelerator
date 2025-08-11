@@ -14,6 +14,8 @@ import { AgentOrchestrator } from '../../lib/agents';
 import { AgentCard } from './AgentCard';
 import { WeeklyProgress } from './WeeklyProgress';
 import { CertificateCard } from './CertificateCard';
+import { StreakFlame } from './StreakFlame';
+import { XPBadge } from './XPBadge';
 import { AgentModal } from '../agents/AgentModal';
 import { Button } from '../ui/Button';
 import { Card } from '../ui/Card';
@@ -240,6 +242,19 @@ export const Dashboard: React.FC = () => {
             </div>
           </motion.div>
         </div>
+
+        {/* Gamification Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="mt-8"
+        >
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <StreakFlame />
+            <XPBadge />
+          </div>
+        </motion.div>
 
         {/* Certificate Section */}
         <motion.div

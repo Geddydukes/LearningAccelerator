@@ -54,8 +54,11 @@ describe('ErrorBoundary Component', () => {
   });
 
   it('shows error details in development mode', () => {
-    const originalEnv = process.env.NODE_ENV;
-    process.env.NODE_ENV = 'development';
+    // Mock import.meta.env.DEV to be true for this test
+    const originalDev = import.meta.env.DEV;
+    Object.defineProperty(import.meta, 'env', {
+      value: { ...import.meta.env, DEV: true }
+    });
 
     render(
       <ErrorBoundary>
@@ -65,6 +68,9 @@ describe('ErrorBoundary Component', () => {
 
     expect(screen.getByText('Error Details')).toBeInTheDocument();
 
-    process.env.NODE_ENV = originalEnv;
+    // Restore original value
+    Object.defineProperty(import.meta, 'env', {
+      value: { ...import.meta.env, DEV: originalDev }
+    });
   });
 });

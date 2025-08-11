@@ -397,7 +397,7 @@ export const CLOWorkflow: React.FC = () => {
           {step === 'review' && moduleData && (
             <div className="space-y-6">
               {/* Debug: Show what data we have */}
-              {process.env.NODE_ENV === 'development' && (
+              {import.meta.env.DEV && (
                 <details className="mb-4 p-4 bg-gray-100 dark:bg-gray-800 rounded-lg">
                   <summary className="cursor-pointer font-medium">Debug: Module Data</summary>
                   <pre className="mt-2 text-xs overflow-auto">

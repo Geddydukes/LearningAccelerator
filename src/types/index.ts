@@ -5,6 +5,7 @@ export interface User {
   avatar_url?: string;
   voice_preference?: string;
   learning_preferences?: LearningPreferences;
+  xp?: number;
   created_at: string;
   updated_at: string;
 }

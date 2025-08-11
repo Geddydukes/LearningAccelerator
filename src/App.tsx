@@ -15,6 +15,7 @@ import { LandingPage } from './components/landing/LandingPage';
 import { UserSetup } from './components/auth/UserSetup';
 import { CLOWorkflow } from './components/workflows/CLOWorkflow';
 import { SocraticWorkflow } from './components/workflows/SocraticWorkflow';
+import { UnifiedLearningWorkspace } from './components/workspace/UnifiedLearningWorkspace';
 
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user, loading } = useAuth();
@@ -89,6 +90,14 @@ const AppContent: React.FC = () => {
             element={
               <ProtectedRoute>
                 <SocraticWorkflow />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/workspace"
+            element={
+              <ProtectedRoute>
+                <UnifiedLearningWorkspace />
               </ProtectedRoute>
             }
           />
