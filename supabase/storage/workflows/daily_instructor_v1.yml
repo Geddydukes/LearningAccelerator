@@ -1,0 +1,30 @@
+key: daily_instructor_v1
+trigger:
+  type: cron_or_event
+  event_types: [ "streak_ping", "user_start_day" ]
+  cron: "0 7 * * *"
+steps:
+  - id: gather_signals
+    call: "/functions/v1/agent-proxy/snapshot"
+    method: "GET"
+    timeout_ms: 8000
+    retry:
+      max_attempts: 3
+      backoff: "exp"
+      base_ms: 1500
+    fanout_of: null
+  - id: create_plan
+    call: "/functions/v1/agent-proxy/instructor/daily"
+    method: "POST"
+    body_from: "gather_signals"
+    headers:
+      X-Idempotency-Key: "${workflow_run_id}-create_plan"
+    timeout_ms: 15000
+    depends_on: [ "gather_signals" ]
+  - id: notify
+    call: "/functions/v1/agent-proxy/notify"
+    method: "POST"
+    body:
+      channel: "inbox"
+      message: "Your daily learning plan is ready! 🚀"
+    depends_on: [ "create_plan" ] 

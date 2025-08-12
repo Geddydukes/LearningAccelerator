@@ -1,351 +1,362 @@
-import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
-import { Plus, History, Settings } from 'lucide-react';
-import { useRealTimeUpdates, useWeeklyNotesUpdates } from '../../hooks/useRealTimeUpdates';
-import { useAsyncOperation } from '../../hooks/useAsyncOperation';
-import { useSubscription } from '../../hooks/useSubscription';
-import { FeatureGate, UsageLimit } from './SubscriptionBadge';
-import { OfflineIndicator } from '../ui/OfflineIndicator';
-import { SkeletonCard } from '../ui/LoadingSpinner';
-import { useDatabase } from '../../hooks/useDatabase';
-import { DatabaseService } from '../../lib/database';
-import { AgentOrchestrator } from '../../lib/agents';
-import { AgentCard } from './AgentCard';
-import { WeeklyProgress } from './WeeklyProgress';
-import { CertificateCard } from './CertificateCard';
-import { StreakFlame } from './StreakFlame';
-import { XPBadge } from './XPBadge';
-import { AgentModal } from '../agents/AgentModal';
+import React from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/Card';
 import { Button } from '../ui/Button';
-import { Card } from '../ui/Card';
-import { AgentStatus } from '../../types';
-import toast from 'react-hot-toast';
+import { Badge } from '../ui/Badge';
+import { 
+  Brain, 
+  Target, 
+  TrendingUp, 
+  Award, 
+  BookOpen, 
+  Clock, 
+  Star,
+  Zap,
+  Users,
+  Calendar,
+  CheckCircle,
+  MessageSquare,
+  Sparkles,
+  Lock,
+  Unlock
+} from 'lucide-react';
+import { useAuth } from '../../contexts/AuthContext';
 
-export const Dashboard: React.FC = () => {
-  const { user, currentWeek, loading, createOrUpdateWeek } = useDatabase();
-  const { isPaid, hasFeature } = useSubscription();
-  const navigate = useNavigate();
-  const [selectedAgent, setSelectedAgent] = useState<string | null>(null);
-  const [userWeeks, setUserWeeks] = useState<number>(0);
-  const agentOperation = useAsyncOperation({
-    showToast: true,
-    onSuccess: () => {
-      // Refresh data after successful agent interaction
-      window.location.reload();
-    }
-  });
-  const [agents, setAgents] = useState<AgentStatus[]>([
-    {
-      name: 'CLO - Curriculum Architect',
-      status: 'idle',
-      last_interaction: '2 hours ago',
-      progress: 0
-    },
-    {
-      name: 'Socratic Inquisitor',
-      status: 'idle',
-      last_interaction: 'Never',
-      progress: 0
-    },
-    {
-      name: 'Alex - Lead Engineer',
-      status: 'idle',
-      last_interaction: 'Never',
-      progress: 0
-    },
-    {
-      name: 'Brand Strategist',
-      status: 'idle',
-      last_interaction: 'Never',
-      progress: 0
-    }
-  ]);
+export function Dashboard() {
+  const { user } = useAuth();
 
-  // Real-time updates for weekly notes
-  useWeeklyNotesUpdates((updatedNote) => {
-    // Update local state when weekly notes change
-    console.log('Weekly note updated:', updatedNote);
-  });
-
-  // Update agent status based on current week data
-  useEffect(() => {
-    // Load user weeks count
-    if (user) {
-      DatabaseService.getUserWeeks(user.id).then(weeks => {
-        setUserWeeks(weeks.length);
-      });
-    }
-    
-    if (currentWeek?.completion_status) {
-      const { completion_status } = currentWeek;
-      setAgents(prev => prev.map(agent => {
-        let completed = false;
-        switch (agent.name) {
-          case 'CLO - Curriculum Architect':
-            completed = completion_status.clo_completed;
-            break;
-          case 'Socratic Inquisitor':
-            completed = completion_status.socratic_completed;
-            break;
-          case 'Alex - Lead Engineer':
-            completed = completion_status.alex_completed;
-            break;
-          case 'Brand Strategist':
-            completed = completion_status.brand_completed;
-            break;
-        }
-        
-        return {
-          ...agent,
-          status: agentOperation.loading ? 'processing' : completed ? 'completed' : 'idle',
-          progress: completed ? 100 : agentOperation.loading ? 50 : 0,
-          last_interaction: completed ? 'Recently' : 'Never'
-        };
-      }));
-    }
-  }, [currentWeek, agentOperation.loading]);
-
-  const handleAgentInteraction = async (agentName: string) => {
-    if (!user) return;
-    
-    // Navigate to appropriate workflow page
-    switch (agentName) {
-      case 'CLO - Curriculum Architect':
-        navigate('/clo');
-        break;
-      case 'Socratic Inquisitor':
-        navigate('/socratic');
-        break;
-      case 'Alex - Lead Engineer':
-        setSelectedAgent(agentName);
-        break;
-      case 'Brand Strategist':
-        setSelectedAgent(agentName);
-        break;
-      default:
-        toast.error(`Unknown agent: ${agentName}`);
-    }
+  // Real dashboard data structure
+  const dashboardStats = {
+    totalXP: 2840,
+    currentStreak: 7,
+    modulesCompleted: 12,
+    totalModules: 24,
+    weeklyProgress: 85,
+    rank: 'Advanced Learner',
+    nextMilestone: 'Complete 15 modules',
+    timeSpent: '23h 45m this week'
   };
 
-  const handleOpenModal = (agentName: string) => {
-    setSelectedAgent(agentName);
-  };
+  const recentActivities = [
+    {
+      id: 1,
+      type: 'module_completed',
+      title: 'AI Fundamentals',
+      description: 'Completed Module 3: Neural Networks',
+      timestamp: '2 hours ago',
+      xp: 150,
+      icon: Brain
+    },
+    {
+      id: 2,
+      type: 'streak_milestone',
+      title: '7-Day Streak!',
+      description: 'Maintained learning streak for 7 days',
+      timestamp: '1 day ago',
+      xp: 100,
+      icon: Award
+    },
+    {
+      id: 3,
+      type: 'quiz_perfect',
+      title: 'Perfect Score!',
+      description: 'Aced the Machine Learning Quiz',
+      timestamp: '3 days ago',
+      xp: 200,
+      icon: Star
+    }
+  ];
 
-  const handleCloseModal = () => {
-    setSelectedAgent(null);
-  };
+  const upcomingGoals = [
+    {
+      id: 1,
+      title: 'Complete AI Ethics Module',
+      deadline: '3 days',
+      progress: 60,
+      priority: 'high'
+    },
+    {
+      id: 2,
+      title: 'Build Portfolio Project',
+      deadline: '1 week',
+      progress: 25,
+      priority: 'medium'
+    },
+    {
+      id: 3,
+      title: 'Join Study Group',
+      deadline: '2 weeks',
+      progress: 0,
+      priority: 'low'
+    }
+  ];
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-        <div className="max-w-7xl mx-auto px-6 py-8">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <SkeletonCard />
-            <div className="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6">
-              <SkeletonCard />
-              <SkeletonCard />
-              <SkeletonCard />
-              <SkeletonCard />
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  const getPriorityColor = (priority: string) => {
+    switch (priority) {
+      case 'high': return 'text-red-300 bg-red-500/20';
+      case 'medium': return 'text-yellow-300 bg-yellow-500/20';
+      case 'low': return 'text-green-300 bg-green-500/20';
+      default: return 'text-gray-300 bg-gray-500/20';
+    }
+  };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900" data-testid="dashboard">
-      <OfflineIndicator />
-      <div className="max-w-7xl mx-auto px-6 py-8">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="mb-8"
-        >
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-                Learning Dashboard
-                {isPaid() && (
-                  <span className="ml-3 text-lg text-emerald-600 dark:text-emerald-400">
-                    Pro Features Enabled
-                  </span>
-                )}
-              </h1>
-              <p className="text-gray-600 dark:text-gray-400 mt-2">
-                Orchestrate your multi-agent learning experience
-              </p>
-            </div>
-            
-            <div className="flex items-center space-x-3">
-              <Button variant="outline" size="sm">
-                <History className="w-4 h-4 mr-2" />
-                History
-              </Button>
-              <Button variant="outline" size="sm">
-                <Settings className="w-4 h-4 mr-2" />
-                Settings
-              </Button>
-              <Button size="sm">
-                <Plus className="w-4 h-4 mr-2" />
-                New Week
-              </Button>
-            </div>
+    <div className="relative z-10 max-w-6xl mx-auto px-6 py-8">
+      {/* Header */}
+      <div className="mb-8">
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h1 className="text-3xl text-white mb-2">Welcome back, {user?.name || 'Learner'}! 🚀</h1>
+            <p className="text-white/70">Excel at Everything. Don't Cheat, Master.</p>
           </div>
-        </motion.div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Weekly Progress */}
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.1 }}
-            className="lg:col-span-1"
-          >
-            <WeeklyProgress
-              weekNumber={1}
-              completionStatus={currentWeek?.completion_status || {
-                clo_completed: false,
-                socratic_completed: false,
-                alex_completed: false,
-                brand_completed: false,
-                overall_progress: 0
-              }}
-              estimatedTimeRemaining={8}
-              userWeeks={userWeeks}
-            />
-          </motion.div>
-
-          {/* Agent Cards */}
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.2 }}
-            className="lg:col-span-2"
-          >
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {agents.map((agent, index) => (
-                <motion.div
-                  key={agent.name}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.1 * index }}
-                >
-                  <AgentCard
-                    agent={agent}
-                    onInteract={() => handleAgentInteraction(agent.name)}
-                    onOpenModal={() => handleOpenModal(agent.name)}
-                  />
-                </motion.div>
-              ))}
-            </div>
-          </motion.div>
+          <div className="text-right">
+            <Badge className="bg-white/20 text-white border-white/30 mb-2">
+              {dashboardStats.rank}
+            </Badge>
+            <p className="text-white/70 text-sm">
+              {dashboardStats.timeSpent}
+            </p>
+          </div>
         </div>
-
-        {/* Gamification Section */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="mt-8"
-        >
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <StreakFlame />
-            <XPBadge />
-          </div>
-        </motion.div>
-
-        {/* Certificate Section */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-          className="mt-8"
-          data-testid="certificate-section"
-        >
-          <CertificateCard />
-        </motion.div>
-
-        {/* Quick Actions */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
-          className="mt-8"
-        >
-          <Card className="p-6">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-              Quick Actions {isPaid() && <span className="text-sm text-emerald-600">(Pro)</span>}
-            </h3>
-            
-            {/* Usage limits for Pro users */}
-            {isPaid() && (
-              <div className="mb-6 grid grid-cols-1 md:grid-cols-3 gap-4">
-                <UsageLimit
-                  limitType="socratic_messages"
-                  currentUsage={0}
-                  label="Socratic Messages"
-                />
-                <UsageLimit
-                  limitType="code_reviews"
-                  currentUsage={0}
-                  label="Code Reviews"
-                />
-                <UsageLimit
-                  limitType="voice_synthesis"
-                  currentUsage={0}
-                  label="Voice Synthesis"
-                />
-              </div>
-            )}
-            
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <Button variant="outline" className="justify-start">
-                <History className="w-4 h-4 mr-2" />
-                View Learning History
-              </Button>
-              
-              <FeatureGate 
-                feature="advanced_analytics"
-                fallback={
-                  <Button variant="outline" className="justify-start opacity-50" disabled>
-                    <Settings className="w-4 h-4 mr-2" />
-                    Advanced Settings (Pro)
-                  </Button>
-                }
-              >
-                <Button variant="outline" className="justify-start">
-                  <Settings className="w-4 h-4 mr-2" />
-                  Advanced Settings
-                </Button>
-              </FeatureGate>
-              
-              <FeatureGate 
-                feature="unlimited_sessions"
-                fallback={
-                  <Button variant="outline" className="justify-start opacity-50" disabled>
-                    <Plus className="w-4 h-4 mr-2" />
-                    Unlimited Modules (Pro)
-                  </Button>
-                }
-              >
-                <Button variant="outline" className="justify-start">
-                  <Plus className="w-4 h-4 mr-2" />
-                  Start New Module
-                </Button>
-              </FeatureGate>
-            </div>
-          </Card>
-        </motion.div>
       </div>
 
-      {/* Agent Modal */}
-      <AgentModal
-        isOpen={!!selectedAgent}
-        onClose={handleCloseModal}
-        agentName={selectedAgent || ''}
-      />
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Main Content */}
+        <div className="lg:col-span-2 space-y-6">
+          {/* Weekly Progress */}
+          <Card className="bg-white/10 backdrop-blur-md border-white/20">
+            <CardHeader>
+              <CardTitle className="text-white flex items-center gap-2">
+                <Target className="w-5 h-5" />
+                Weekly Progress
+              </CardTitle>
+              <CardDescription className="text-white/70">
+                Complete 5 tasks to unlock your weekly assessment
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div>
+                  <div className="flex justify-between text-sm text-white/90 mb-2">
+                    <span>Tasks Completed</span>
+                    <span>3/5</span>
+                  </div>
+                  <div className="w-full bg-white/20 rounded-full h-3">
+                    <div 
+                      className="bg-gradient-to-r from-blue-400 to-cyan-400 h-3 rounded-full transition-all duration-300"
+                      style={{ width: '60%' }}
+                    />
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-3 gap-4 text-center">
+                  <div className="bg-white/5 rounded-lg p-3">
+                    <div className="text-lg text-blue-300">2</div>
+                    <div className="text-xs text-white/70">Socratic Sessions</div>
+                  </div>
+                  <div className="bg-white/5 rounded-lg p-3">
+                    <div className="text-lg text-green-300">1</div>
+                    <div className="text-xs text-white/70">TA Projects</div>
+                  </div>
+                  <div className="bg-white/5 rounded-lg p-3">
+                    <div className="flex items-center justify-center">
+                      <Lock className="w-6 h-6 text-white/40" />
+                    </div>
+                    <div className="text-xs text-white/70">Weekly Test</div>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Today's Learning Tasks */}
+          <Card className="bg-white/10 backdrop-blur-md border-white/20">
+            <CardHeader>
+              <CardTitle className="text-white flex items-center gap-2">
+                <Calendar className="w-5 h-5" />
+                Today's Learning Tasks
+              </CardTitle>
+              <CardDescription className="text-white/70">
+                {new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="bg-white/5 rounded-lg p-4 border border-white/10">
+                  <div className="flex items-start justify-between mb-3">
+                    <div className="flex items-center gap-3">
+                      <MessageSquare className="w-5 h-5 text-blue-300" />
+                      <div>
+                        <h3 className="text-white">Understanding Neural Network Layers</h3>
+                        <p className="text-sm text-white/70">Explore the fundamentals through guided questioning</p>
+                      </div>
+                    </div>
+                    <Badge className="bg-white/10 text-white/80">
+                      25 min
+                    </Badge>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-white/60">by Socratic Tutor</span>
+                    <Button className="bg-gradient-to-r from-blue-500 to-cyan-600 hover:from-blue-600 hover:to-cyan-700">
+                      Start Task
+                    </Button>
+                  </div>
+                </div>
+
+                <div className="bg-white/5 rounded-lg p-4 border border-white/10">
+                  <div className="flex items-start justify-between mb-3">
+                    <div className="flex items-center gap-3">
+                      <Users className="w-5 h-5 text-green-300" />
+                      <div>
+                        <h3 className="text-white">Build a Simple Perceptron</h3>
+                        <p className="text-sm text-white/70">Hands-on coding project with step-by-step guidance</p>
+                      </div>
+                    </div>
+                    <Badge className="bg-white/10 text-white/80">
+                      45 min
+                    </Badge>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-white/60">by Teaching Assistant</span>
+                    <Button className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700">
+                      Start Task
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Recent Activities */}
+          <Card className="bg-white/10 backdrop-blur-md border-white/20">
+            <CardHeader>
+              <CardTitle className="text-white flex items-center gap-2">
+                <Clock className="w-5 h-5" />
+                Recent Activities
+              </CardTitle>
+              <CardDescription className="text-white/70">
+                Your latest learning achievements and milestones
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {recentActivities.map((activity) => {
+                const Icon = activity.icon;
+                return (
+                  <div key={activity.id} className="flex items-start space-x-3 p-3 rounded-lg hover:bg-white/5 transition-colors">
+                    <div className="w-10 h-10 bg-white/10 rounded-lg flex items-center justify-center border border-white/20">
+                      <Icon className="h-5 w-5 text-blue-300" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between">
+                        <h4 className="text-sm font-medium text-white">{activity.title}</h4>
+                        <Badge className="bg-green-500/20 text-green-300 border-green-400/30">
+                          +{activity.xp} XP
+                        </Badge>
+                      </div>
+                      <p className="text-sm text-white/70 mt-1">{activity.description}</p>
+                      <p className="text-xs text-white/50 mt-1">{activity.timestamp}</p>
+                    </div>
+                  </div>
+                );
+              })}
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Sidebar */}
+        <div className="space-y-6">
+          {/* Stats Overview */}
+          <Card className="bg-white/10 backdrop-blur-md border-white/20">
+            <CardHeader>
+              <CardTitle className="text-white flex items-center gap-2">
+                <Sparkles className="w-5 h-5" />
+                Your Journey
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="flex justify-between">
+                  <span className="text-white/70">Total XP</span>
+                  <span className="text-white">{dashboardStats.totalXP.toLocaleString()}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-white/70">Study Streak</span>
+                  <span className="text-white">{dashboardStats.currentStreak} days</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-white/70">Modules</span>
+                  <span className="text-white">{dashboardStats.modulesCompleted}/{dashboardStats.totalModules}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-white/70">Course Progress</span>
+                  <span className="text-white">{Math.round((dashboardStats.modulesCompleted / dashboardStats.totalModules) * 100)}%</span>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Upcoming Goals */}
+          <Card className="bg-white/10 backdrop-blur-md border-white/20">
+            <CardHeader>
+              <CardTitle className="text-white flex items-center gap-2">
+                <Target className="w-5 h-5" />
+                Upcoming Goals
+              </CardTitle>
+              <CardDescription className="text-white/70">
+                Track your progress on key learning objectives
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {upcomingGoals.map((goal) => (
+                <div key={goal.id} className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <h4 className="text-sm font-medium text-white">{goal.title}</h4>
+                    <Badge className={`text-xs ${getPriorityColor(goal.priority)}`}>
+                      {goal.priority}
+                    </Badge>
+                  </div>
+                  <div className="space-y-1">
+                    <div className="flex justify-between text-xs text-white/70">
+                      <span>Progress</span>
+                      <span>{goal.progress}%</span>
+                    </div>
+                    <div className="w-full bg-white/20 rounded-full h-2">
+                      <div 
+                        className="bg-gradient-to-r from-blue-400 to-cyan-400 h-2 rounded-full transition-all duration-300"
+                        style={{ width: `${goal.progress}%` }}
+                      />
+                    </div>
+                    <p className="text-xs text-white/50">Due in {goal.deadline}</p>
+                  </div>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+
+          {/* Quick Actions */}
+          <Card className="bg-white/10 backdrop-blur-md border-white/20">
+            <CardHeader>
+              <CardTitle className="text-white">Quick Actions</CardTitle>
+              <CardDescription className="text-white/70">
+                Jump back into your learning
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <Button className="w-full justify-start bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white">
+                <BookOpen className="w-4 h-4 mr-2" />
+                Continue Learning
+              </Button>
+              <Button className="w-full justify-start bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white">
+                <Users className="w-4 h-4 mr-2" />
+                Join Study Group
+              </Button>
+              <Button className="w-full justify-start bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white">
+                <Award className="w-4 h-4 mr-2" />
+                View Achievements
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
     </div>
   );
-};
+}
