@@ -28,10 +28,7 @@ export function SimpleAppShell() {
             <Button
               size="lg"
               className="bg-primary text-primary-foreground hover:bg-primary/90 px-8"
-              onClick={() => {
-                // TODO: Implement learning intent creation
-                console.log('Create learning intent');
-              }}
+              onClick={() => navigate('/unified-learning')}
             >
               Start Learning
             </Button>
