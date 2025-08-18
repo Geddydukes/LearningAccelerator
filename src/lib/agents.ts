@@ -1,4 +1,3 @@
-import { AgentProxyService } from './gemini';
 import { DatabaseService } from './database';
 
 export class AgentOrchestrator {
@@ -6,28 +5,41 @@ export class AgentOrchestrator {
     try {
       console.log('🎯 CLO Agent called for user:', userId, 'week:', weekNumber, 'input:', userInput);
       
-      // Call agent proxy instead of direct Gemini API
-      const response = await AgentProxyService.callCLOAgent(userId, userInput, weekNumber);
+      // Call the new CLO edge function
+      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/clo-agent`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+        },
+        body: JSON.stringify({
+          action: userInput,
+          payload: { weekNumber },
+          userId
+        })
+      });
       
-      if (response.success && response.data) {
+      const result = await response.json();
+      
+      if (result.success && result.data) {
         // Handle different response types
-        if (response.data.text_response) {
+        if (result.data.text_response) {
           // CLO is requesting something (like AGREE_PARAMS)
-          console.log('📝 CLO text response:', response.data.text_response);
-          return { success: true, data: { text_response: response.data.text_response } };
+          console.log('📝 CLO text response:', result.data.text_response);
+          return { success: true, data: { text_response: result.data.text_response } };
         } else {
           // Save structured data to database with completion status
           console.log('💾 Saving CLO module data for week:', weekNumber);
           
           // Flatten the CLO_Briefing_Note and CLO_Assessor_Directive for easier access
           const flattenedData = {
-            ...response.data,
+            ...result.data,
             // If we have nested structure, flatten it
-            ...(response.data.CLO_Briefing_Note || {}),
-            ...(response.data.CLO_Assessor_Directive || {}),
+            ...(result.data.CLO_Briefing_Note || {}),
+            ...(result.data.CLO_Assessor_Directive || {}),
             // Store the full response text for complete module display  
-            full_content: response.data.full_response_text,
-            raw_response: response.data.raw_response
+            full_content: result.data.full_response_text,
+            raw_response: result.data.raw_response
           };
           
           await DatabaseService.createOrUpdateWeeklyNote(userId, weekNumber, {
@@ -46,7 +58,7 @@ export class AgentOrchestrator {
         }
       }
       
-      return response;
+      return result;
     } catch (error) {
       console.error('CLO Agent error:', error);
       return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
@@ -71,28 +83,40 @@ export class AgentOrchestrator {
       // Add user message to database
       await DatabaseService.addMessage(sessionId, 'user', userMessage);
       
-      // Call agent proxy instead of direct Gemini API
-      const response = await AgentProxyService.callSocraticAgent(
-        userId,
-        userMessage, 
-        conversationHistory, 
-        cloContext,
-        sessionId
-      );
+      // Call the new Socratic edge function
+      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/socratic-agent`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+        },
+        body: JSON.stringify({
+          action: 'CONTINUE_SESSION',
+          payload: { 
+            message: userMessage, 
+            conversationHistory, 
+            cloContext,
+            sessionId 
+          },
+          userId
+        })
+      });
       
-      if (response.success && response.data) {
+      const result = await response.json();
+      
+      if (result.success && result.data) {
         // Add assistant response to database
-        await DatabaseService.addMessage(sessionId, 'assistant', response.data.question);
+        await DatabaseService.addMessage(sessionId, 'assistant', result.data.question);
         
         // Update session with new question count
         await DatabaseService.updateSocraticSession(sessionId, {
           total_questions: (await DatabaseService.getSessionMessages(sessionId)).length
         });
         
-        return response;
+        return result;
       }
       
-      return response;
+      return result;
     } catch (error) {
       console.error('Socratic Agent error:', error);
       return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
@@ -103,15 +127,28 @@ export class AgentOrchestrator {
     try {
       console.log('👨‍💻 Alex Agent called for user:', userId, 'repo:', repositoryUrl, 'week:', weekNumber);
       
-      // Call agent proxy instead of direct Gemini API
-      const response = await AgentProxyService.callAlexAgent(userId, repositoryUrl, undefined, weekNumber);
+      // Call the new Alex edge function
+      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/alex-agent`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+        },
+        body: JSON.stringify({
+          action: 'REVIEW_CODE',
+          payload: { repositoryUrl, weekNumber },
+          userId
+        })
+      });
       
-      if (response.success && response.data) {
+      const result = await response.json();
+      
+      if (result.success && result.data) {
         // Save structured data to database
         console.log('💾 Saving Alex analysis data for week:', weekNumber);
         
         await DatabaseService.createOrUpdateWeeklyNote(userId, weekNumber, {
-          lead_engineer_briefing_note: response.data,
+          lead_engineer_briefing_note: result.data,
           completion_status: {
             clo_completed: true,
             socratic_completed: true,
@@ -121,10 +158,10 @@ export class AgentOrchestrator {
           }
         });
         
-        return response;
+        return result;
       }
       
-      return response;
+      return result;
     } catch (error) {
       console.error('Alex Agent error:', error);
       return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
@@ -148,21 +185,33 @@ export class AgentOrchestrator {
         lead_engineer_briefing_note: currentWeek?.lead_engineer_briefing_note
       };
       
-      // Call agent proxy instead of direct Gemini API
-      const response = await AgentProxyService.callBrandAgent(
-        userId,
-        businessContext,
-        weeklyIntelligence,
-        personalReflection,
-        weekNumber
-      );
+      // Call the new Brand edge function
+      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/brand-agent`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+        },
+        body: JSON.stringify({
+          action: 'SUBMIT_BRIEFING',
+          payload: { 
+            businessContext, 
+            weeklyIntelligence, 
+            personalReflection, 
+            weekNumber 
+          },
+          userId
+        })
+      });
       
-      if (response.success && response.data) {
+      const result = await response.json();
+      
+      if (result.success && result.data) {
         // Save structured data to database
         console.log('💾 Saving Brand strategy data for week:', weekNumber);
         
         await DatabaseService.createOrUpdateWeeklyNote(userId, weekNumber, {
-          brand_strategy_package: response.data,
+          brand_strategy_package: result.data,
           completion_status: {
             clo_completed: true,
             socratic_completed: true,
@@ -172,10 +221,10 @@ export class AgentOrchestrator {
           }
         });
         
-        return response;
+        return result;
       }
       
-      return response;
+      return result;
     } catch (error) {
       console.error('Brand Agent error:', error);
       return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
@@ -192,35 +241,22 @@ export class AgentOrchestrator {
     try {
       console.log('🔄 Running weekly flow for user:', userId, 'week:', weekNumber);
       
-      // Use the new AgentProxyService for the complete flow
-      const response = await AgentProxyService.runWeeklyFlow(
-        userId,
-        weekNumber,
-        userInput,
-        businessContext,
-        personalReflection
-      );
+      // Run the flow through individual agent calls
+      const cloResult = await this.callCLOAgent(userId, userInput, weekNumber);
+      if (!cloResult.success) return cloResult;
       
-      if (response.success && response.data) {
-        // Save the complete weekly flow data
-        await DatabaseService.createOrUpdateWeeklyNote(userId, weekNumber, {
-          clo_briefing_note: response.data.clo,
-          lead_engineer_briefing_note: response.data.alex,
-          brand_strategy_package: response.data.brand,
-          completion_status: {
-            clo_completed: true,
-            socratic_completed: false, // Socratic is separate
-            alex_completed: !!response.data.alex,
-            brand_completed: true,
-            overall_progress: response.data.alex ? 100 : 75
-          }
-        });
-        
-        console.log('✅ Weekly flow completed successfully');
-        return response;
-      }
+      const brandResult = await this.callBrandAgent(userId, businessContext, weekNumber, personalReflection);
+      if (!brandResult.success) return brandResult;
       
-      return response;
+      // Return combined results
+      const combinedData = {
+        clo: cloResult.data,
+        brand: brandResult.data,
+        alex: null // Alex requires repository URL, so it's separate
+      };
+      
+      console.log('✅ Weekly flow completed successfully');
+      return { success: true, data: combinedData };
     } catch (error) {
       console.error('Weekly flow error:', error);
       return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
