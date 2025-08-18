@@ -532,7 +532,7 @@ export const UnifiedLearningPlatform: React.FC = () => {
         
         if (result.success && result.data) {
           // Check if user demonstrates level 5 understanding
-          if (result.data.understanding_level >= 5) {
+          if (result.data.mastery_level >= 5) {
             // Mark Socratic as completed
             setPracticeSessions(prev => 
               prev.map(p => 
@@ -543,21 +543,57 @@ export const UnifiedLearningPlatform: React.FC = () => {
             );
             return 'Outstanding! You\'ve demonstrated level 5 understanding. Socratic practice complete.';
           }
+          
+          // Auto-synthesize voice response for Socratic questions
+          if (voice.hasVoiceSupport && hasFeature('voice_synthesis')) {
+            await voice.synthesizeAndPlay(result.data.question);
+          }
+          
           return result.data.question || 'That\'s an interesting perspective. What makes you think that approach would work best?';
         }
       } else {
-        // TA mode - check lesson completion
-        if (message.toLowerCase().includes('complete') || message.toLowerCase().includes('done') || message.toLowerCase().includes('finished')) {
-          // Mark TA as completed
-          setPracticeSessions(prev => 
-            prev.map(p => 
-              p.type === 'ta' 
-                ? { ...p, isCompleted: true }
-                : p
+        // TA mode - get help with exercises
+        const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ta-agent`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+          },
+          body: JSON.stringify({
+            action: 'HELP_WITH_EXERCISE',
+            payload: { 
+              message,
+              exerciseId: 'daily-exercise',
+              lessonTitle: dailyLesson?.title || 'Daily Lesson'
+            },
+            userId: user.id
+          })
+        });
+        
+        const result = await response.json();
+        
+        if (result.success && result.data) {
+          // Check if lesson is complete
+          if (message.toLowerCase().includes('complete') || message.toLowerCase().includes('done') || message.toLowerCase().includes('finished')) {
+            // Mark TA as completed
+            setPracticeSessions(prev => 
+              prev.map(p => 
+                p.type === 'ta' 
+                  ? { ...p, isCompleted: true }
+                  : p
               )
-          );
-          return 'Great! TA lesson completed successfully.';
+            );
+            return 'Great! TA lesson completed successfully.';
+          }
+          
+          // Auto-synthesize voice response for TA guidance
+          if (voice.hasVoiceSupport && hasFeature('voice_synthesis')) {
+            await voice.synthesizeAndPlay(result.data.help_text);
+          }
+          
+          return result.data.help_text;
         }
+        
         return 'Please complete the lesson exercises. Type "complete" when you\'re done.';
       }
       
@@ -596,10 +632,71 @@ export const UnifiedLearningPlatform: React.FC = () => {
     
     if (type === 'socratic') {
       addMessage('Great! Let\'s begin Socratic practice. I\'ll ask you questions to help you think deeper about the concepts. Demonstrate your understanding and I\'ll guide you to level 5 mastery.', 'practice');
+      // Start Socratic session with initial question
+      handleSocraticStart();
     } else {
       addMessage('Excellent! Let\'s begin Teaching Assistant practice. I\'ll provide hands-on guidance and exercises. Complete the lesson and type "complete" when you\'re done.', 'practice');
+      // Start TA session with initial guidance
+      handleTAStart();
     }
   };
+
+  const handleSocraticStart = async () => {
+    try {
+      const response = await AgentOrchestrator.callSocraticAgent(
+        user!.id,
+        'socratic-session',
+        'START_SESSION',
+        [],
+        { topic: dailyLesson?.title || 'Machine Learning Fundamentals' }
+      );
+      
+      if (response.success && response.data) {
+        addMessage(response.data.question, 'practice');
+        // Auto-synthesize voice response for Socratic
+        if (voice.hasVoiceSupport && hasFeature('voice_synthesis')) {
+          await voice.synthesizeAndPlay(response.data.question);
+        }
+      }
+    } catch (error) {
+      console.error('Error starting Socratic session:', error);
+      addMessage('I encountered an error starting the Socratic session. Let me provide a question to get us started: What is the fundamental difference between machine learning and traditional programming?', 'practice');
+    }
+  };
+
+  const handleTAStart = async () => {
+    try {
+      // Call TA agent for initial guidance
+      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ta-agent`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+        },
+        body: JSON.stringify({
+          action: 'HELP_WITH_EXERCISE',
+          payload: { 
+            exerciseId: 'daily-exercise',
+            lessonTitle: dailyLesson?.title || 'Daily Lesson'
+          },
+          userId: user!.id
+        })
+      });
+      
+      const result = await response.json();
+      
+      if (result.success && result.data) {
+        addMessage(result.data.help_text, 'practice');
+        // Auto-synthesize voice response for TA
+        if (voice.hasVoiceSupport && hasFeature('voice_synthesis')) {
+          await voice.synthesizeAndPlay(result.data.help_text);
+        }
+      }
+    } catch (error) {
+      console.error('Error starting TA session:', error);
+      addMessage('Welcome to Teaching Assistant practice! I\'m here to help you with today\'s exercises. What would you like to work on first?', 'practice');
+    }
+  }
 
   const goToNextDay = async () => {
     try {
@@ -756,6 +853,30 @@ export const UnifiedLearningPlatform: React.FC = () => {
                       ) : (
                         <div className="space-y-3">
                           <p className="text-blue-200/90">{learningPlan.summary}</p>
+                          
+                          {/* Weekly Summary */}
+                          {learningPlan.fullContent?.weekly_summary && (
+                            <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-4">
+                              <h4 className="text-lg font-semibold text-white mb-2">Weekly Overview</h4>
+                              <p className="text-blue-200/90 mb-3">{learningPlan.fullContent.weekly_summary}</p>
+                              
+                              {/* Daily Breakdown */}
+                              {learningPlan.fullContent.daily_breakdown && (
+                                <div className="space-y-2">
+                                  <h5 className="text-md font-medium text-white">Daily Breakdown:</h5>
+                                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                                    {learningPlan.fullContent.daily_breakdown.map((day: any, index: number) => (
+                                      <div key={index} className="flex items-center justify-between bg-white/5 rounded p-2">
+                                        <span className="text-blue-200/90">Day {day.day}: {day.focus}</span>
+                                        <span className="text-blue-200/70 text-sm">{day.duration}</span>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          )}
+                          
                           <div className="flex items-center space-x-4 text-sm text-blue-200/70">
                             <span className="flex items-center">
                               <Clock className="w-4 h-4 mr-2" />
