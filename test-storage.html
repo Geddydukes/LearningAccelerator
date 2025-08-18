@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Storage Access</title>
+</head>
+<body>
+    <h1>Testing Storage Access</h1>
+    <div id="result"></div>
+    
+    <script>
+        async function testStorage() {
+            const resultDiv = document.getElementById('result');
+            
+            try {
+                // Test if the bucket exists by trying to access a file
+                const response = await fetch('https://jclgmvbkrlkppecwnljv.supabase.co/storage/v1/object/public/agent-prompts/clo_v3.yml');
+                
+                if (response.ok) {
+                    const content = await response.text();
+                    resultDiv.innerHTML = `<p style="color: green;">✅ Storage bucket accessible!</p>
+                    <p>CLO prompt length: ${content.length} characters</p>
+                    <p>First 200 chars: ${content.substring(0, 200)}...</p>`;
+                } else {
+                    resultDiv.innerHTML = `<p style="color: red;">❌ Storage bucket not accessible: ${response.status} ${response.statusText}</p>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<p style="color: red;">❌ Error: ${error.message}</p>`;
+            }
+        }
+        
+        testStorage();
+    </script>
+</body>
+</html>

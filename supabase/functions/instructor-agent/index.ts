@@ -26,16 +26,23 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     )
 
-    // Load instructor prompt from storage
-    const { data: promptData, error: promptError } = await supabaseClient.storage
-      .from('agent-prompts')
-      .download('instructor_v2_1.yml')
+    // Load instructor prompt from storage (fallback to hardcoded if storage fails)
+    let promptText;
+    try {
+      const { data: promptData, error: promptError } = await supabaseClient.storage
+        .from('agent-prompts')
+        .download('instructor_v2_1.yml')
 
-    if (promptError) {
-      throw new Error(`Failed to load instructor prompt: ${promptError.message}`)
+      if (promptError) {
+        console.log('Storage failed, using hardcoded prompt:', promptError.message);
+        promptText = getHardcodedInstructorPrompt();
+      } else {
+        promptText = await promptData.text();
+      }
+    } catch (error) {
+      console.log('Storage error, using hardcoded prompt:', error.message);
+      promptText = getHardcodedInstructorPrompt();
     }
-
-    const promptText = await promptData.text()
 
     // Get user profile and context
     const { data: userProfile } = await supabaseClient
@@ -60,8 +67,16 @@ serve(async (req) => {
       .replace(/{{USER_PREMIUM_BOOL}}/g, (userProfile?.premium || false).toString())
       .replace(/{{USER_TZ}}/g, userProfile?.timezone || 'UTC')
 
+    // Map our actions to the prompt's expected commands
+    let command;
+    if (action === 'GET_DAILY_LESSON') {
+      command = 'START_DAY';
+    } else if (action === 'GET_NEXT_LESSON') {
+      command = 'REPLAN_LIGHT';
+    }
+    
     // Call Gemini API with formatted prompt
-    const geminiResponse = await callGeminiAPI(formattedPrompt, action, payload)
+    const geminiResponse = await callGeminiAPI(formattedPrompt, command, payload)
 
     if (geminiResponse.success) {
       return new Response(
@@ -104,7 +119,7 @@ async function callGeminiAPI(prompt: string, action: string, payload: any) {
       body: JSON.stringify({
         contents: [{
           parts: [{
-            text: `${prompt}\n\nAction: ${action}\nPayload: ${JSON.stringify(payload)}\n\nGenerate a response based on the prompt instructions.`
+            text: `${formattedPrompt}\n\nCommand: ${command}\n\nGenerate a daily lesson plan following the prompt instructions. Return the lesson in the specified JSON format with markdown content.`
           }]
         }]
       })
