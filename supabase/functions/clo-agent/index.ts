@@ -137,7 +137,7 @@ serve(async (req) => {
     
     try {
       const { data: promptData, error: promptError } = await supabaseClient.storage
-        .from('agent-prompts')
+        .from('prompts')
         .download('clo_v3.md')
 
       if (!promptError && promptData) {
