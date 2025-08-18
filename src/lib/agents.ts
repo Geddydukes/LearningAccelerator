@@ -5,15 +5,14 @@ export class AgentOrchestrator {
     try {
       console.log('🎯 CLO Agent called for user:', userId, 'week:', weekNumber, 'input:', userInput);
       
-      // Call the agent-proxy with CLO agent type
-      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/agent-proxy`, {
+      // Call the dedicated CLO agent function
+      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/clo-agent`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
         },
         body: JSON.stringify({
-          agent: 'clo',
           action: userInput,
           payload: { weekNumber },
           userId
@@ -84,15 +83,14 @@ export class AgentOrchestrator {
       // Add user message to database
       await DatabaseService.addMessage(sessionId, 'user', userMessage);
       
-      // Call the agent-proxy with Socratic agent type
-      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/agent-proxy`, {
+      // Call the dedicated Socratic agent function
+      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/socratic-agent`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
         },
         body: JSON.stringify({
-          agent: 'socratic',
           action: 'CONTINUE_SESSION',
           payload: { 
             message: userMessage, 
@@ -129,15 +127,14 @@ export class AgentOrchestrator {
     try {
       console.log('👨‍💻 Alex Agent called for user:', userId, 'repo:', repositoryUrl, 'week:', weekNumber);
       
-      // Call the agent-proxy with Alex agent type
-      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/agent-proxy`, {
+      // Call the dedicated Alex agent function
+      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/alex-agent`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
         },
         body: JSON.stringify({
-          agent: 'alex',
           action: 'REVIEW_CODE',
           payload: { repositoryUrl, weekNumber },
           userId
@@ -188,15 +185,14 @@ export class AgentOrchestrator {
         lead_engineer_briefing_note: currentWeek?.lead_engineer_briefing_note
       };
       
-      // Call the agent-proxy with Brand agent type
-      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/agent-proxy`, {
+      // Call the dedicated Brand agent function
+      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/brand-agent`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
         },
         body: JSON.stringify({
-          agent: 'brand',
           action: 'SUBMIT_BRIEFING',
           payload: { 
             businessContext, 
