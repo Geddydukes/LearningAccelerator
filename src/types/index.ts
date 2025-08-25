@@ -23,8 +23,14 @@ export interface WeeklyNote {
   week_number: number;
   clo_briefing_note?: CLOBriefingNote;
   socratic_conversation?: SocraticConversation;
+  instructor_lesson?: InstructorLesson;
+  ta_session?: TASession;
   lead_engineer_briefing_note?: LeadEngineerBriefingNote;
   brand_strategy_package?: BrandStrategyPackage;
+  clarifier_session?: ClarifierSession;
+  onboarder_session?: OnboarderSession;
+  career_match_session?: CareerMatchSession;
+  portfolio_session?: PortfolioSession;
   completion_status: CompletionStatus;
   created_at: string;
   updated_at: string;
@@ -58,6 +64,92 @@ export interface SocraticConversation {
   // Summary for Brand agent
   learning_breakthrough?: string;
   engagement_level?: number;
+}
+
+export interface InstructorLesson {
+  lesson_id: string;
+  title: string;
+  objectives: string[];
+  content: string;
+  exercises: string[];
+  estimated_duration: number;
+  day_number: number;
+  practice_options: Array<{
+    type: 'socratic' | 'ta';
+    title: string;
+    description: string;
+  }>;
+  version?: string;
+}
+
+export interface TASession {
+  session_id: string;
+  exercise_id?: string;
+  help_text: string;
+  hints: string[];
+  solution_steps: string[];
+  is_completed: boolean;
+  feedback?: string;
+  suggestions?: string[];
+  score?: number;
+  max_score?: number;
+  next_steps?: string;
+  version?: string;
+}
+
+export interface ClarifierSession {
+  session_id: string;
+  user_goals: string[];
+  requirements: string[];
+  constraints: string[];
+  priorities: string[];
+  clarification_questions: string[];
+  is_completed: boolean;
+  version?: string;
+}
+
+export interface OnboarderSession {
+  session_id: string;
+  user_profile: {
+    name: string;
+    background: string;
+    goals: string[];
+    preferences: object;
+  };
+  learning_path: string[];
+  initial_assessment: object;
+  is_completed: boolean;
+  version?: string;
+}
+
+export interface CareerMatchSession {
+  session_id: string;
+  career_opportunities: Array<{
+    title: string;
+    company: string;
+    match_score: number;
+    requirements: string[];
+    benefits: string[];
+  }>;
+  skill_gaps: string[];
+  recommendations: string[];
+  is_completed: boolean;
+  version?: string;
+}
+
+export interface PortfolioSession {
+  session_id: string;
+  portfolio_items: Array<{
+    type: 'project' | 'article' | 'certification' | 'contribution';
+    title: string;
+    description: string;
+    url?: string;
+    skills_demonstrated: string[];
+  }>;
+  optimization_suggestions: string[];
+  showcase_strategy: string[];
+  is_completed: boolean;
+  version?: string;
 }
 
 export interface SocraticMessage {
@@ -95,7 +187,13 @@ export interface BrandStrategyPackage {
   weekly_intelligence_briefing?: {
     clo_briefing_note?: CLOBriefingNote;
     socratic_briefing_note?: SocraticConversation;
+    instructor_lesson?: InstructorLesson;
+    ta_session?: TASession;
     lead_engineer_briefing_note?: LeadEngineerBriefingNote;
+    clarifier_session?: ClarifierSession;
+    onboarder_session?: OnboarderSession;
+    career_match_session?: CareerMatchSession;
+    portfolio_session?: PortfolioSession;
     personal_reflection?: string;
   };
 }
@@ -103,8 +201,14 @@ export interface BrandStrategyPackage {
 export interface CompletionStatus {
   clo_completed: boolean;
   socratic_completed: boolean;
+  instructor_completed: boolean;
+  ta_completed: boolean;
   alex_completed: boolean;
   brand_completed: boolean;
+  clarifier_completed: boolean;
+  onboarder_completed: boolean;
+  career_match_completed: boolean;
+  portfolio_completed: boolean;
   overall_progress: number;
 }
 

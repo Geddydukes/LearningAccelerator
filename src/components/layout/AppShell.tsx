@@ -1,84 +1,276 @@
 import React, { useState, useMemo, useCallback, memo } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { Menu, X, Home, Brain, Users, Briefcase, FileText, ChevronRight } from 'lucide-react';
+import { useLocation, useNavigate, Routes, Route } from 'react-router-dom';
+import { Menu, X, Home, Brain, Users, Briefcase, FileText, ChevronRight, Lock, Crown, CheckCircle, Circle, BookOpen } from 'lucide-react';
 import { PATHS } from '../../routes/paths';
 import { useAuth } from '../../contexts/AuthContext';
+import { useSubscription } from '../../hooks/useSubscription';
+import { CORE_AGENTS, PREMIUM_AGENTS, AGENTS } from '../../lib/agents/registry';
+import HomeDashboard from '../home/HomeDashboard';
+import { UnifiedLearningPlatform } from '../workspace/UnifiedLearningPlatform';
+import { 
+  CurrentModule, 
+  SelfGuided, 
+  PastTracks, 
+  CareerPreview, 
+  PortfolioPreview, 
+  Settings 
+} from '../pages';
+import { SideNav } from './SideNav';
 
-// Navigation items configuration
+// Navigation items configuration - generated from agent registry
 const NAV_ITEMS = [
+  // Core learning items
   {
     id: 'dashboard',
     label: 'Dashboard',
     path: PATHS.home,
     icon: Home,
-    description: 'Your learning overview'
+    description: 'Your learning overview',
+    requiresPremium: false
   },
   {
-    id: 'module',
-    label: 'Current Module',
-    path: PATHS.moduleCurrent,
-    icon: Brain,
-    description: 'Continue your learning'
+    id: 'workspace',
+    label: 'Learning Workspace',
+    path: PATHS.workspace,
+    icon: BookOpen,
+    description: 'Your active learning session',
+    requiresPremium: false
   },
   {
-    id: 'socratic',
-    label: 'Socratic Chat',
-    path: PATHS.socratic,
-    icon: Users,
-    description: 'Interactive learning'
-  },
-  {
-    id: 'ta',
-    label: 'Teaching Assistant',
-    path: PATHS.ta,
-    icon: Brain,
-    description: 'Get help & guidance'
-  },
-  {
-    id: 'career',
-    label: 'Career Hub',
-    path: PATHS.career,
-    icon: Briefcase,
-    description: 'Career development'
-  },
-  {
-    id: 'portfolio',
-    label: 'Portfolio',
-    path: PATHS.portfolio,
+    id: 'past-tracks',
+    label: 'Past Learning Tracks',
+    path: PATHS.pastTracks,
     icon: FileText,
-    description: 'Showcase your work'
+    description: 'Your completed tracks',
+    requiresPremium: false
+  },
+  // Core agents (weekly mode)
+  ...CORE_AGENTS
+    .filter(id => AGENTS[id].mode === 'weekly')
+    .map(id => ({
+      id: `agent-${id}`,
+      label: AGENTS[id].title,
+      path: AGENTS[id].route,
+      icon: BookOpen, // Will be replaced with dynamic icon loading
+      description: AGENTS[id].description,
+      requiresPremium: false
+    })),
+  // Premium features
+  {
+    id: 'brand-career',
+    label: 'Brand & Career',
+    path: '/home/brand-career',
+    icon: Briefcase,
+    description: 'Brand strategy and career development (Premium)',
+    requiresPremium: true
   }
 ];
 
 // Simple content components for now
-const Dashboard = memo(() => (
+const Dashboard = memo(() => <HomeDashboard />);
+
+const ModuleCurrent = memo(() => (
   <div className="p-6">
-    <h1 className="text-3xl font-bold text-gray-900 mb-6">🏠 Dashboard</h1>
-    <div className="bg-white rounded-lg shadow p-6">
-      <p className="text-lg text-gray-600">Welcome to your learning dashboard!</p>
-      <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="bg-blue-100 p-4 rounded-lg">
-          <h3 className="font-semibold text-blue-800">Total XP</h3>
-          <p className="text-2xl font-bold text-blue-600">2,840</p>
-        </div>
-        <div className="bg-green-100 p-4 rounded-lg">
-          <h3 className="font-semibold text-green-800">Current Streak</h3>
-          <p className="text-2xl font-bold text-green-600">7 days</p>
-        </div>
-        <div className="bg-purple-100 p-4 rounded-lg">
-          <h3 className="font-semibold text-purple-800">Modules</h3>
-          <p className="text-2xl font-bold text-purple-600">12/24</p>
-        </div>
-      </div>
+    <h1 className="text-3xl font-medium text-foreground mb-6">📚 Current Module</h1>
+    <div className="bg-card border border-border/50 rounded-lg p-6">
+      <p className="text-lg text-muted-foreground">Your current learning module will appear here.</p>
     </div>
   </div>
 ));
 
-const ModuleCurrent = memo(() => (
+const SelfGuidedLearning = memo(() => (
   <div className="p-6">
-    <h1 className="text-3xl font-bold text-gray-900 mb-6">📚 Current Module</h1>
-    <div className="bg-white rounded-lg shadow p-6">
-      <p className="text-lg text-gray-600">Your current learning module will appear here.</p>
+    <h1 className="text-3xl font-medium text-foreground mb-6">🚀 Self-guided Learning</h1>
+    <div className="bg-card border border-border/50 rounded-lg p-6">
+      <p className="text-lg text-muted-foreground mb-4">
+        Start a new learning journey with AI-powered guidance. Choose your focus area and we'll create a personalized learning plan.
+      </p>
+      <button 
+        onClick={() => window.location.href = '/home/workspace'}
+        className="bg-primary text-primary-foreground hover:bg-primary/90 px-6 py-3 rounded-lg transition-colors"
+      >
+        Start Learning Journey
+      </button>
+    </div>
+  </div>
+));
+
+const PastLearningTracks = memo(() => {
+  const { user } = useAuth();
+  const { isPaid } = useSubscription();
+  
+  // Mock data - replace with real data from your database
+  const pastTracks = [
+    {
+      id: 'fullstack_web_1',
+      name: 'Full-Stack Web Development',
+      completedAt: '2024-12-15',
+      progress: 100,
+      duration: '8 weeks',
+      skills: ['React', 'Node.js', 'MongoDB'],
+      certificate: true
+    },
+    {
+      id: 'ai_ml_1',
+      name: 'AI & Machine Learning',
+      completedAt: '2024-11-20',
+      progress: 85,
+      duration: '6 weeks',
+      skills: ['Python', 'TensorFlow', 'Data Analysis'],
+      certificate: false
+    }
+  ];
+
+  const maxTracks = isPaid ? 10 : 2;
+  const canAddMore = pastTracks.length < maxTracks;
+
+  return (
+    <div className="p-6">
+      <div className="mb-6">
+        <h1 className="text-3xl font-medium text-foreground mb-2">📚 Past Learning Tracks</h1>
+        <p className="text-muted-foreground">
+          Track your learning journey and review completed courses
+          {!isPaid && (
+            <span className="text-foreground font-medium">
+              {' '}(Limited to {maxTracks} tracks on basic plan)
+            </span>
+          )}
+        </p>
+      </div>
+
+      {/* Stats Overview */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+        <div className="bg-card border border-border/50 rounded-lg p-4">
+          <div className="text-2xl font-medium text-foreground">{pastTracks.length}</div>
+          <div className="text-sm text-muted-foreground">Completed Tracks</div>
+        </div>
+        <div className="bg-card border border-border/50 rounded-lg p-4">
+          <div className="text-2xl font-medium text-foreground">
+            {pastTracks.filter(t => t.certificate).length}
+          </div>
+          <div className="text-sm text-muted-foreground">Certificates</div>
+        </div>
+        <div className="bg-card border border-border/50 rounded-lg p-4">
+          <div className="text-2xl font-medium text-foreground">
+            {pastTracks.reduce((acc, t) => acc + t.skills.length, 0)}
+          </div>
+          <div className="text-sm text-muted-foreground">Skills Learned</div>
+        </div>
+        <div className="bg-card border border-border/50 rounded-lg p-4">
+          <div className="text-2xl font-medium text-foreground">
+            {pastTracks.reduce((acc, t) => acc + parseInt(t.duration), 0)} weeks
+          </div>
+          <div className="text-sm text-muted-foreground">Total Time</div>
+        </div>
+      </div>
+
+      {/* Tracks List */}
+      <div className="space-y-4">
+        {pastTracks.map((track) => (
+          <div key={track.id} className="bg-card border border-border/50 rounded-lg p-6">
+            <div className="flex items-start justify-between mb-4">
+              <div className="flex-1">
+                <h3 className="text-xl font-medium text-foreground mb-2">{track.name}</h3>
+                <div className="flex items-center space-x-4 text-sm text-muted-foreground mb-3">
+                  <span>Completed: {track.completedAt}</span>
+                  <span>Duration: {track.duration}</span>
+                  <span className="flex items-center">
+                    {track.certificate ? (
+                      <>
+                        <CheckCircle className="w-4 h-4 text-green-600 mr-1" />
+                        Certificate Earned
+                      </>
+                    ) : (
+                      <>
+                        <Circle className="w-4 h-4 text-muted-foreground mr-1" />
+                        No Certificate
+                      </>
+                    )}
+                  </span>
+                </div>
+                
+                {/* Progress Bar */}
+                <div className="mb-3">
+                  <div className="flex justify-between text-sm text-muted-foreground mb-1">
+                    <span>Progress</span>
+                    <span>{track.progress}%</span>
+                  </div>
+                  <div className="w-full bg-muted rounded-full h-2">
+                    <div 
+                      className="bg-primary h-2 rounded-full transition-all duration-300"
+                      style={{ width: `${track.progress}%` }}
+                    />
+                  </div>
+                </div>
+
+                {/* Skills */}
+                <div className="flex flex-wrap gap-2">
+                  {track.skills.map((skill, index) => (
+                    <span 
+                      key={index}
+                      className="px-3 py-1 bg-accent text-foreground text-sm rounded-full"
+                    >
+                      {skill}
+                    </span>
+                  ))}
+                </div>
+              </div>
+              
+              <div className="ml-4">
+                <button className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors">
+                  Review
+                </button>
+              </div>
+            </div>
+          </div>
+        ))}
+
+        {/* Add New Track Button */}
+        {canAddMore && (
+          <div className="bg-muted/50 border-2 border-dashed border-border rounded-lg p-6 text-center">
+            <button className="px-6 py-3 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors">
+              + Start New Learning Track
+            </button>
+            <p className="text-sm text-muted-foreground mt-2">
+              Begin a new learning journey
+            </p>
+          </div>
+        )}
+
+        {!canAddMore && !isPaid && (
+          <div className="bg-card border border-border/50 rounded-lg p-6 text-center">
+            <div className="text-muted-foreground mb-3">
+              <Lock className="w-8 h-8 mx-auto mb-2" />
+              <h3 className="text-lg font-medium text-foreground">Track Limit Reached</h3>
+            </div>
+            <p className="text-muted-foreground mb-4">
+              You've reached the limit of {maxTracks} tracks on your basic plan. 
+              Upgrade to premium for unlimited learning tracks!
+            </p>
+            <button className="px-6 py-3 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors">
+              Upgrade to Premium
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+});
+
+const CareerHub = memo(() => (
+  <div className="p-6">
+    <h1 className="text-3xl font-medium text-foreground mb-6">💼 Career Hub</h1>
+    <div className="bg-card border border-border/50 rounded-lg p-6">
+      <p className="text-lg text-muted-foreground">Career development tools will appear here.</p>
+    </div>
+  </div>
+));
+
+const Portfolio = memo(() => (
+  <div className="p-6">
+    <h1 className="text-3xl font-medium text-foreground mb-6">📁 Portfolio</h1>
+    <div className="bg-card border border-border/50 rounded-lg p-6">
+      <p className="text-lg text-muted-foreground">Your portfolio will appear here.</p>
     </div>
   </div>
 ));
@@ -92,61 +284,13 @@ const SocraticChat = memo(() => (
   </div>
 ));
 
-// Content switching logic
-const getContentComponent = useCallback((pathname: string) => {
-  console.log('AppShell: Rendering content for pathname:', pathname);
-  
-  switch (pathname) {
-    case PATHS.home:
-      return <Dashboard />;
-    case PATHS.moduleCurrent:
-      return <ModuleCurrent />;
-    case PATHS.socratic:
-      return <SocraticChat />;
-    case PATHS.ta:
-      return (
-        <div className="p-6">
-          <h1 className="text-3xl font-bold text-gray-900 mb-6">🤖 Teaching Assistant</h1>
-          <div className="bg-white rounded-lg shadow p-6">
-            <p className="text-lg text-gray-600">Teaching assistant will appear here.</p>
-          </div>
-        </div>
-      );
-    case PATHS.career:
-      return (
-        <div className="p-6">
-          <h1 className="text-3xl font-bold text-gray-900 mb-6">💼 Career Hub</h1>
-          <div className="bg-white rounded-lg shadow p-6">
-            <p className="text-lg text-gray-600">Career development tools will appear here.</p>
-          </div>
-        </div>
-      );
-    case PATHS.portfolio:
-      return (
-        <div className="p-6">
-          <h1 className="text-3xl font-bold text-gray-900 mb-6">📁 Portfolio</h1>
-          <div className="bg-white rounded-lg shadow p-6">
-            <p className="text-lg text-gray-600">Your portfolio will appear here.</p>
-          </div>
-        </div>
-      );
-    default:
-      console.log('AppShell: Default case, showing Dashboard');
-      return <Dashboard />;
-  }
-}, []);
-
 const AppShell = memo(() => {
-  console.log('AppShell: Component rendering');
-  
   const location = useLocation();
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
+  const { isPaid } = useSubscription();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
-
-  console.log('AppShell: Current location:', location.pathname);
-  console.log('AppShell: User:', user);
 
   // Get current active nav item
   const activeNavItem = useMemo(() => {
@@ -155,7 +299,6 @@ const AppShell = memo(() => {
 
   // Handle navigation
   const handleNavigation = useCallback((path: string) => {
-    console.log('AppShell: Navigating to:', path);
     navigate(path);
     setIsMobileMenuOpen(false);
   }, [navigate]);
@@ -170,91 +313,13 @@ const AppShell = memo(() => {
     }
   }, [signOut, navigate]);
 
-  // Get current content component
-  const currentContent = useMemo(() => {
-    return getContentComponent(location.pathname);
-  }, [location.pathname, getContentComponent]);
 
-  console.log('AppShell: About to render content');
 
   return (
-    <div className="flex h-screen bg-gray-50">
+    <div className="flex h-screen bg-background">
       {/* Desktop Sidebar */}
-      <div className={`hidden lg:flex flex-col bg-white border-r border-gray-200 transition-all duration-300 ${
-        isSidebarCollapsed ? 'w-16' : 'w-64'
-      }`}>
-        {/* Logo Section */}
-        <div className="flex items-center justify-between p-4 border-b border-gray-200">
-          {!isSidebarCollapsed && (
-            <h1 className="text-xl font-bold text-gray-800">
-              Learning Accelerator
-            </h1>
-          )}
-          <button
-            onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
-            className="p-1 hover:bg-gray-100 rounded"
-          >
-            <ChevronRight className={`w-4 h-4 transition-transform ${
-              isSidebarCollapsed ? 'rotate-180' : ''
-            }`} />
-          </button>
-        </div>
-
-        {/* Navigation Items */}
-        <nav className="flex-1 p-4 space-y-2">
-          {NAV_ITEMS.map((item) => {
-            const Icon = item.icon;
-            const isActive = location.pathname === item.path;
-            
-            return (
-              <button
-                key={item.id}
-                onClick={() => handleNavigation(item.path)}
-                className={`w-full flex items-center p-3 rounded-lg transition-all duration-200 ${
-                  isActive
-                    ? 'bg-blue-50 text-blue-600 border border-blue-200'
-                    : 'text-gray-700 hover:bg-gray-100'
-                }`}
-              >
-                <Icon className={`w-5 h-5 ${
-                  isActive ? 'text-blue-600' : 'text-gray-500'
-                }`} />
-                {!isSidebarCollapsed && (
-                  <div className="ml-3 text-left">
-                    <div className="font-medium">{item.label}</div>
-                    <div className="text-xs text-gray-500">
-                      {item.description}
-                    </div>
-                  </div>
-                )}
-              </button>
-            );
-          })}
-        </nav>
-
-        {/* User Section */}
-        {!isSidebarCollapsed && (
-          <div className="p-4 border-t border-gray-200">
-            <div className="flex items-center space-x-3 mb-3">
-              <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
-                <span className="text-white font-medium text-sm">
-                  {user?.email?.charAt(0).toUpperCase() || 'U'}
-                </span>
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-gray-900 truncate">
-                  {user?.email || 'User'}
-                </p>
-              </div>
-            </div>
-            <button
-              onClick={handleSignOut}
-              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md hover:bg-gray-50"
-            >
-              Sign Out
-            </button>
-          </div>
-        )}
+      <div className="hidden lg:flex">
+        <SideNav />
       </div>
 
       {/* Mobile Menu Overlay */}
@@ -264,17 +329,17 @@ const AppShell = memo(() => {
             className="fixed inset-0 bg-black bg-opacity-50"
             onClick={() => setIsMobileMenuOpen(false)}
           />
-          <div className="fixed left-0 top-0 h-full w-80 bg-white shadow-xl">
+          <div className="fixed left-0 top-0 h-full w-80 bg-card shadow-xl">
             {/* Mobile Header */}
-            <div className="flex items-center justify-between p-4 border-b border-gray-200">
-              <h1 className="text-xl font-bold text-gray-800">
-                Learning Accelerator
+            <div className="flex items-center justify-between p-4 border-b border-border/50">
+              <h1 className="text-xl font-medium text-foreground">
+                Wisely
               </h1>
               <button
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="p-2 hover:bg-gray-100 rounded"
+                className="p-2 hover:bg-accent rounded-lg transition-colors"
               >
-                <X className="w-5 h-5" />
+                <X className="w-5 h-5 text-muted-foreground" />
               </button>
             </div>
 
@@ -283,23 +348,40 @@ const AppShell = memo(() => {
               {NAV_ITEMS.map((item) => {
                 const Icon = item.icon;
                 const isActive = location.pathname === item.path;
+                const isPremium = item.requiresPremium && !isPaid;
                 
                 return (
                   <button
                     key={item.id}
-                    onClick={() => handleNavigation(item.path)}
+                    onClick={() => {
+                      if (isPremium) {
+                        // Show upgrade prompt for premium features
+                        alert('This feature requires a premium subscription. Please upgrade to access.');
+                        return;
+                      }
+                      handleNavigation(item.path);
+                      setIsMobileMenuOpen(false);
+                    }}
                     className={`w-full flex items-center p-3 rounded-lg transition-all duration-200 ${
                       isActive
-                        ? 'bg-blue-50 text-blue-600 border border-blue-200'
-                        : 'text-gray-700 hover:bg-gray-100'
+                        ? 'bg-primary text-primary-foreground'
+                        : isPremium
+                        ? 'text-muted-foreground cursor-not-allowed'
+                        : 'text-foreground hover:bg-accent'
                     }`}
+                    disabled={isPremium}
                   >
                     <Icon className={`w-5 h-5 ${
-                      isActive ? 'text-blue-600' : 'text-gray-500'
+                      isActive ? 'text-primary-foreground' : isPremium ? 'text-muted-foreground' : 'text-muted-foreground'
                     }`} />
-                    <div className="ml-3 text-left">
-                      <div className="font-medium">{item.label}</div>
-                      <div className="text-xs text-gray-500">
+                    <div className="ml-3 text-left flex-1">
+                      <div className="font-medium flex items-center justify-between">
+                        {item.label}
+                        {isPremium && (
+                          <Lock className="w-4 h-4 text-muted-foreground" />
+                        )}
+                      </div>
+                      <div className="text-xs text-muted-foreground">
                         {item.description}
                       </div>
                     </div>
@@ -309,22 +391,22 @@ const AppShell = memo(() => {
             </nav>
 
             {/* Mobile User Section */}
-            <div className="p-4 border-t border-gray-200 mt-auto">
+            <div className="p-4 border-t border-border/50 mt-auto">
               <div className="flex items-center space-x-3 mb-3">
-                <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
-                  <span className="text-white font-medium text-sm">
+                <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
+                  <span className="text-primary-foreground font-medium text-sm">
                     {user?.email?.charAt(0).toUpperCase() || 'U'}
                   </span>
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-gray-900 truncate">
+                  <p className="text-sm font-medium text-foreground truncate">
                     {user?.email || 'User'}
                   </p>
                 </div>
               </div>
               <button
                 onClick={handleSignOut}
-                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md hover:bg-gray-50"
+                className="w-full px-3 py-2 text-sm border border-border rounded-md hover:bg-accent transition-colors"
               >
                 Sign Out
               </button>
@@ -333,38 +415,31 @@ const AppShell = memo(() => {
         </div>
       )}
 
+      {/* Mobile Menu Button */}
+      <div className="lg:hidden fixed top-4 left-4 z-30">
+        <button
+          onClick={() => setIsMobileMenuOpen(true)}
+          className="p-2 bg-card border border-border/50 rounded-lg shadow-lg"
+        >
+          <Menu className="w-5 h-5 text-foreground" />
+        </button>
+      </div>
+
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Top Header */}
-        <header className="bg-white border-b border-gray-200 px-4 py-3">
-          <div className="flex items-center justify-between">
-            {/* Mobile Menu Button */}
-            <button
-              onClick={() => setIsMobileMenuOpen(true)}
-              className="lg:hidden p-2 hover:bg-gray-100 rounded"
-            >
-              <Menu className="w-5 h-5" />
-            </button>
-
-            {/* Breadcrumb */}
-            <div className="flex items-center space-x-2">
-              <span className="text-sm text-gray-500">/</span>
-              <span className="text-sm font-medium text-gray-900">
-                {activeNavItem.label}
-              </span>
-            </div>
-
-            {/* Right side actions */}
-            <div className="flex items-center space-x-2">
-              {/* Add any header actions here */}
-            </div>
-          </div>
-        </header>
-
-        {/* Main Content */}
-        <main className="flex-1 overflow-auto">
-          {currentContent}
-        </main>
+      <div className="flex-1 overflow-auto bg-background">
+        <div className="h-full">
+          <Routes>
+            <Route path="/" element={<HomeDashboard />} />
+            <Route path="/module/current" element={<CurrentModule trackLabel="AI/ML Engineering" />} />
+            <Route path="/self-guided" element={<SelfGuided />} />
+            <Route path="/past-tracks" element={<PastTracks />} />
+            <Route path="/workspace" element={<UnifiedLearningPlatform />} />
+            <Route path="/career" element={<CareerPreview userTier={isPaid ? 'premium' : 'free'} />} />
+            <Route path="/portfolio" element={<PortfolioPreview userTier={isPaid ? 'premium' : 'free'} />} />
+            <Route path="/settings" element={<Settings userTier={isPaid ? 'premium' : 'free'} />} />
+            <Route path="*" element={<HomeDashboard />} />
+          </Routes>
+        </div>
       </div>
     </div>
   );

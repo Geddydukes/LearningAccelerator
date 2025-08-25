@@ -40,24 +40,45 @@
 - ❌ `/cron/career-match` (job ingest)
 - ❌ `/cron/security-audit` (weekly scan)
 
-## 3. ✅ Prompt & Placeholder Map
+## 3. ✅ Prompt Path System
+
+**Architecture**: Manifest-driven prompt compilation with private storage and signed URLs
+
+```
+Registry (registry.ts) → Manifest (build/agents.manifest.json) → Base Prompts (immutable)
+                                    ↓
+                            Compile (per-user variables) → Private Cache → Signed URLs
+                                    ↓
+                            Agent Proxy → LLM → Response
+```
+
+### Prompt Path Flow
+1. **Build Time**: `npm run build:manifest` generates manifest from registry
+2. **CI/CD**: `scripts/sync-prompts.sh` uploads manifest + base prompts to Supabase Storage
+3. **Runtime**: Frontend calls `/functions/v1/track-sync` to compile prompts with user variables
+4. **Caching**: Compiled prompts stored in private `prompts-compiled` bucket with SHA-256 hash keys
+5. **Execution**: Agent proxy fetches compiled prompts via 60-second signed URLs
+6. **Telemetry**: All operations logged to `prompt_compilations` and `prompt_invocations` tables
+
+### Storage Buckets
+- **`prompts-base`** - Public read, immutable base prompt templates
+- **`prompts-manifest`** - Public read, short TTL (60s) for agent metadata
+- **`prompts-compiled`** - **Private**, user-specific compiled prompts with PII protection
+
+### Security Model
+- **Base prompts**: Public (no PII)
+- **Compiled prompts**: Private with signed URLs (contains user PII like END_GOAL, hardware specs)
+- **Manifest**: Public metadata only
+- **Service role**: Full access for compilation and caching
 
 | File | Status | Template Variables |
 |------|--------|-------------------|
-| `prompts/clo_v3.yml` | ✅ Complete | {{TRACK_LABEL}}, {{CORE_COMPETENCY_BLOCK}}, {{MONTH_GOALS_JSON}}, {{TIME_PER_WEEK}}, {{BUDGET_JSON}}, {{HARDWARE_SPECS}}, {{LEARNING_STYLE}}, {{END_GOAL}} |
-| `prompts/socratic_v2_0.md` | ✅ Complete | None found (static prompts) |
-| `prompts/alex_v2_2.md` | ✅ Complete | None found |
-| `prompts/brand_strategist_v2_1.md` | ✅ Complete | None found |
+| `prompts/base/clo_v3.yml` | ✅ Complete | {{TRACK_LABEL}}, {{TIME_PER_WEEK}}, {{END_GOAL}}, {{LEARNING_STYLE}}, {{HARDWARE_SPECS}} |
+| `prompts/base/socratic_v3.yml` | ✅ Complete | {{WEEK_NUMBER}}, {{LEARNING_OBJECTIVES}}, {{CURRENT_PROGRESS}} |
+| `prompts/base/alex_v3.yml` | ✅ Complete | {{WEEK_NUMBER}}, {{REPOSITORY_URL}}, {{TECHNICAL_FOCUS}} |
+| `prompts/base/brand_strategist_v3.yml` | ✅ Complete | {{WEEK_NUMBER}}, {{WEEK_THEME}}, {{TARGET_AUDIENCE}} |
 
-**Implemented Placeholders** (v3 templates):
-- ✅ `{{TRACK_LABEL}}` - Track name (AI/ML Engineering)
-- ✅ `{{CORE_COMPETENCY_BLOCK}}` - Level-specific competencies
-- ✅ `{{MONTH_GOALS_JSON}}` - Monthly learning goals
-- ✅ `{{TIME_PER_WEEK}}` - User's weekly time commitment
-- ✅ `{{BUDGET_JSON}}` - User's budget constraints
-- ✅ `{{HARDWARE_SPECS}}` - User's hardware specifications
-- ✅ `{{LEARNING_STYLE}}` - User's preferred learning style
-- ✅ `{{END_GOAL}}` - User's career end goal
+**Privacy Protection**: User-specific variables (END_GOAL, hardware specs, learning preferences) are compiled into private storage with signed URL access only.
 
 ## 4. ✅ Data Flow Narratives
 

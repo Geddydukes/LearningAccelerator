@@ -7,16 +7,17 @@ export const PATHS = {
   // Main app routes (all under /home)
   home: "/home",
   moduleCurrent: "/home/module/current",
-  socratic: "/home/socratic",
-  ta: "/home/ta",
+  pastTracks: "/home/past-tracks",
+  selfGuided: "/home/self-guided", // Add self-guided learning route
   career: "/home/career",
   portfolio: "/home/portfolio",
+  workspace: "/home/workspace", // Add the learning workspace route
   
   // Settings and other routes
   settings: "/home/settings",
   
   // Legacy routes (for redirects)
-  workspace: "/workspace",
+  legacyWorkspace: "/workspace", // Rename to avoid conflict
   clo: "/clo",
   
   // API and utility routes
@@ -36,8 +37,6 @@ export const isProtectedRoute = (path: string): boolean => {
 export const getActiveNavItem = (pathname: string) => {
   if (pathname === PATHS.home) return 'dashboard';
   if (pathname === PATHS.moduleCurrent) return 'module';
-  if (pathname === PATHS.socratic) return 'socratic';
-  if (pathname === PATHS.ta) return 'ta';
   if (pathname === PATHS.career) return 'career';
   if (pathname === PATHS.portfolio) return 'portfolio';
   return 'dashboard';

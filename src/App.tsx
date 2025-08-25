@@ -3,6 +3,7 @@ import { ThemeProvider } from './contexts/ThemeContext';
 import { AuthProvider } from './contexts/AuthContext';
 import { LandingPage } from './components/landing/LandingPage';
 import { AuthForm } from './components/auth/AuthForm';
+import AppShell from './components/layout/AppShell';
 import { SimpleAppShell } from './components/layout/SimpleAppShell';
 import { UnifiedLearningPlatform } from './components/workspace/UnifiedLearningPlatform';
 import { ErrorBoundary } from './components/ui/ErrorBoundary';
@@ -52,12 +53,12 @@ function AppContent() {
         <Route path="/auth" element={<AuthForm />} />
         
         {/* Protected routes */}
-        <Route path="/home/*" element={<SimpleAppShell />} />
-        <Route path="/unified-learning" element={<UnifiedLearningPlatform />} />
+        <Route path="/home/*" element={<AppShell />} />
         
         {/* Legacy routes - redirect to new structure */}
-        <Route path="/workspace" element={<Navigate to="/unified-learning" replace />} />
-        <Route path="/clo" element={<Navigate to="/unified-learning" replace />} />
+        <Route path="/workspace" element={<Navigate to="/home/workspace" replace />} />
+        <Route path="/clo" element={<Navigate to="/home/workspace" replace />} />
+        <Route path="/unified-learning" element={<Navigate to="/home/workspace" replace />} />
         
         {/* Default redirect */}
         <Route path="/" element={<Navigate to="/landing" replace />} />
