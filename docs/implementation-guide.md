@@ -1,4 +1,182 @@
-# Implementation Guide: UI Redesign with shadcn/ui
+# Implementation Guide: Instructor-Centric Learning Flow
+
+## Overview
+
+This guide outlines the implementation of the **instructor-centric learning flow** where the Instructor Agent operates as a classroom teacher, delivering structured lectures, checking comprehension, and preparing students for targeted practice sessions.
+
+## 🎓 Core Learning Flow Implementation
+
+### Phase 1: Instructor Agent Enhancement
+
+The Instructor Agent needs to be enhanced to operate as a classroom teacher with three key phases:
+
+#### 1. Lecture Delivery Phase
+```typescript
+interface InstructorAgent {
+  deliverLecture(basePrompt: CLOPrompt): Promise<LectureContent>;
+  checkComprehension(lectureContent: LectureContent): Promise<ComprehensionCheck>;
+  modifyPracticePrompts(
+    basePrompt: CLOPrompt, 
+    comprehensionResults: ComprehensionCheck
+  ): Promise<ModifiedPrompts>;
+}
+```
+
+#### 2. Comprehension Check Phase
+```typescript
+interface ComprehensionCheck {
+  questions: Array<{
+    question: string;
+    userAnswer: string;
+    understandingLevel: 'mastered' | 'needs_work' | 'not_understood';
+    followUpActions: string[];
+  }>;
+  overallUnderstanding: Record<string, 'mastered' | 'needs_work' | 'not_understood'>;
+}
+```
+
+#### 3. Practice Preparation Phase
+```typescript
+interface ModifiedPrompts {
+  ta: {
+    basePrompt: string;
+    userUnderstanding: Record<string, string>;
+    instructorNotes: string;
+    practiceFocus: string[];
+  };
+  socratic: {
+    basePrompt: string;
+    userUnderstanding: Record<string, string>;
+    instructorNotes: string;
+    socraticFocus: string[];
+  };
+}
+```
+
+### Phase 2: Prompt Modification System
+
+The system needs to modify TA/Socratic prompts based on Instructor comprehension checks:
+
+```typescript
+// Example: TA Agent receives modified prompt
+const modifiedTAPrompt = {
+  topic: "Neural Networks",
+  exercises: ["Build simple NN", "Test with data", "Optimize parameters"],
+  difficulty: "intermediate",
+  user_understanding: {
+    basic_concepts: "mastered",
+    bias_variance: "needs_reinforcement", 
+    optimization: "not_covered"
+  },
+  instructor_notes: "User understands basic NN structure but struggled with bias-variance tradeoff. Focus TA exercises on this concept.",
+  practice_focus: "bias_variance_tradeoff"
+};
+```
+
+### Phase 3: Frontend Interface Implementation
+
+#### Instructor Interface Components
+```typescript
+// Lecture delivery interface
+const LectureInterface = () => {
+  const [lectureContent, setLectureContent] = useState<string>('');
+  const [currentPhase, setCurrentPhase] = useState<'lecture' | 'comprehension' | 'practice'>('lecture');
+  
+  return (
+    <div className="lecture-container">
+      {currentPhase === 'lecture' && <LectureDelivery />}
+      {currentPhase === 'comprehension' && <ComprehensionCheck />}
+      {currentPhase === 'practice' && <PracticePreparation />}
+    </div>
+  );
+};
+```
+
+#### Practice Mode Selection
+```typescript
+const PracticeSelection = () => {
+  const [selectedMode, setSelectedMode] = useState<'ta' | 'socratic' | null>(null);
+  
+  return (
+    <div className="practice-selection">
+      <h3>Choose your practice mode:</h3>
+      <button onClick={() => setSelectedMode('ta')}>
+        TA Practice (Hands-on Coding)
+      </button>
+      <button onClick={() => setSelectedMode('socratic')}>
+        Socratic Practice (Question-Based Learning)
+      </button>
+    </div>
+  );
+};
+```
+
+## 🔄 Data Flow Implementation
+
+### Daily Learning Session Flow
+```typescript
+// 1. CLO provides base prompt
+const basePrompt = await cloAgent.getDailyPrompt(week, day);
+
+// 2. Instructor delivers lecture and checks comprehension
+const instructorSession = await instructorAgent.deliverLecture(basePrompt);
+
+// 3. Instructor modifies prompts based on comprehension
+const modifiedPrompts = await instructorAgent.modifyPracticePrompts(
+  basePrompt,
+  instructorSession.comprehensionChecks
+);
+
+// 4. TA/Socratic receive modified prompts
+const taResponse = await taAgent.generateExercises(modifiedPrompts.ta);
+const socraticResponse = await socraticAgent.generateQuestions(modifiedPrompts.socratic);
+```
+
+### Weekly Assessment Loop
+```typescript
+// 1. Alex grades weekly tasks
+const alexAssessment = await alexAgent.gradeWeeklyTasks(userId, week);
+
+// 2. CLO adjusts curriculum based on assessment
+const updatedCurriculum = await cloAgent.adjustCurriculum(alexAssessment);
+
+// 3. Next week's learning plan reflects adjustments
+const nextWeekPlan = await cloAgent.generateWeeklyPlan(week + 1, updatedCurriculum);
+```
+
+## 🚀 Implementation Phases
+
+### Phase 1: Complete Missing Agent Functions (Day 1-2)
+- Create missing individual agent functions
+- Update agent-proxy handlers
+- Test all agent endpoints
+
+### Phase 2: Instructor Agent Enhancement (Day 2-3)
+- Implement lecture delivery capability
+- Add comprehension check functionality
+- Create prompt modification system
+
+### Phase 3: Frontend Integration (Day 3-4)
+- Build instructor interface components
+- Implement practice mode selection
+- Create seamless flow between agents
+
+### Phase 4: Testing & Optimization (Day 4-5)
+- End-to-end testing of complete flow
+- Performance optimization
+- Error handling verification
+
+## 📚 Related Documentation
+
+- [Agent Flow Documentation](./agent-flow.md) - Complete learning flow
+- [Architecture Documentation](./architecture.md) - System architecture
+- [Data Flow Documentation](./data-flow.md) - Data flow patterns
+
+---
+
+**Version**: 3.0  
+**Last Updated**: January 2025  
+**Focus**: Instructor-Centric Learning Implementation
 
 ## Phase 1: Foundation Setup
 

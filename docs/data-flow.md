@@ -1,10 +1,10 @@
-# 🚀 Learning Accelerator Data Flow v2.1
+# 🚀 Learning Accelerator Data Flow v3.0 - Instructor-Centric Learning
 
 ## Overview
 
-The Learning Accelerator orchestrator system manages the flow of data between users, AI agents, and learning sessions. This document describes the data flow for Orchestrator v1.1 with InstructorAgent v2.1 integration.
+The Learning Accelerator orchestrator system manages the flow of data between users, AI agents, and learning sessions. This document describes the **instructor-centric learning flow** where the Instructor Agent operates as a classroom teacher, delivering lectures, checking comprehension, and preparing students for targeted practice sessions.
 
-## System Architecture
+## System Architecture - Instructor-Centric Flow
 
 ```
 User Interface (React SPA)
@@ -16,11 +16,46 @@ User Interface (React SPA)
    Orchestrator v1.1
          │
          ▼
-   AI Agent Ecosystem
+   Instructor-Centric Agent Ecosystem
          │
          ▼
    Supabase (Postgres + Storage)
 ```
+
+## Instructor-Centric Learning Flow
+
+### Daily Learning Session Flow
+
+```
+CLO Framework → Instructor Lecture → Comprehension Check → Practice Preparation
+                     │                        │                    │
+                     ▼                        ▼                    ▼
+              Structured Content        Understanding Level    Modified Prompts
+                     │                        │                    │
+                     ▼                        ▼                    ▼
+              User Engagement         Adaptive Teaching    TA/Socratic Practice
+```
+
+### Agent Interaction Patterns
+
+#### 1. Lecture Delivery Phase
+- **CLO Agent**: Provides daily lesson framework
+- **Instructor Agent**: Delivers structured lecture content
+- **User**: Receives organized, pedagogical instruction
+
+#### 2. Comprehension Check Phase  
+- **Instructor Agent**: Asks targeted questions
+- **User**: Responds with understanding level
+- **Instructor Agent**: Adapts teaching based on responses
+
+#### 3. Practice Preparation Phase
+- **Instructor Agent**: Modifies TA/Socratic prompts based on comprehension
+- **User**: Chooses practice mode (TA coding or Socratic questioning)
+- **TA/Socratic Agents**: Receive tailored prompts for targeted practice
+
+#### 4. Weekly Assessment Loop
+- **Alex Agent**: Grades weekly project submissions
+- **CLO Agent**: Adjusts next week's curriculum based on Alex feedback
 
 ## Core Data Flow
 
