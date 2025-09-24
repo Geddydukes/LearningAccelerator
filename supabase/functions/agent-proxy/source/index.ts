@@ -7,7 +7,7 @@ const corsHeaders = {
 }
 
 interface AgentRequest {
-  agent: 'clo' | 'socratic' | 'alex' | 'brand';
+  agent: 'clo' | 'socratic' | 'alex' | 'brand' | 'onboarder' | 'portfolio_curator' | 'clarifier' | 'ta' | 'instructor' | 'career_match';
   action: string;
   payload: any;
   userId: string;
@@ -44,16 +44,34 @@ serve(async (req) => {
     let result;
     switch (agent) {
       case 'clo':
-        result = await handleCLOAgent(promptText, action, payload)
+        result = await handleCLOAgent(promptText, action, payload, userId)
         break
       case 'socratic':
-        result = await handleSocraticAgent(promptText, action, payload)
+        result = await handleSocraticAgent(promptText, action, payload, userId)
         break
       case 'alex':
-        result = await handleAlexAgent(promptText, action, payload)
+        result = await handleAlexAgent(promptText, action, payload, userId)
         break
       case 'brand':
-        result = await handleBrandAgent(promptText, action, payload)
+        result = await handleBrandAgent(promptText, action, payload, userId)
+        break
+      case 'onboarder':
+        result = await handleOnboarderAgent(promptText, action, payload, userId)
+        break
+      case 'portfolio_curator':
+        result = await handlePortfolioAgent(promptText, action, payload, userId)
+        break
+      case 'clarifier':
+        result = await handleClarifierAgent(promptText, action, payload, userId)
+        break
+      case 'ta':
+        result = await handleTAAgent(promptText, action, payload, userId)
+        break
+      case 'instructor':
+        result = await handleInstructorAgent(promptText, action, payload, userId)
+        break
+      case 'career_match':
+        result = await handleCareerMatchAgent(promptText, action, payload, userId)
         break
       default:
         throw new Error(`Unknown agent: ${agent}`)
@@ -91,230 +109,67 @@ function getPromptPath(agent: string): string {
     'clo': 'clo_v3.yml',
     'socratic': 'socratic_v3.yml', 
     'alex': 'alex_v3.yml',
-    'brand': 'brand_strategist_v3.yml'
+    'brand': 'brand_strategist_v3.yml',
+    'onboarder': 'onboarder_v2.yml',
+    'portfolio_curator': 'portfolio_v1_8.yml',
+    'clarifier': 'clarifier_v3.yml',
+    'ta': 'taagent_v1_4.yml',
+    'instructor': 'instructor_v2_1.yml',
+    'career_match': 'career_match_v1_3.yml'
   }
   
   return promptMap[agent as keyof typeof promptMap] || `${agent}_prompt.yml`
 }
 
-async function handleCLOAgent(prompt: string, action: string, payload: any) {
-  // TODO: Implement actual Gemini API call with loaded prompt
-  console.log('CLO Agent called with action:', action)
-  
-  let result;
-  switch (action) {
-    case 'GET_DAILY_LESSON':
-      result = {
-        lesson_id: 'lesson-1',
-        title: 'Introduction to Machine Learning Fundamentals',
-        objectives: [
-          'Understand basic ML concepts and terminology',
-          'Learn about supervised vs unsupervised learning',
-          'Complete hands-on exercises with sample data'
-        ],
-        content: 'Today we\'ll explore the foundational concepts of machine learning. We\'ll start with understanding what machine learning is, how it differs from traditional programming, and the different types of learning approaches.',
-        exercises: [
-          'Complete the ML terminology quiz',
-          'Practice with the sample dataset exercise',
-          'Build a simple linear regression model'
-        ],
-        duration: 60,
-        day_number: 1
-      };
-      break;
-    case 'GET_WEEKLY_PLAN':
-      result = {
-        plan_id: 'plan-1',
-        title: 'Machine Learning Fundamentals - Week 1',
-        description: 'Introduction to core ML concepts and practical applications',
-        objectives: [
-          'Master fundamental ML concepts and terminology',
-          'Implement basic supervised learning algorithms',
-          'Complete a practical ML project from start to finish'
-        ],
-        key_concepts: [
-          'Machine Learning vs Traditional Programming',
-          'Supervised vs Unsupervised Learning',
-          'Model Training and Validation',
-          'Feature Engineering and Selection'
-        ],
-        resources: [
-          { type: 'Course', title: 'ML Fundamentals', url: '#', description: 'Comprehensive online course' },
-          { type: 'Book', title: 'Hands-On ML', url: '#', description: 'Practical ML guidebook' },
-          { type: 'Tool', title: 'Jupyter Notebooks', url: '#', description: 'Interactive development environment' }
-        ],
-        estimated_duration: 540,
-        week_number: 1
-      };
-      break;
-    default:
-      result = {
-        module_title: "Sample Learning Module",
-        learning_objectives: ["Objective 1", "Objective 2"],
-        key_concepts: ["Concept 1", "Concept 2"],
-        estimated_duration: 120,
-        prerequisites: ["Basic knowledge"],
-        resources: [],
-        assessment_criteria: ["Criteria 1"]
-      };
-  }
-  
-  return {
-    shouldPersist: true,
-    data: result
-  }
+async function handleCLOAgent(_prompt: string, action: string, payload: any, userId: string) {
+  const data = await callAgentFunction('clo-agent', action, payload, userId)
+  return { shouldPersist: true, data }
 }
 
 async function handleSocraticAgent(prompt: string, action: string, payload: any) {
-  // TODO: Implement Gemini API call with Socratic prompt
   console.log('Socratic Agent called with action:', action)
-  
-  let result;
-  switch (action) {
-    case 'START_SESSION':
-      result = {
-        session_id: crypto.randomUUID(),
-        question: "What do you think is the fundamental difference between machine learning and traditional programming?",
-        level: 1,
-        topic: payload.topic || 'Machine Learning Fundamentals'
-      };
-      break;
-    case 'CONTINUE_SESSION':
-      result = {
-        question: "Can you give me a concrete example of how you would apply this concept in practice?",
-        level: 3,
-        feedback: "Good understanding of the basics. Let's dive deeper into application."
-      };
-      break;
-    case 'ASSESS_MASTERY':
-      result = {
-        mastery_level: 4,
-        next_question: "What are the potential limitations or weaknesses of this approach?",
-        level: 5,
-        is_mastered: false
-      };
-      break;
-    default:
-      result = {
-        question: "What do you think about this concept?",
-        conversation_id: payload.sessionId || crypto.randomUUID()
-      };
-  }
-  
-  return {
-    shouldPersist: false,
-    data: result
-  }
+  const data = await callAgentFunction('socratic-agent', action, payload, (payload && payload.userId) || '')
+  return { shouldPersist: false, data }
 }
 
-async function handleAlexAgent(prompt: string, action: string, payload: any) {
-  // TODO: Implement Gemini API call with Alex prompt
-  console.log('Alex Agent called with action:', action)
-  
-  let result;
-  switch (action) {
-    case 'REVIEW_CODE':
-      result = {
-        repository_url: payload.repositoryUrl,
-        analysis_summary: "Code analysis complete - good structure with room for improvement",
-        code_quality_score: 85,
-        recommendations: [
-          "Add comprehensive error handling",
-          "Implement input validation",
-          "Consider adding unit tests"
-        ],
-        technical_debt_items: [
-          "Hardcoded configuration values",
-          "Missing documentation"
-        ],
-        best_practices_followed: [
-          "Clean code structure",
-          "Good separation of concerns"
-        ],
-        areas_for_improvement: [
-          "Error handling",
-          "Testing coverage",
-          "Documentation"
-        ]
-      };
-      break;
-    case 'DEPTH_ADVISOR':
-      result = {
-        recommendation: "STANDARD",
-        reasoning: "Code shows intermediate complexity, standard review depth is appropriate",
-        estimated_review_time: "15-20 minutes"
-      };
-      break;
-    default:
-      result = {
-        repository_url: payload.repositoryUrl,
-        analysis_summary: "Code analysis complete",
-        code_quality_score: 85,
-        recommendations: [],
-        technical_debt_items: [],
-        best_practices_followed: [],
-        areas_for_improvement: []
-      };
-  }
-  
-  return {
-    shouldPersist: true,
-    data: result
-  }
+async function handleAlexAgent(_prompt: string, action: string, payload: any, userId: string) {
+  const data = await callAgentFunction('alex-agent', action, payload, userId)
+  return { shouldPersist: true, data }
 }
 
-async function handleBrandAgent(prompt: string, action: string, payload: any) {
-  // TODO: Implement Gemini API call with Brand prompt
-  console.log('Brand Agent called with action:', action)
-  
-  let result;
-  switch (action) {
-    case 'SUBMIT_BRIEFING':
-      result = {
-        content_themes: [
-          "Machine Learning Fundamentals",
-          "Practical Application",
-          "Continuous Learning"
-        ],
-        kpi_metrics: [
-          { metric: "Learning Progress", value: "75%", trend: "↑" },
-          { metric: "Concept Mastery", value: "8/10", trend: "→" },
-          { metric: "Project Completion", value: "3/5", trend: "↑" }
-        ],
-        social_content_suggestions: [
-          "Share your ML learning journey on LinkedIn",
-          "Post about the practical project you completed",
-          "Tweet about key insights from today's session"
-        ],
-        brand_voice_analysis: "Professional and engaging, showing technical expertise while remaining approachable",
-        engagement_strategies: [
-          "Share weekly learning milestones",
-          "Post code snippets with explanations",
-          "Engage with the ML community"
-        ]
-      };
-      break;
-    case 'CONTENT_OPTIMIZER':
-      result = {
-        top_format: "LinkedIn post with visual",
-        tweak_suggestion: "Add a personal story about your learning challenge",
-        engagement_prediction: "High engagement expected due to relatable content"
-      };
-      break;
-    default:
-      result = {
-        content_themes: ["Theme 1", "Theme 2"],
-        kpi_metrics: [],
-        social_content_suggestions: [],
-        brand_voice_analysis: "Professional and engaging",
-        engagement_strategies: []
-      };
-  }
-  
-  return {
-    shouldPersist: true,
-    data: result
-  }
+async function handleBrandAgent(_prompt: string, action: string, payload: any, userId: string) {
+  const data = await callAgentFunction('brand-agent', action, payload, userId)
+  return { shouldPersist: true, data }
+}
+
+async function handleOnboarderAgent(_prompt: string, action: string, payload: any, userId: string) {
+  const data = await callAgentFunction('onboarder-agent', action, payload, userId)
+  return { shouldPersist: true, data }
+}
+
+async function handlePortfolioAgent(_prompt: string, action: string, payload: any, userId: string) {
+  const data = await callAgentFunction('portfolio-curator', action, payload, userId)
+  return { shouldPersist: true, data }
+}
+
+async function handleClarifierAgent(_prompt: string, action: string, payload: any, userId: string) {
+  const data = await callAgentFunction('clarifier-agent', action, payload, userId)
+  return { shouldPersist: true, data }
+}
+
+async function handleTAAgent(_prompt: string, action: string, payload: any, userId: string) {
+  const data = await callAgentFunction('ta-agent', action, payload, userId)
+  return { shouldPersist: true, data }
+}
+
+async function handleInstructorAgent(_prompt: string, action: string, payload: any, userId: string) {
+  const data = await callAgentFunction('instructor-agent', action, payload, userId)
+  return { shouldPersist: true, data }
+}
+
+async function handleCareerMatchAgent(_prompt: string, action: string, payload: any, userId: string) {
+  const data = await callAgentFunction('career-match', action, payload, userId)
+  return { shouldPersist: true, data }
 }
 
 async function persistAgentResult(supabaseClient: any, userId: string, agent: string, data: any) {
@@ -336,4 +191,27 @@ async function persistAgentResult(supabaseClient: any, userId: string, agent: st
   if (error) {
     console.error('Failed to persist agent result:', error)
   }
+}
+
+async function callAgentFunction(endpoint: string, action: string, payload: any, userId: string): Promise<any> {
+  const supabaseUrl = Deno.env.get('SUPABASE_URL')
+  const authToken = Deno.env.get('EDGE_SERVICE_JWT') || Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || ''
+  if (!supabaseUrl || !authToken) {
+    throw new Error('Missing SUPABASE_URL or EDGE_SERVICE_JWT/SERVICE_ROLE_KEY in environment')
+  }
+
+  const resp = await fetch(`${supabaseUrl}/functions/v1/${endpoint}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${authToken}`
+    },
+    body: JSON.stringify({ action, payload, userId })
+  })
+
+  const json = await resp.json()
+  if (!resp.ok || !json.success) {
+    throw new Error(json.error || `Upstream ${endpoint} call failed`)
+  }
+  return json.data
 }

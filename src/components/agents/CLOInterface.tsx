@@ -235,18 +235,7 @@ export const CLOInterface: React.FC = () => {
               />
             )}
 
-            {moduleData.assessment_criteria && (
-              <CollapsibleMarkdown title="Assessment Criteria" defaultOpen={false}>
-                <ul className="space-y-2">
-                  {moduleData.assessment_criteria.map((criteria, index) => (
-                    <li key={index} className="flex items-start space-x-2">
-                      <CheckCircle className="w-4 h-4 text-emerald-500 mt-0.5 flex-shrink-0" />
-                      <span>{criteria}</span>
-                    </li>
-                  ))}
-                </ul>
-              </CollapsibleMarkdown>
-            )}
+            {/* Intentionally hide any sections below Resources (e.g., daily prompts, TA/Socratic prompts, assessment, internal notes) */}
 
             <div className="pt-6 border-t border-gray-200 dark:border-gray-700">
               <Button 

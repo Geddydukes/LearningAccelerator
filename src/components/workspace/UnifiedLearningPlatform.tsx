@@ -1980,19 +1980,7 @@ export const UnifiedLearningPlatform: React.FC = () => {
                                         '📖'
                                       )}
                                       
-                                      {/* Daily Socratic Prompts */}
-                                      {sections.dailySocraticPrompts && formatContentSection(
-                                        sections.dailySocraticPrompts[1], 
-                                        'Daily Socratic Prompts', 
-                                        '💭'
-                                      )}
-                                      
-                                      {/* TA Daily Tasks */}
-                                      {sections.taDailyTasks && formatContentSection(
-                                        sections.taDailyTasks[1], 
-                                        'TA Daily Tasks', 
-                                        '📝'
-                                      )}
+
                                       
                                       {/* Capstone Project */}
                                       {sections.capstoneProject && (
@@ -2036,7 +2024,7 @@ export const UnifiedLearningPlatform: React.FC = () => {
                                       )}
                                       
                                       {/* Daily Breakdown Section */}
-                                      {learningPlan.fullContent.daily_breakdown && (
+                                      {/* {learningPlan.fullContent.daily_breakdown && (
                                         <div className="bg-card border border-border/50 rounded-lg p-4">
                                           <h4 className="text-lg font-medium text-foreground mb-3">📅 Daily Breakdown</h4>
                                           <div className="space-y-3">
@@ -2051,7 +2039,7 @@ export const UnifiedLearningPlatform: React.FC = () => {
                                             })}
                                           </div>
                                         </div>
-                                      )}
+                                      )} */}
                                       
                                       {/* Remaining Unparsed Content */}
                                       {(() => {

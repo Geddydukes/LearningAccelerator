@@ -289,11 +289,11 @@ export class AgentOrchestrator {
 		userId: string, 
 		action: string, 
 		payload: any, 
-		weekNumber: number
+		weekNumber?: number
 	) {
 		try {
 			console.log('👨‍🏫 Instructor Agent called for user:', userId, 'action:', action, 'week:', weekNumber);
-			const key = makeRequestKey(userId, `instructor_${action}`, weekNumber);
+			const key = makeRequestKey(userId, `instructor_${action}`, weekNumber || 1);
 
 			// Serve from short-lived cache if available
 			const cached = RESPONSE_CACHE.get(key);
@@ -318,7 +318,7 @@ export class AgentOrchestrator {
 					},
 					body: JSON.stringify({
 						action: action,
-						payload: { ...payload, weekNumber },
+						payload: { ...payload, weekNumber: weekNumber || 1 },
 						userId: userId
 					})
 				});
@@ -327,9 +327,9 @@ export class AgentOrchestrator {
 				
 				if (result.success && result.data) {
 					// Save structured data to database
-					console.log('💾 Saving Instructor data for week:', weekNumber);
+					console.log('💾 Saving Instructor data for week:', weekNumber || 1);
 					
-					await DatabaseService.createOrUpdateWeeklyNote(userId, weekNumber, {
+					await DatabaseService.createOrUpdateWeeklyNote(userId, weekNumber || 1, {
 						instructor_lesson: result.data,
 						completion_status: {
 							clo_completed: false,

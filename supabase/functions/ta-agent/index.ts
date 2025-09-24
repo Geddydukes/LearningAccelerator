@@ -10,6 +10,11 @@ interface TARequest {
   action: string;
   payload: any;
   userId: string;
+  instructorModifications?: {
+    userUnderstanding: Record<string, string>;
+    instructorNotes: string;
+    practiceFocus: string[];
+  };
 }
 
 serve(async (req) => {
@@ -18,7 +23,7 @@ serve(async (req) => {
   }
 
   try {
-    const { action, payload, userId }: TARequest = await req.json()
+    const { action, payload, userId, instructorModifications }: TARequest = await req.json()
 
     // Initialize Supabase client
     const supabaseClient = createClient(
@@ -44,11 +49,14 @@ serve(async (req) => {
       .eq('id', userId)
       .single()
 
-    // Format prompt with user context
+    // Format prompt with user context and instructor modifications
     const formattedPrompt = promptText
       .replace(/{{TOPIC}}/g, payload.topic || 'Machine Learning Fundamentals')
       .replace(/{{LEARNING_STYLE}}/g, userProfile?.learning_style || 'mixed')
       .replace(/{{USER_LEVEL}}/g, payload.userLevel || 'beginner')
+      .replace(/{{INSTRUCTOR_NOTES}}/g, instructorModifications?.instructorNotes || '')
+      .replace(/{{PRACTICE_FOCUS}}/g, instructorModifications?.practiceFocus?.join(', ') || '')
+      .replace(/{{USER_UNDERSTANDING}}/g, JSON.stringify(instructorModifications?.userUnderstanding || {}))
 
     // Call Gemini API with formatted prompt
     const geminiResponse = await callGeminiAPI(formattedPrompt, action, payload)

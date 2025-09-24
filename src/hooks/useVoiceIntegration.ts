@@ -15,7 +15,7 @@ export const useVoiceIntegration = (options: VoiceIntegrationOptions = {}) => {
   const [transcript, setTranscript] = useState('');
   const [isListening, setIsListening] = useState(false);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
-  const recognitionRef = useRef<SpeechRecognition | null>(null);
+  const recognitionRef = useRef<any | null>(null);
 
   const {
     generateAudio,
@@ -45,7 +45,7 @@ export const useVoiceIntegration = (options: VoiceIntegrationOptions = {}) => {
       setIsListening(true);
     };
 
-    recognition.onresult = (event) => {
+    recognition.onresult = (event: any) => {
       let finalTranscript = '';
       let interimTranscript = '';
 
@@ -65,7 +65,7 @@ export const useVoiceIntegration = (options: VoiceIntegrationOptions = {}) => {
       }
     };
 
-    recognition.onerror = (event) => {
+    recognition.onerror = (event: any) => {
       console.error('Speech recognition error:', event.error);
       setIsListening(false);
       toast.error('Speech recognition failed');
@@ -110,11 +110,23 @@ export const useVoiceIntegration = (options: VoiceIntegrationOptions = {}) => {
         }
       };
 
-      mediaRecorder.onstop = () => {
+      mediaRecorder.onstop = async () => {
         const blob = new Blob(chunks, { type: 'audio/wav' });
-        const audioUrl = URL.createObjectURL(blob);
-        // TODO: Process recorded audio
-        console.log('Recording complete:', audioUrl);
+        
+        try {
+          // Process recorded audio
+          const transcript = await processRecordedAudio(blob);
+          setTranscript(transcript);
+          
+          if (options.onTranscriptReady) {
+            options.onTranscriptReady(transcript);
+          }
+          
+          console.log('Recording processed:', transcript);
+        } catch (error) {
+          console.error('Failed to process audio:', error);
+          toast.error('Failed to process audio recording');
+        }
       };
 
       mediaRecorder.start();
@@ -147,6 +159,47 @@ export const useVoiceIntegration = (options: VoiceIntegrationOptions = {}) => {
       console.error('TTS failed:', error);
     }
   }, [generateAudio, playAudio, audioUrl, options.autoPlay]);
+
+  const processRecordedAudio = async (audioBlob: Blob): Promise<string> => {
+    try {
+      // Convert blob to base64
+      const base64Audio = await blobToBase64(audioBlob);
+      
+      // Call voice transcription endpoint
+      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/voice/transcribe`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`
+        },
+        body: JSON.stringify({
+          audio: base64Audio,
+          userId: user?.id
+        })
+      });
+
+      const result = await response.json();
+      
+      if (result.success) {
+        return result.transcript;
+      } else {
+        throw new Error(result.error);
+      }
+    } catch (error) {
+      console.error('Voice processing error:', error);
+      throw error;
+    }
+  };
+
+  // Helper function to convert blob to base64
+  const blobToBase64 = (blob: Blob): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+    });
+  };
 
   const downloadTranscript = useCallback((text: string, filename = 'transcript.txt') => {
     const blob = new Blob([text], { type: 'text/plain' });

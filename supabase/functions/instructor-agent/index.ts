@@ -73,10 +73,16 @@ serve(async (req) => {
       command = 'START_DAY';
     } else if (action === 'GET_NEXT_LESSON') {
       command = 'REPLAN_LIGHT';
+    } else if (action === 'DELIVER_LECTURE') {
+      command = 'DELIVER_LECTURE';
+    } else if (action === 'CHECK_COMPREHENSION') {
+      command = 'CHECK_COMPREHENSION';
+    } else if (action === 'MODIFY_PRACTICE_PROMPTS') {
+      command = 'MODIFY_PRACTICE_PROMPTS';
     }
     
     // Call Gemini API with formatted prompt
-    const geminiResponse = await callGeminiAPI(formattedPrompt, command, payload)
+    const geminiResponse = await callGeminiAPI(formattedPrompt, command, payload, action)
 
     if (geminiResponse.success) {
       return new Response(
@@ -104,7 +110,7 @@ serve(async (req) => {
   }
 })
 
-async function callGeminiAPI(prompt: string, action: string, payload: any) {
+async function callGeminiAPI(prompt: string, command: string, payload: any, originalAction: string) {
   try {
     const geminiApiKey = Deno.env.get('GEMINI_API_KEY')
     if (!geminiApiKey) {
@@ -119,7 +125,7 @@ async function callGeminiAPI(prompt: string, action: string, payload: any) {
       body: JSON.stringify({
         contents: [{
           parts: [{
-            text: `${formattedPrompt}\n\nCommand: ${command}\n\nGenerate a daily lesson plan following the prompt instructions. Return the lesson in the specified JSON format with markdown content.`
+            text: `${prompt}\n\nCommand: ${command}\nPayload: ${JSON.stringify(payload)}\n\nGenerate a response based on the prompt instructions and command. Return structured data in JSON format.`
           }]
         }]
       })
@@ -128,21 +134,12 @@ async function callGeminiAPI(prompt: string, action: string, payload: any) {
     const result = await response.json()
     
     if (result.candidates && result.candidates[0]?.content?.parts?.[0]?.text) {
+      const responseText = result.candidates[0].content.parts[0].text
+      
+      // Parse response based on action type
       return {
         success: true,
-        data: {
-          lesson_id: `daily-${payload.dayNumber || 1}`,
-          title: extractTitle(result.candidates[0].content.parts[0].text),
-          objectives: extractObjectives(result.candidates[0].content.parts[0].text),
-          content: extractContent(result.candidates[0].content.parts[0].text),
-          exercises: extractExercises(result.candidates[0].content.parts[0].text),
-          estimated_duration: extractDuration(result.candidates[0].content.parts[0].text),
-          day_number: payload.dayNumber || 1,
-          practice_options: [
-            { type: 'socratic', title: 'Socratic Practice', description: 'Deep dive through questioning' },
-            { type: 'ta', title: 'TA Session', description: 'Get help with exercises' }
-          ]
-        }
+        data: parseInstructorResponse(responseText, originalAction, payload)
       }
     } else {
       throw new Error('Invalid response from Gemini API')
@@ -152,6 +149,65 @@ async function callGeminiAPI(prompt: string, action: string, payload: any) {
       success: false,
       error: error.message
     }
+  }
+}
+
+// Main response parser for instructor agent
+function parseInstructorResponse(responseText: string, action: string, payload: any) {
+  try {
+    // Try to parse as JSON first
+    const jsonMatch = responseText.match(/\{[\s\S]*\}/)
+    if (jsonMatch) {
+      return JSON.parse(jsonMatch[0])
+    }
+  } catch (e) {
+    // If JSON parsing fails, create structured response
+  }
+
+  // Fallback structured response based on action
+  switch (action) {
+    case 'DELIVER_LECTURE':
+      return {
+        lecture_content: extractContent(responseText) || "Today we'll explore the foundational concepts of machine learning. We'll start with understanding what machine learning is, how it differs from traditional programming, and the different types of learning approaches.",
+        key_concepts: extractKeyConcepts(responseText) || ["Supervised Learning", "Unsupervised Learning", "Model Training"],
+        estimated_duration: extractDuration(responseText) || 20,
+        next_phase: 'comprehension_check',
+        lecture_id: `lecture-${Date.now()}`,
+        difficulty_level: payload.difficultyLevel || 'intermediate'
+      }
+    case 'CHECK_COMPREHENSION':
+      return {
+        questions: extractComprehensionQuestions(responseText) || [
+          { id: 'q1', question: 'What is the difference between supervised and unsupervised learning?' },
+          { id: 'q2', question: 'Explain the concept of model training.' }
+        ],
+        user_understanding: extractUnderstandingLevel(responseText) || 'intermediate',
+        next_phase: 'practice_preparation',
+        assessment_id: `assessment-${Date.now()}`
+      }
+    case 'MODIFY_PRACTICE_PROMPTS':
+      return {
+        ta_prompt: extractTAPrompt(responseText) || "Modified TA prompt based on user understanding...",
+        socratic_prompt: extractSocraticPrompt(responseText) || "Modified Socratic prompt based on user understanding...",
+        practice_focus: extractPracticeFocus(responseText) || ["reinforcement", "application"],
+        modification_id: `modification-${Date.now()}`
+      }
+    case 'GET_DAILY_LESSON':
+    case 'GET_NEXT_LESSON':
+    default:
+      return {
+        lesson_id: `daily-${payload.dayNumber || 1}`,
+        title: extractTitle(responseText),
+        objectives: extractObjectives(responseText),
+        content: extractContent(responseText),
+        exercises: extractExercises(responseText),
+        estimated_duration: extractDuration(responseText),
+        day_number: payload.dayNumber || 1,
+        practice_options: [
+          { type: 'socratic', title: 'Socratic Practice', description: 'Deep dive through questioning' },
+          { type: 'ta', title: 'TA Session', description: 'Get help with exercises' }
+        ]
+      }
   }
 }
 
@@ -191,4 +247,55 @@ function extractExercises(text: string): string[] {
 function extractDuration(text: string): number {
   const durationMatch = text.match(/Duration[:\s]+(\d+)/i)
   return durationMatch ? parseInt(durationMatch[1]) : 30
+}
+
+function extractKeyConcepts(text: string): string[] {
+  const conceptsMatch = text.match(/Key Concepts?[:\s]+([\s\S]*?)(?=\n\n|\n[A-Z]|$)/i)
+  if (conceptsMatch) {
+    return conceptsMatch[1]
+      .split('\n')
+      .map(concept => concept.replace(/^[-*•]\s*/, '').trim())
+      .filter(concept => concept.length > 0)
+  }
+  return ['Core concepts']
+}
+
+function extractComprehensionQuestions(text: string): Array<{id: string, question: string}> {
+  const questionsMatch = text.match(/Questions?[:\s]+([\s\S]*?)(?=\n\n|\n[A-Z]|$)/i)
+  if (questionsMatch) {
+    return questionsMatch[1]
+      .split('\n')
+      .map((q, index) => ({
+        id: `q${index + 1}`,
+        question: q.replace(/^[-*•]\s*/, '').trim()
+      }))
+      .filter(q => q.question.length > 0)
+  }
+  return []
+}
+
+function extractUnderstandingLevel(text: string): string {
+  const levelMatch = text.match(/Understanding Level[:\s]+([^\n]+)/i)
+  return levelMatch ? levelMatch[1].trim().toLowerCase() : 'intermediate'
+}
+
+function extractTAPrompt(text: string): string {
+  const taMatch = text.match(/TA Prompt[:\s]+([\s\S]*?)(?=\n\n|\n[A-Z]|$)/i)
+  return taMatch ? taMatch[1].trim() : 'Modified TA prompt based on user understanding...'
+}
+
+function extractSocraticPrompt(text: string): string {
+  const socraticMatch = text.match(/Socratic Prompt[:\s]+([\s\S]*?)(?=\n\n|\n[A-Z]|$)/i)
+  return socraticMatch ? socraticMatch[1].trim() : 'Modified Socratic prompt based on user understanding...'
+}
+
+function extractPracticeFocus(text: string): string[] {
+  const focusMatch = text.match(/Practice Focus[:\s]+([\s\S]*?)(?=\n\n|\n[A-Z]|$)/i)
+  if (focusMatch) {
+    return focusMatch[1]
+      .split('\n')
+      .map(focus => focus.replace(/^[-*•]\s*/, '').trim())
+      .filter(focus => focus.length > 0)
+  }
+  return ['reinforcement', 'application']
 }
