@@ -14,12 +14,15 @@ See `docs/architecture.md` for C4 context and container diagrams.
 
 ## ✨ Key Capabilities
 
+- **Education Agent UI - AKA Guru**: Unified interface and personality orchestrating all agents as tools
 - **Instructor-Centric Learning**: Classroom-style teaching with structured lectures and comprehension checks
 - **Adaptive Practice**: TA/Socratic agents receive instructor-modified prompts based on user understanding
 - **Multi-Agent Support**: 10 specialized agents with instructor as central coordinator
+- **CLO Program Planning**: Multi-week Program Plan with versioning → weekly plans adjusted by performance
 - **Secure Prompt Injection**: Prompts are server-side only; never exposed in client
 - **Daily Feedback Loops**: Practice results modify next day's learning plan
 - **Weekly Assessment**: Alex grades tasks → CLO adjusts curriculum
+- **Coding Workspace**: In-browser coding tasks with tests and Alex grading integration
 - **PWA**: Offline-capable build, service worker, and web manifest
 - **Analytics-Ready**: Progress and streak primitives with e2e coverage
 
@@ -82,6 +85,23 @@ Core endpoints (Supabase Edge Functions):
 - `/functions/v1/orchestrator/rate_limit` – token bucket
 - `/functions/v1/cron-orchestrator` – cron workflows
 
+Education Agent endpoints (state machine + tools):
+
+- `/functions/v1/education-agent` – event-driven session flow (start_day → lecture → check → practice → reflect)
+- `/functions/v1/agent-proxy` – secure proxy to individual agents
+
+CLO planning endpoints:
+
+- `/functions/v1/clo/program.plan` – create multi-week Program Plan (versioned)
+- `/functions/v1/clo/program.accept` – accept/freeze Program Plan version
+- `/functions/v1/clo/weekly.plan` – derive weekly plan from Program Plan + performance
+
+Coding workspace endpoints:
+
+- `/functions/v1/coding-workspace/start` – scaffold coding session (fs, brief, tests)
+- `/functions/v1/coding-workspace/run` – execute tests/run code and capture output
+- `/functions/v1/coding-workspace/alex.final` – grade submission and return scorecard
+
 ## 🎓 Learning Flow Architecture
 
 ### Daily Learning Session
@@ -91,9 +111,11 @@ Core endpoints (Supabase Edge Functions):
 4. **Practice Sessions**: User chooses TA (coding) or Socratic (questioning) with tailored prompts
 
 ### Weekly Assessment Loop
-1. **Alex Assessment**: Grades weekly project submissions
-2. **CLO Adjustment**: Modifies next week's curriculum based on Alex feedback
-3. **Curriculum Evolution**: Learning objectives adapt to user progress
+1. **Program Plan Reference**: CLO maintains a versioned multi-week Program Plan
+2. **Weekly Plan Creation**: CLO derives week N plan from Program Plan + prior performance
+3. **Alex Assessment**: Grades weekly project submissions against the week’s rubric
+4. **CLO Adjustment**: Updates next week's plan; revision bumps Program Plan version as needed
+5. **Curriculum Evolution**: Learning objectives adapt to user progress
 
 See `docs/agent-flow.md` for complete learning flow documentation.
 
@@ -127,6 +149,10 @@ supabase/
 design-system/             # Reusable DS and tokens
 docs/                      # Architecture, SLOs, guides
 scripts/                   # Orchestrator, prompts, seeding
+src/components/education/  # Education Agent UI (unified)
+src/components/coding/     # In-browser coding workspace
+supabase/functions/education-agent/   # Session state machine
+supabase/functions/coding-workspace/  # Coding tools (start/run/alex)
 ```
 
 ## 🧪 Testing
