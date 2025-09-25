@@ -60,6 +60,26 @@ const prompts = [
   {
     name: 'taagent_v1_4.yml',
     path: '../prompts/base/taagent_v1_4.yml'
+  },
+  {
+    name: 'taagent_v1_5.yml',
+    path: '../prompts/base/taagent_v1_5.yml'
+  },
+  {
+    name: 'socratic_v3_1.yml',
+    path: '../prompts/base/socratic_v3_1.yml'
+  },
+  {
+    name: 'alex_v3_1.yml',
+    path: '../prompts/base/alex_v3_1.yml'
+  },
+  {
+    name: 'clarifier_v3_1.yml',
+    path: '../prompts/base/clarifier_v3_1.yml'
+  },
+  {
+    name: 'onboarder_v2_4.yml',
+    path: '../prompts/base/onboarder_v2_4.yml'
   }
 ];
 

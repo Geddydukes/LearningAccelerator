@@ -8,15 +8,15 @@
   },
   "socratic": {
     "id": "socratic",
-    "promptPath": "socratic_v3.yml",
-    "defaultPromptVersion": "3.0",
+    "promptPath": "socratic_v3_1.yml",
+    "defaultPromptVersion": "3.1",
     "entitlement": "core",
     "mode": "weekly"
   },
   "alex": {
     "id": "alex",
-    "promptPath": "alex_v3.yml",
-    "defaultPromptVersion": "3.0",
+    "promptPath": "alex_v3_1.yml",
+    "defaultPromptVersion": "3.1",
     "entitlement": "core",
     "mode": "weekly"
   },
@@ -29,15 +29,15 @@
   },
   "onboarder": {
     "id": "onboarder",
-    "promptPath": "onboarder_v2.yml",
-    "defaultPromptVersion": "2.0",
+    "promptPath": "onboarder_v2_4.yml",
+    "defaultPromptVersion": "2.4",
     "entitlement": "core",
     "mode": "adhoc"
   },
   "ta": {
     "id": "ta",
-    "promptPath": "taagent_v1_4.yml",
-    "defaultPromptVersion": "1.4",
+    "promptPath": "taagent_v1_5.yml",
+    "defaultPromptVersion": "1.5",
     "entitlement": "core",
     "mode": "weekly"
   },
@@ -64,8 +64,8 @@
   },
   "clarifier": {
     "id": "clarifier",
-    "promptPath": "clarifier_v3.yml",
-    "defaultPromptVersion": "3.0",
+    "promptPath": "clarifier_v3_1.yml",
+    "defaultPromptVersion": "3.1",
     "entitlement": "core",
     "mode": "adhoc"
   }
