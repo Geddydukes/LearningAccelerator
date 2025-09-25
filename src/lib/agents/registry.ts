@@ -50,8 +50,8 @@ export const AGENTS: Record<AgentId, AgentMeta> = {
     route: "/home/workspace",
     icon: "GraduationCap",
     color: "indigo",
-    promptPath: "prompts/base/clo_v3.yml",
-    defaultPromptVersion: "3.0",
+    promptPath: "prompts/base/clo_v3_1.yml",
+    defaultPromptVersion: "3.1",
     persistsTo: "both",
     rateLimitPerMin: 4,
     displayOrder: 10
@@ -170,8 +170,8 @@ export const AGENTS: Record<AgentId, AgentMeta> = {
     route: "/home/workspace",
     icon: "BookOpenCheck",
     color: "blue",
-    promptPath: "prompts/base/instructor_v2_1.yml",
-    defaultPromptVersion: "2.1",
+    promptPath: "prompts/base/instructor_v2_2.yml",
+    defaultPromptVersion: "2.2",
     persistsTo: "agent_results",
     rateLimitPerMin: 4,
     displayOrder: 15

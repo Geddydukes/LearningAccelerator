@@ -5,7 +5,7 @@ import { join } from 'path';
 
 // Define the agents data (same as in buildAgentsManifest.ts)
 const AGENTS = {
-  clo: { id: "clo", promptPath: "prompts/base/clo_v3.yml" },
+  clo: { id: "clo", promptPath: "prompts/base/clo_v3_1.yml" },
   socratic: { id: "socratic", promptPath: "prompts/base/socratic_v3.yml" },
   alex: { id: "alex", promptPath: "prompts/base/alex_v3.yml" },
   brand: { id: "brand", promptPath: "prompts/base/brand_strategist_v3.yml" },
@@ -13,7 +13,7 @@ const AGENTS = {
   ta: { id: "ta", promptPath: "prompts/base/taagent_v1_4.yml" },
   career_match: { id: "career_match", promptPath: "prompts/base/career_match_v1_3.yml" },
   portfolio_curator: { id: "portfolio_curator", promptPath: "prompts/base/portfolio_v1_8.yml" },
-  instructor: { id: "instructor", promptPath: "prompts/base/instructor_v2_1.yml" },
+  instructor: { id: "instructor", promptPath: "prompts/base/instructor_v2_2.yml" },
   clarifier: { id: "clarifier", promptPath: "prompts/base/clarifier_v3.yml" }
 };
 

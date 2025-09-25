@@ -31,7 +31,7 @@ serve(async (req) => {
     try {
       const { data: promptData, error: promptError } = await supabaseClient.storage
         .from('agent-prompts')
-        .download('instructor_v2_1.yml')
+        .download('instructor_v2_2.yml')
 
       if (promptError) {
         console.log('Storage failed, using hardcoded prompt:', promptError.message);

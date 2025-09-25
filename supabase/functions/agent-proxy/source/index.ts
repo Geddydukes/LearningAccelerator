@@ -106,7 +106,7 @@ serve(async (req) => {
 
 function getPromptPath(agent: string): string {
   const promptMap = {
-    'clo': 'clo_v3.yml',
+    'clo': 'clo_v3_1.yml',
     'socratic': 'socratic_v3.yml', 
     'alex': 'alex_v3.yml',
     'brand': 'brand_strategist_v3.yml',
@@ -114,7 +114,7 @@ function getPromptPath(agent: string): string {
     'portfolio_curator': 'portfolio_v1_8.yml',
     'clarifier': 'clarifier_v3.yml',
     'ta': 'taagent_v1_4.yml',
-    'instructor': 'instructor_v2_1.yml',
+    'instructor': 'instructor_v2_2.yml',
     'career_match': 'career_match_v1_3.yml'
   }
   

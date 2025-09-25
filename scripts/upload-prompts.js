@@ -18,6 +18,10 @@ const prompts = [
     path: '../prompts/base/clo_v3.yml'
   },
   {
+    name: 'clo_v3_1.yml',
+    path: '../prompts/base/clo_v3_1.yml'
+  },
+  {
     name: 'socratic_v3.yml',
     path: '../prompts/base/socratic_v3.yml'
   },
@@ -32,6 +36,10 @@ const prompts = [
   {
     name: 'instructor_v2_1.yml',
     path: '../prompts/base/instructor_v2_1.yml'
+  },
+  {
+    name: 'instructor_v2_2.yml',
+    path: '../prompts/base/instructor_v2_2.yml'
   },
   {
     name: 'clarifier_v3.yml',

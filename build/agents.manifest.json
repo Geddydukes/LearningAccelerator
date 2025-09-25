@@ -1,8 +1,8 @@
 {
   "clo": {
     "id": "clo",
-    "promptPath": "clo_v3.yml",
-    "defaultPromptVersion": "3.0",
+    "promptPath": "clo_v3_1.yml",
+    "defaultPromptVersion": "3.1",
     "entitlement": "core",
     "mode": "weekly"
   },
@@ -57,8 +57,8 @@
   },
   "instructor": {
     "id": "instructor",
-    "promptPath": "instructor_v2_1.yml",
-    "defaultPromptVersion": "2.1",
+    "promptPath": "instructor_v2_2.yml",
+    "defaultPromptVersion": "2.2",
     "entitlement": "core",
     "mode": "weekly"
   },
