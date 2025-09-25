@@ -1,6 +1,11 @@
 import { createClient } from '@supabase/supabase-js';
 import { readFileSync } from 'fs';
-import { join } from 'path';
+import { dirname, join } from 'path';
+import { fileURLToPath } from 'url';
+
+// ESM-compatible __dirname (properly decoded)
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -96,7 +101,7 @@ async function uploadPrompts() {
       const { data, error } = await supabase.storage
         .from('agent-prompts')
         .upload(prompt.name, content, {
-          contentType: 'application/x-yaml',
+          contentType: 'text/plain',
           upsert: true
         });
       

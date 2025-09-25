@@ -1,5 +1,4 @@
-// Tool Registry - wraps Edge Functions as typed tools with normalized I/O
-// Deno (Supabase Edge) environment
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 export type ToolCallArgs = {
   userId: string;
@@ -10,155 +9,317 @@ export type ToolCallArgs = {
   etagIfNoneMatch?: string;
 };
 
-export type ToolResult<TData> = {
+export type ToolResult<TData = any> = {
   ok: boolean;
   data?: TData;
   error?: string;
   etag?: string;
+  degraded?: boolean;
 };
 
-async function invokeEdgeFunction<TData = unknown>(
-  fnPath: string,
-  body: Record<string, unknown>,
-  etagIfNoneMatch?: string,
-): Promise<ToolResult<TData>> {
-  const urlBase = Deno.env.get('SUPABASE_URL');
-  const serviceJwt = Deno.env.get('EDGE_SERVICE_JWT');
-  if (!urlBase || !serviceJwt) {
-    return { ok: false, error: 'Missing SUPABASE_URL or EDGE_SERVICE_JWT' };
-  }
-
-  const res = await fetch(`${urlBase}/functions/v1/${fnPath}`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${serviceJwt}`,
-      ...(etagIfNoneMatch ? { 'If-None-Match': etagIfNoneMatch } : {}),
-    },
-    body: JSON.stringify(body),
-  });
-
-  if (res.status === 304) {
-    return { ok: true, data: undefined, etag: res.headers.get('ETag') ?? undefined };
-  }
-
-  const etag = res.headers.get('ETag') ?? undefined;
-  const json = await res.json().catch(() => ({} as any));
-  if (!res.ok) {
-    return { ok: false, error: json?.error || res.statusText, etag };
-  }
-  // Normalize common shapes { success, data } | { ok, data }
-  const data = json?.data ?? json;
-  const ok = json?.ok ?? json?.success ?? true;
-  return { ok, data, error: ok ? undefined : (json?.error || 'Unknown error'), etag };
+export interface Tool<TIn = any, TOut = any> {
+  name: string;
+  version: string;
+  rateLimitPerMin: number;
+  call: (args: ToolCallArgs & TIn) => Promise<ToolResult<TOut>>;
 }
 
+// Helper to call Edge Functions with proper error handling and ETag support
+async function callEdgeTool(
+  fnPath: string,
+  body: Record<string, unknown>,
+  etagIfNoneMatch?: string
+): Promise<ToolResult<any>> {
+  const supabaseUrl = Deno.env.get('SUPABASE_URL');
+  const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+  
+  if (!supabaseUrl || !serviceKey) {
+    return { ok: false, error: 'Missing Supabase configuration' };
+  }
+
+  try {
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${serviceKey}`,
+    };
+
+    if (etagIfNoneMatch) {
+      headers['If-None-Match'] = etagIfNoneMatch;
+    }
+
+    const response = await fetch(`${supabaseUrl}/functions/v1/${fnPath}`, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify(body),
+    });
+
+    if (response.status === 304) {
+      return { ok: true, etag: etagIfNoneMatch };
+    }
+
+    const result = await response.json();
+    const etag = response.headers.get('etag');
+
+    if (!response.ok) {
+      return { 
+        ok: false, 
+        error: result.error || `HTTP ${response.status}`,
+        degraded: response.status >= 500
+      };
+    }
+
+    return { 
+      ok: true, 
+      data: result.data || result,
+      etag: etag || undefined
+    };
+  } catch (error) {
+    return { 
+      ok: false, 
+      error: error.message,
+      degraded: true
+    };
+  }
+}
+
+// Tool Registry - wraps existing agents as typed tools
 export const toolRegistry = {
+  // CLO Tools
   clo: {
-    planWeek: (args: ToolCallArgs & { topic: string }) =>
-      invokeEdgeFunction('agent-proxy', {
-        agent: 'clo',
-        action: 'GET_WEEKLY_PLAN',
-        payload: { topic: (args.payload?.topic as string) || args.topic, week: args.week },
-        userId: args.userId,
-        weekNumber: args.week,
-      }, args.etagIfNoneMatch),
+    name: 'CLO',
+    version: '3.1',
+    rateLimitPerMin: 4,
+    call: async (args: ToolCallArgs & {
+      action: 'PROGRAM_PLAN_CREATE' | 'PROGRAM_PLAN_ACCEPT' | 'WEEKLY_PLAN_CREATE';
+      intentObject?: any;
+      programDurationWeeks?: number;
+      programPlanId?: string;
+      programVersion?: string;
+      weekNumber?: number;
+      priorPerformanceSummary?: any;
+    }) => {
+      const { action, intentObject, programDurationWeeks, programPlanId, programVersion, weekNumber, priorPerformanceSummary, ...baseArgs } = args;
+      
+      const payload = {
+        action,
+        ...(intentObject && { intentObject }),
+        ...(programDurationWeeks && { programDurationWeeks }),
+        ...(programPlanId && { programPlanId }),
+        ...(programVersion && { programVersion }),
+        ...(weekNumber && { weekNumber }),
+        ...(priorPerformanceSummary && { priorPerformanceSummary }),
+      };
 
-    planDay: (args: ToolCallArgs & { topic?: string }) =>
-      invokeEdgeFunction('agent-proxy', {
-        agent: 'clo',
-        action: 'GET_DAILY_LESSON',
-        payload: { topic: (args.payload?.topic as string) || args.topic, day: args.day, week: args.week },
-        userId: args.userId,
-        weekNumber: args.week,
-      }, args.etagIfNoneMatch),
-  },
+      return callEdgeTool('clo-agent', {
+        action,
+        payload,
+        userId: baseArgs.userId,
+      }, baseArgs.etagIfNoneMatch);
+    }
+  } as Tool,
 
+  // Instructor Tools
   instructor: {
-    deliverLecture: (args: ToolCallArgs & { basePrompt?: unknown }) =>
-      invokeEdgeFunction('instructor-agent', {
-        action: 'DELIVER_LECTURE',
-        payload: { basePrompt: args.payload?.basePrompt, week: args.week, day: args.day },
-        userId: args.userId,
-      }, args.etagIfNoneMatch),
+    name: 'Instructor',
+    version: '2.2',
+    rateLimitPerMin: 4,
+    call: async (args: ToolCallArgs & {
+      mode: 'DELIVER_LECTURE' | 'CHECK_COMPREHENSION' | 'MODIFY_PRACTICE_PROMPTS' | 'DAILY_REFLECTION';
+      weeklyPlanSnapshot?: any;
+      learnerProfile?: any;
+      checkResults?: any;
+      todayTelemetry?: any;
+    }) => {
+      const { mode, weeklyPlanSnapshot, learnerProfile, checkResults, todayTelemetry, ...baseArgs } = args;
+      
+      const payload = {
+        mode,
+        ...(weeklyPlanSnapshot && { weeklyPlanSnapshot }),
+        ...(learnerProfile && { learnerProfile }),
+        ...(checkResults && { checkResults }),
+        ...(todayTelemetry && { todayTelemetry }),
+      };
 
-    checkComprehension: (args: ToolCallArgs & { lectureContext: unknown }) =>
-      invokeEdgeFunction('instructor-agent', {
-        action: 'CHECK_COMPREHENSION',
-        payload: { lectureContext: args.payload?.lectureContext },
-        userId: args.userId,
-      }, args.etagIfNoneMatch),
+      return callEdgeTool('instructor-agent', {
+        action: mode,
+        payload,
+        userId: baseArgs.userId,
+      }, baseArgs.etagIfNoneMatch);
+    }
+  } as Tool,
 
-    modifyPracticePrompts: (args: ToolCallArgs & { understandingMap: unknown; cloDailyPrompts: unknown }) =>
-      invokeEdgeFunction('instructor-agent', {
-        action: 'MODIFY_PRACTICE_PROMPTS',
-        payload: {
-          understandingMap: args.payload?.understandingMap,
-          cloDailyPrompts: args.payload?.cloDailyPrompts,
-        },
-        userId: args.userId,
-      }, args.etagIfNoneMatch),
-  },
-
+  // TA Tools
   ta: {
-    generateExercises: (args: ToolCallArgs & { modifiedPrompt: unknown }) =>
-      invokeEdgeFunction('agent-proxy', {
-        agent: 'ta',
-        action: 'GENERATE_EXERCISES',
-        payload: { modifiedPrompt: args.payload?.modifiedPrompt },
-        userId: args.userId,
-      }, args.etagIfNoneMatch),
-  },
+    name: 'TA',
+    version: '1.5',
+    rateLimitPerMin: 6,
+    call: async (args: ToolCallArgs & {
+      mode: 'PREP_EXERCISES' | 'PROVIDE_HINT' | 'EVALUATE_PRACTICE' | 'FORWARD_BLOCKERS';
+      taBasePrompt?: any;
+      instructorMods?: any;
+      exerciseContext?: any;
+      submission?: any;
+      rubricLight?: any;
+      blockers?: string[];
+    }) => {
+      const { mode, taBasePrompt, instructorMods, exerciseContext, submission, rubricLight, blockers, ...baseArgs } = args;
+      
+      const payload = {
+        mode,
+        ...(taBasePrompt && { taBasePrompt }),
+        ...(instructorMods && { instructorMods }),
+        ...(exerciseContext && { exerciseContext }),
+        ...(submission && { submission }),
+        ...(rubricLight && { rubricLight }),
+        ...(blockers && { blockers }),
+      };
 
+      return callEdgeTool('ta-agent', {
+        action: mode,
+        payload,
+        userId: baseArgs.userId,
+      }, baseArgs.etagIfNoneMatch);
+    }
+  } as Tool,
+
+  // Socratic Tools
   socratic: {
-    generateQuestions: (args: ToolCallArgs & { modifiedPrompt: unknown }) =>
-      invokeEdgeFunction('agent-proxy', {
-        agent: 'socratic',
-        action: 'GENERATE_QUESTIONS',
-        payload: { modifiedPrompt: args.payload?.modifiedPrompt },
-        userId: args.userId,
-      }, args.etagIfNoneMatch),
-  },
+    name: 'Socratic',
+    version: '3.1',
+    rateLimitPerMin: 8,
+    call: async (args: ToolCallArgs & {
+      mode: 'START_DIALOG' | 'CONTINUE_DIALOG' | 'SUMMARIZE_GAPS';
+      socraticBasePrompt?: any;
+      instructorMods?: any;
+      dialogContext?: any;
+      learnerMessage?: string;
+      dialogTranscript?: any[];
+    }) => {
+      const { mode, socraticBasePrompt, instructorMods, dialogContext, learnerMessage, dialogTranscript, ...baseArgs } = args;
+      
+      const payload = {
+        mode,
+        ...(socraticBasePrompt && { socraticBasePrompt }),
+        ...(instructorMods && { instructorMods }),
+        ...(dialogContext && { dialogContext }),
+        ...(learnerMessage && { learnerMessage }),
+        ...(dialogTranscript && { dialogTranscript }),
+      };
 
+      return callEdgeTool('socratic-agent', {
+        action: mode,
+        payload,
+        userId: baseArgs.userId,
+      }, baseArgs.etagIfNoneMatch);
+    }
+  } as Tool,
+
+  // Alex Tools
   alex: {
-    preReview: (args: ToolCallArgs & { fs: Array<{ path: string; content: string }>; rubric?: unknown }) =>
-      invokeEdgeFunction('coding-workspace/alex/pre', {
-        action: 'PRE_REVIEW',
-        payload: { fs: args.payload?.fs, rubric: args.payload?.rubric },
-        userId: args.userId,
-      }, args.etagIfNoneMatch),
+    name: 'Alex',
+    version: '3.1',
+    rateLimitPerMin: 3,
+    call: async (args: ToolCallArgs & {
+      mode: 'PRECHECK' | 'FINAL_GRADE';
+      submission?: any;
+      rubric?: any;
+      weekRef?: any;
+    }) => {
+      const { mode, submission, rubric, weekRef, ...baseArgs } = args;
+      
+      const payload = {
+        mode,
+        ...(submission && { submission }),
+        ...(rubric && { rubric }),
+        ...(weekRef && { weekRef }),
+      };
 
-    finalReview: (args: ToolCallArgs & { fs: Array<{ path: string; content: string }>; rubric: unknown }) =>
-      invokeEdgeFunction('coding-workspace/alex/final', {
-        action: 'FINAL_REVIEW',
-        payload: { fs: args.payload?.fs, rubric: args.payload?.rubric },
-        userId: args.userId,
-      }, args.etagIfNoneMatch),
-  },
+      return callEdgeTool('alex-agent', {
+        action: mode,
+        payload,
+        userId: baseArgs.userId,
+      }, baseArgs.etagIfNoneMatch);
+    }
+  } as Tool,
 
+  // Coding Workspace Tools
   codingWorkspace: {
-    start: (args: ToolCallArgs & { language: string; focusAreas: string[]; rubric?: unknown }) =>
-      invokeEdgeFunction('coding-workspace/start', {
-        action: 'START',
-        payload: {
-          language: (args.payload?.language as string) || (args as any).language,
-          focusAreas: (args.payload?.focusAreas as string[]) || (args as any).focusAreas,
-          rubric: args.payload?.rubric,
-          week: args.week,
-          day: args.day,
-        },
-        userId: args.userId,
-      }, args.etagIfNoneMatch),
+    name: 'CodingWorkspace',
+    version: '1.0',
+    rateLimitPerMin: 10,
+    call: async (args: ToolCallArgs & {
+      action: 'START' | 'RUN' | 'ALEX_FINAL';
+      language?: string;
+      focusAreas?: string[];
+      fs?: any[];
+      tests?: boolean;
+      rubric?: any;
+    }) => {
+      const { action, language, focusAreas, fs, tests, rubric, ...baseArgs } = args;
+      
+      const payload = {
+        ...(language && { language }),
+        ...(focusAreas && { focusAreas }),
+        ...(fs && { fs }),
+        ...(tests !== undefined && { tests }),
+        ...(rubric && { rubric }),
+      };
 
-    run: (args: ToolCallArgs & { fs: Array<{ path: string; content: string }>; language: string; tests?: boolean }) =>
-      invokeEdgeFunction('coding-workspace/run', {
-        action: 'RUN',
-        payload: { fs: args.payload?.fs, language: args.payload?.language, tests: args.payload?.tests },
-        userId: args.userId,
-      }, args.etagIfNoneMatch),
-  },
+      return callEdgeTool(`coding-workspace/${action.toLowerCase()}`, {
+        payload,
+        userId: baseArgs.userId,
+      }, baseArgs.etagIfNoneMatch);
+    }
+  } as Tool,
 };
 
-export type ToolRegistry = typeof toolRegistry;
+// Helper to validate tool call results and extract structured data
+export function parseToolResult<T>(result: ToolResult, expectedFields: string[]): T | null {
+  if (!result.ok || !result.data) {
+    return null;
+  }
 
+  const data = result.data;
+  
+  // Check if all expected fields are present
+  const missingFields = expectedFields.filter(field => !(field in data));
+  if (missingFields.length > 0) {
+    console.warn(`Missing expected fields: ${missingFields.join(', ')}`);
+    return null;
+  }
 
+  return data as T;
+}
+
+// Helper to extract telemetry from tool results
+export function extractTelemetry(result: ToolResult): Record<string, any> {
+  if (!result.ok || !result.data) {
+    return {};
+  }
+
+  const data = result.data;
+  const telemetry: Record<string, any> = {};
+
+  // Extract common telemetry patterns
+  if (data.telemetry) {
+    Object.assign(telemetry, data.telemetry);
+  }
+
+  if (data.blockers) {
+    telemetry.blockers = data.blockers;
+  }
+
+  if (data.mastery_estimate) {
+    telemetry.mastery_estimate = data.mastery_estimate;
+  }
+
+  if (data.gaps_per_concept) {
+    telemetry.gaps_per_concept = data.gaps_per_concept;
+  }
+
+  if (data.scorecard) {
+    telemetry.scorecard = data.scorecard;
+  }
+
+  return telemetry;
+}
