@@ -28,7 +28,8 @@ export interface Tool<TIn = any, TOut = any> {
 async function callEdgeTool(
   fnPath: string,
   body: Record<string, unknown>,
-  etagIfNoneMatch?: string
+  etagIfNoneMatch?: string,
+  correlationId?: string
 ): Promise<ToolResult<any>> {
   const supabaseUrl = Deno.env.get('SUPABASE_URL');
   const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
@@ -45,6 +46,10 @@ async function callEdgeTool(
 
     if (etagIfNoneMatch) {
       headers['If-None-Match'] = etagIfNoneMatch;
+    }
+
+    if (correlationId) {
+      headers['x-correlation-id'] = correlationId;
     }
 
     const response = await fetch(`${supabaseUrl}/functions/v1/${fnPath}`, {
@@ -114,7 +119,7 @@ export const toolRegistry = {
         action,
         payload,
         userId: baseArgs.userId,
-      }, baseArgs.etagIfNoneMatch);
+      }, baseArgs.etagIfNoneMatch, baseArgs.correlationId);
     }
   } as Tool,
 
@@ -144,7 +149,7 @@ export const toolRegistry = {
         action: mode,
         payload,
         userId: baseArgs.userId,
-      }, baseArgs.etagIfNoneMatch);
+      }, baseArgs.etagIfNoneMatch, baseArgs.correlationId);
     }
   } as Tool,
 
@@ -178,7 +183,7 @@ export const toolRegistry = {
         action: mode,
         payload,
         userId: baseArgs.userId,
-      }, baseArgs.etagIfNoneMatch);
+      }, baseArgs.etagIfNoneMatch, baseArgs.correlationId);
     }
   } as Tool,
 
@@ -210,7 +215,7 @@ export const toolRegistry = {
         action: mode,
         payload,
         userId: baseArgs.userId,
-      }, baseArgs.etagIfNoneMatch);
+      }, baseArgs.etagIfNoneMatch, baseArgs.correlationId);
     }
   } as Tool,
 
@@ -238,7 +243,7 @@ export const toolRegistry = {
         action: mode,
         payload,
         userId: baseArgs.userId,
-      }, baseArgs.etagIfNoneMatch);
+      }, baseArgs.etagIfNoneMatch, baseArgs.correlationId);
     }
   } as Tool,
 
@@ -268,7 +273,7 @@ export const toolRegistry = {
       return callEdgeTool(`coding-workspace/${action.toLowerCase()}`, {
         payload,
         userId: baseArgs.userId,
-      }, baseArgs.etagIfNoneMatch);
+      }, baseArgs.etagIfNoneMatch, baseArgs.correlationId);
     }
   } as Tool,
 };
@@ -322,4 +327,58 @@ export function extractTelemetry(result: ToolResult): Record<string, any> {
   }
 
   return telemetry;
+}
+
+// Agent event logging helper
+export async function logAgentEvent(
+  correlationId: string,
+  userId: string,
+  agent: string,
+  tool: string,
+  status: 'running' | 'completed' | 'failed',
+  tokensIn: number = 0,
+  tokensOut: number = 0,
+  costEstimate: number = 0,
+  errorMessage?: string
+): Promise<void> {
+  const supabaseUrl = Deno.env.get('SUPABASE_URL');
+  const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+  
+  if (!supabaseUrl || !serviceKey) {
+    console.warn('Missing Supabase configuration for agent event logging');
+    return;
+  }
+
+  try {
+    const supabase = createClient(supabaseUrl, serviceKey);
+    
+    const eventData = {
+      correlation_id: correlationId,
+      user_id: userId,
+      agent,
+      tool,
+      status,
+      tokens_in: tokensIn,
+      tokens_out: tokensOut,
+      cost_estimate: costEstimate,
+      error_message: errorMessage,
+      ended_at: status !== 'running' ? new Date().toISOString() : null,
+    };
+
+    if (status === 'running') {
+      // Insert new event
+      await supabase.from('agent_events').insert(eventData);
+    } else {
+      // Update existing event
+      await supabase
+        .from('agent_events')
+        .update(eventData)
+        .eq('correlation_id', correlationId)
+        .eq('agent', agent)
+        .eq('tool', tool)
+        .eq('status', 'running');
+    }
+  } catch (error) {
+    console.error('Failed to log agent event:', error);
+  }
 }

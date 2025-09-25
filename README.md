@@ -1,6 +1,14 @@
 # Learning Accelerator
 
+> **AI-powered learning platform where an Education Agent (Guru) orchestrates specialized AI teachers for personalized, instructor-centric learning experiences.**
+
 Multi-agent learning platform with a Supabase-backed orchestrator, PWA frontend, and versioned agent prompts. The app now centers on self-guided learning flows powered by scheduled workflows and secure agent proxying.
+
+## 🎬 Demo
+
+[![Guru V1 Demo](https://img.shields.io/badge/Demo-Guru%20V1-blue)](https://github.com/your-org/learning-accelerator/releases/tag/v0.1.0-edu)
+
+*Watch the 120-second demo showing the complete learning flow from lecture → comprehension check → practice → reflection*
 
 ## 🏗️ Current Architecture
 
@@ -167,6 +175,28 @@ supabase/functions/coding-workspace/  # Coding tools (start/run/alex)
 - API keys and prompts are server-side only
 - Rate limiting and idempotency for agent/orchestrator endpoints
 - RLS on orchestrator tables (see docs)
+
+### Row Level Security (RLS) Examples
+
+```sql
+-- Users can only access their own education sessions
+CREATE POLICY "Users can view their own education sessions" ON education_sessions
+  FOR SELECT USING (auth.uid() = user_id);
+
+-- Users can only insert their own program plans
+CREATE POLICY "Users can insert their own program plans" ON program_plans
+  FOR INSERT WITH CHECK (auth.uid() = user_id);
+
+-- Service role can access agent events for observability
+CREATE POLICY "Service role can access agent events" ON agent_events
+  FOR ALL USING (auth.role() = 'service_role');
+```
+
+### Rate Limiting Policy
+
+- **Per User**: 30 calls/minute, 200 calls/day
+- **Per Agent**: 4-8 calls/minute (varies by agent)
+- **Global**: 1000 calls/minute across all users
 
 ## 📈 Performance & SLOs
 

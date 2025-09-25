@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useCallback, memo } from 'react';
-import { useLocation, useNavigate, Routes, Route } from 'react-router-dom';
+import { useLocation, useNavigate, Routes, Route, useParams } from 'react-router-dom';
 import { Menu, X, Home, Brain, Users, Briefcase, FileText, ChevronRight, Lock, Crown, CheckCircle, Circle, BookOpen } from 'lucide-react';
 import { PATHS } from '../../routes/paths';
 import { useAuth } from '../../contexts/AuthContext';
@@ -7,6 +7,7 @@ import { useSubscription } from '../../hooks/useSubscription';
 import { CORE_AGENTS, PREMIUM_AGENTS, AGENTS } from '../../lib/agents/registry';
 import HomeDashboard from '../home/HomeDashboard';
 import { UnifiedLearningPlatform } from '../workspace/UnifiedLearningPlatform';
+import { SessionTimeline } from '../dev/SessionTimeline';
 import { 
   CurrentModule, 
   SelfGuided, 
@@ -284,6 +285,11 @@ const SocraticChat = memo(() => (
   </div>
 ));
 
+const TimelineWrapper = memo(() => {
+  const { correlationId } = useParams<{ correlationId: string }>();
+  return <SessionTimeline correlationId={correlationId || ''} />;
+});
+
 const AppShell = memo(() => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -434,6 +440,7 @@ const AppShell = memo(() => {
             <Route path="/self-guided" element={<SelfGuided />} />
             <Route path="/past-tracks" element={<PastTracks />} />
             <Route path="/workspace" element={<UnifiedLearningPlatform />} />
+            <Route path="/dev/timeline/:correlationId" element={<TimelineWrapper />} />
             <Route path="/career" element={<CareerPreview userTier={isPaid ? 'premium' : 'free'} />} />
             <Route path="/portfolio" element={<PortfolioPreview userTier={isPaid ? 'premium' : 'free'} />} />
             <Route path="/settings" element={<Settings userTier={isPaid ? 'premium' : 'free'} />} />

@@ -1,0 +1,183 @@
+id: datasci-week-1-weekly
+program_id: datasci-week-1
+week_number: 1
+title: "Introduction to Data Science"
+description: "Week 1 focuses on understanding what data science is and getting comfortable with Python basics"
+
+daily_plans:
+  day_1:
+    title: "What is Data Science?"
+    learning_objectives:
+      - "Understand the data science workflow"
+      - "Learn about different types of data"
+      - "Explore real-world data science applications"
+    lecture_content:
+      topic: "Introduction to Data Science"
+      key_concepts:
+        - "Data science definition and scope"
+        - "The data science workflow (Ask, Prepare, Process, Analyze, Share, Act)"
+        - "Types of data (structured, unstructured, semi-structured)"
+        - "Data science vs. data analysis vs. machine learning"
+      examples:
+        - "Netflix recommendation system"
+        - "Google Maps traffic prediction"
+        - "Amazon product recommendations"
+    comprehension_checks:
+      - "What are the main steps in the data science workflow?"
+      - "Can you give an example of structured vs. unstructured data?"
+      - "How does data science differ from traditional statistics?"
+    practice_exercises:
+      ta_exercises:
+        - "Create a simple data collection survey"
+        - "Identify data types in a sample dataset"
+      socratic_questions:
+        - "What problems in your daily life could data science help solve?"
+        - "How do you think companies use data to make decisions?"
+  
+  day_2:
+    title: "Python Environment Setup"
+    learning_objectives:
+      - "Set up Python development environment"
+      - "Install necessary data science libraries"
+      - "Create first Jupyter notebook"
+    lecture_content:
+      topic: "Python Environment for Data Science"
+      key_concepts:
+        - "Python installation and version management"
+        - "Virtual environments and package management"
+        - "Jupyter Notebooks introduction"
+        - "Essential libraries: NumPy, Pandas, Matplotlib"
+      examples:
+        - "Installing Python via Anaconda"
+        - "Creating virtual environment"
+        - "Installing packages with pip"
+    comprehension_checks:
+      - "Why is it important to use virtual environments?"
+      - "What is the purpose of Jupyter Notebooks?"
+      - "Which libraries are essential for data science?"
+    practice_exercises:
+      ta_exercises:
+        - "Set up Python environment"
+        - "Install required libraries"
+        - "Create and run first Jupyter notebook"
+      socratic_questions:
+        - "What challenges might you face when setting up a development environment?"
+        - "How do you think Jupyter Notebooks help with data exploration?"
+  
+  day_3:
+    title: "Basic Python Syntax"
+    learning_objectives:
+      - "Learn Python variables and data types"
+      - "Understand basic operations and functions"
+      - "Practice Python syntax and conventions"
+    lecture_content:
+      topic: "Python Fundamentals for Data Science"
+      key_concepts:
+        - "Variables and data types (int, float, string, boolean)"
+        - "Basic operations and operators"
+        - "Functions and methods"
+        - "Python syntax and indentation"
+      examples:
+        - "Working with different data types"
+        - "Basic mathematical operations"
+        - "String manipulation"
+    comprehension_checks:
+      - "What are the main data types in Python?"
+      - "How does Python handle indentation?"
+      - "What's the difference between a function and a method?"
+    practice_exercises:
+      ta_exercises:
+        - "Create variables of different types"
+        - "Write simple functions"
+        - "Practice basic operations"
+      socratic_questions:
+        - "Why is Python popular for data science?"
+        - "How do you think programming languages differ from human languages?"
+  
+  day_4:
+    title: "Introduction to Jupyter Notebooks"
+    learning_objectives:
+      - "Master Jupyter Notebook interface"
+      - "Learn cell types and execution"
+      - "Practice notebook best practices"
+    lecture_content:
+      topic: "Jupyter Notebooks for Data Science"
+      key_concepts:
+        - "Jupyter interface and navigation"
+        - "Cell types (code, markdown, raw)"
+        - "Cell execution and kernel management"
+        - "Notebook organization and documentation"
+      examples:
+        - "Creating markdown cells for documentation"
+        - "Running code cells"
+        - "Adding comments and explanations"
+    comprehension_checks:
+      - "What are the different types of cells in Jupyter?"
+      - "How do you add documentation to your notebooks?"
+      - "What is a kernel in Jupyter?"
+    practice_exercises:
+      ta_exercises:
+        - "Create a well-documented notebook"
+        - "Practice different cell types"
+        - "Organize code and explanations"
+      socratic_questions:
+        - "How do notebooks help with data exploration?"
+        - "What makes a good data science notebook?"
+  
+  day_5:
+    title: "Week 1 Project: Hello Data Science"
+    learning_objectives:
+      - "Apply week's learning to a practical project"
+      - "Create first data science script"
+      - "Practice problem-solving approach"
+    lecture_content:
+      topic: "Putting It All Together"
+      key_concepts:
+        - "Project planning and organization"
+        - "Code documentation and comments"
+        - "Testing and debugging basics"
+        - "Presenting results effectively"
+      examples:
+        - "Planning a simple data analysis project"
+        - "Writing clean, documented code"
+        - "Presenting findings clearly"
+    comprehension_checks:
+      - "How do you plan a data science project?"
+      - "What makes code easy to understand?"
+      - "How do you present your findings?"
+    practice_exercises:
+      ta_exercises:
+        - "Complete Hello Data Science project"
+        - "Create data types exploration notebook"
+        - "Document your learning journey"
+      socratic_questions:
+        - "What did you find most challenging this week?"
+        - "How confident do you feel about Python basics?"
+
+weekly_assessment:
+  project_title: "Data Types Exploration"
+  project_description: "Create a Jupyter notebook that explores different data types and demonstrates your understanding of Python basics"
+  requirements:
+    - "Create variables of different data types"
+    - "Demonstrate basic operations on each type"
+    - "Include markdown documentation"
+    - "Add comments explaining your code"
+  rubric:
+    functionality: 0.4
+    documentation: 0.3
+    creativity: 0.2
+    presentation: 0.1
+
+weekly_reflection_questions:
+  - "What was the most interesting thing you learned this week?"
+  - "What concept did you find most challenging?"
+  - "How do you plan to apply this knowledge?"
+  - "What would you like to learn more about next week?"
+
+next_week_preview:
+  title: "Statistical Foundations"
+  description: "Next week we'll dive into statistics, learning about descriptive statistics, probability, and data distributions"
+  preparation:
+    - "Review basic math concepts"
+    - "Think about data you encounter daily"
+    - "Prepare questions about statistics"

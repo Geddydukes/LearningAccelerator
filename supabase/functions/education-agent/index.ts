@@ -41,6 +41,19 @@ serve(async (req) => {
     const body: EventBody = await req.json();
     if (!body?.userId) return error('Missing userId', 400);
 
+    // Rate limiting check (token bucket)
+    const rateLimitResult = await checkRateLimit(body.userId, 'education-agent');
+    if (!rateLimitResult.allowed) {
+      return error(`Rate limit exceeded. Try again in ${rateLimitResult.retryAfter} seconds`, 429);
+    }
+
+    // Idempotency check
+    const idempotencyKey = body.correlationId || `${body.userId}-${body.event}-${body.week}-${body.day}`;
+    const idempotencyCheck = await checkIdempotency(idempotencyKey);
+    if (idempotencyCheck.isDuplicate) {
+      return ok(idempotencyCheck.result);
+    }
+
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
@@ -75,6 +88,9 @@ serve(async (req) => {
     if (result.ok && result.data) {
       await persistArtifacts(supabase, session, result.data);
     }
+
+    // Store result for idempotency
+    await storeIdempotencyResult(idempotencyKey, result);
 
     return ok(result);
 
@@ -411,6 +427,85 @@ function extractTelemetryFromResults(results: any): Record<string, any> {
 
 function generateETag(): string {
   return `W/"${Date.now()}-${Math.random().toString(36).substr(2, 9)}"`;
+}
+
+// Rate limiting helper (token bucket)
+async function checkRateLimit(userId: string, endpoint: string): Promise<{ allowed: boolean; retryAfter?: number }> {
+  const supabase = createClient(
+    Deno.env.get('SUPABASE_URL') ?? '',
+    Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+  );
+
+  const now = Date.now();
+  const windowMs = 60 * 1000; // 1 minute window
+  const maxRequests = 30; // 30 requests per minute per user
+
+  // Get recent requests for this user/endpoint
+  const { data: recentRequests } = await supabase
+    .from('rate_limit_logs')
+    .select('created_at')
+    .eq('user_id', userId)
+    .eq('endpoint', endpoint)
+    .gte('created_at', new Date(now - windowMs).toISOString())
+    .order('created_at', { ascending: false });
+
+  if (recentRequests && recentRequests.length >= maxRequests) {
+    const oldestRequest = recentRequests[recentRequests.length - 1];
+    const retryAfter = Math.ceil((new Date(oldestRequest.created_at).getTime() + windowMs - now) / 1000);
+    return { allowed: false, retryAfter };
+  }
+
+  // Log this request
+  await supabase
+    .from('rate_limit_logs')
+    .insert({
+      user_id: userId,
+      endpoint,
+      created_at: new Date().toISOString(),
+    });
+
+  return { allowed: true };
+}
+
+// Idempotency check helper
+async function checkIdempotency(idempotencyKey: string): Promise<{ isDuplicate: boolean; result?: any }> {
+  if (!idempotencyKey) return { isDuplicate: false };
+
+  const supabase = createClient(
+    Deno.env.get('SUPABASE_URL') ?? '',
+    Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+  );
+
+  const { data: existing } = await supabase
+    .from('idempotency_keys')
+    .select('result')
+    .eq('key', idempotencyKey)
+    .gte('created_at', new Date(Date.now() - 60 * 1000).toISOString()) // 60 second window
+    .single();
+
+  if (existing) {
+    return { isDuplicate: true, result: existing.result };
+  }
+
+  return { isDuplicate: false };
+}
+
+// Store idempotency result
+async function storeIdempotencyResult(idempotencyKey: string, result: any): Promise<void> {
+  if (!idempotencyKey) return;
+
+  const supabase = createClient(
+    Deno.env.get('SUPABASE_URL') ?? '',
+    Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+  );
+
+  await supabase
+    .from('idempotency_keys')
+    .insert({
+      key: idempotencyKey,
+      result,
+      created_at: new Date().toISOString(),
+    });
 }
 
 function ok(data: any) {
