@@ -132,6 +132,11 @@ creating models with different numbers of layers so you can see how
 complexity affects performance..."
 ```
 
+#### Coding Workspace (Unified Tool)
+- The Education Agent invokes a dedicated Coding Workspace when practice requires coding.
+- The workspace provides: virtual file system, Monaco editor, test runner, TA hints/fixes, and Alex reviews.
+- TA and Alex are called via server-side tools that parse inputs (fs[], language, rubric) and return structured outputs (hints, patches, annotations, scorecards).
+
 #### Option B: Socratic Practice (Question-Based Learning)
 **Socratic Agent** receives instructor-modified prompt:
 

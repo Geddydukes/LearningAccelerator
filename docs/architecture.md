@@ -84,6 +84,12 @@ C4Container
 3. **Practice Preparation**: Instructor modifies TA/Socratic prompts based on comprehension
 4. **Practice Sessions**: User chooses TA (coding) or Socratic (questioning) with tailored prompts
 
+#### Unified Education Agent UI and Coding Workspace
+
+- **Education Agent (UI)**: A single unified surface that orchestrates all agents as internal tools. The UI presents a timeline of phases (Plan → Lecture → Check → Practice → Reflect) and embeds structured outputs (lecture blocks, questions, coding tasks, reviews) in one conversation-like experience.
+- **Tool Registry (Server-only)**: Wraps all existing agents (CLO, Instructor, TA, Socratic, Alex, Brand, etc.) behind typed tool calls with strict input/output contracts and ETag-based caching.
+- **Coding Workspace (Tool)**: A dedicated, in-browser coding environment (file tree + Monaco editor + runner) used when practice focuses on coding. TA provides scaffolding/hints/fixes; Alex performs pre/final reviews with rubric scoring. The Education Agent calls this tool with focus areas and instructor notes.
+
 #### Weekly Assessment Loop
 1. **Alex Assessment**: Grades weekly project submissions
 2. **CLO Adjustment**: Modifies next week's curriculum based on Alex feedback

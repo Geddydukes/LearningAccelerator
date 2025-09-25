@@ -53,6 +53,12 @@ CLO Framework → Instructor Lecture → Comprehension Check → Practice Prepar
 - **User**: Chooses practice mode (TA coding or Socratic questioning)
 - **TA/Socratic Agents**: Receive tailored prompts for targeted practice
 
+#### 3.1 Coding Workspace Tool (When practice includes coding)
+- **Education Agent → Coding Workspace/start**: Initializes a virtual FS, task brief, and getting started docs using focus areas and rubric from Instructor/CLO.
+- **TA (coding tools)**: Generates exercises, hints, and patches; evaluates failing tests context to guide fixes.
+- **Runner**: Executes code/tests in a sandbox; returns stdout/stderr and pass/fail summaries.
+- **Alex (review tools)**: Produces pre/final reviews with rubric scoring; returns annotations and diff suggestions.
+
 #### 4. Weekly Assessment Loop
 - **Alex Agent**: Grades weekly project submissions
 - **CLO Agent**: Adjusts next week's curriculum based on Alex feedback
