@@ -5,15 +5,15 @@ info:
   version: 1.0.0
   contact:
     name: Wisely Team
-    email: api@learningaccelerator.com
+    email: api@wisely.com
   license:
     name: MIT
     url: https://opensource.org/licenses/MIT
 
 servers:
-  - url: https://api.learningaccelerator.com/v1
+  - url: https://api.wisely.com/v1
     description: Production server
-  - url: https://staging-api.learningaccelerator.com/v1
+  - url: https://staging-api.wisely.com/v1
     description: Staging server
   - url: http://localhost:3000/v1
     description: Development server

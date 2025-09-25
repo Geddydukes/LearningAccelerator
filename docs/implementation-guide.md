@@ -1,8 +1,8 @@
-# Implementation Guide: Instructor-Centric Learning Flow
+# Implementation Guide: Wisely Education Agent
 
 ## Overview
 
-This guide outlines the implementation of the **instructor-centric learning flow** where the Instructor Agent operates as a classroom teacher, delivering structured lectures, checking comprehension, and preparing students for targeted practice sessions.
+This guide outlines the implementation of **Wisely's Education Agent (Guru)** system, featuring an instructor-centric learning flow where the Instructor Agent operates as a classroom teacher, delivering structured lectures, checking comprehension, and preparing students for targeted practice sessions.
 
 ## 🎓 Core Learning Flow Implementation
 
