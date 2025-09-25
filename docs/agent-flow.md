@@ -2,11 +2,11 @@
 
 ## Overview
 
-This document describes the complete agent interaction flow in the Learning Accelerator platform, focusing on the **instructor-centric learning model** where the Instructor Agent operates as a classroom teacher.
+This document describes the complete agent interaction flow in the Wisely platform, focusing on the **instructor-centric learning model** where the Instructor Agent operates as a classroom teacher.
 
 ## 🎯 Core Learning Philosophy
 
-The Learning Accelerator uses a **classroom teaching model** where:
+Wisely uses a **classroom teaching model** where:
 - **Instructor Agent** = Classroom teacher delivering lectures and checking comprehension
 - **TA Agent** = Teaching assistant for hands-on coding practice
 - **Socratic Agent** = Question-based learning facilitator

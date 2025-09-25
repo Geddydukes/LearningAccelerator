@@ -1,4 +1,4 @@
-# Operations Runbook - Learning Accelerator
+# Operations Runbook - Wisely
 
 ## Deployment Flow
 

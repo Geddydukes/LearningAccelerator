@@ -481,7 +481,7 @@ class ProductionReadinessTester {
     }
     
     if (readinessScore >= 90) {
-      console.log('🎉 CONGRATULATIONS! Your Learning Accelerator is production ready!');
+      console.log('🎉 CONGRATULATIONS! Your Wisely is production ready!');
     } else if (readinessScore >= 75) {
       console.log('⚠️ Almost there! Fix the remaining issues to achieve production readiness.');
     } else {

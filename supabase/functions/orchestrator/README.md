@@ -1,6 +1,6 @@
-# 🚀 Learning Accelerator Orchestrator v1.1
+# 🚀 Wisely Orchestrator v1.1
 
-A production-ready orchestrator system that manages AI agent workflows, caching, and learning session orchestration for the Learning Accelerator platform.
+A production-ready orchestrator system that manages AI agent workflows, caching, and learning session orchestration for the Wisely platform.
 
 ## 🏗️ Architecture
 
@@ -466,4 +466,4 @@ For issues or questions:
 
 **Version**: 1.1  
 **Last Updated**: January 2025  
-**Maintainer**: Learning Accelerator Team 
+**Maintainer**: Wisely Team 

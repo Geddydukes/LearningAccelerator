@@ -81,6 +81,6 @@ test.describe('Authentication Flow', () => {
     
     // 4. Should redirect to landing page
     await page.waitForURL('**/landing');
-    await expect(page.locator('text=Learning Accelerator')).toBeVisible();
+    await expect(page.locator('text=Wisely')).toBeVisible();
   });
 });

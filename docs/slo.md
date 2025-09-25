@@ -1,4 +1,4 @@
-# Service Level Objectives (SLO) - Learning Accelerator
+# Service Level Objectives (SLO) - Wisely
 
 ## Performance Targets
 

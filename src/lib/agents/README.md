@@ -2,7 +2,7 @@
 
 ## Overview
 
-The Agent Registry provides a single source of truth for all 10 AI agents in the Learning Accelerator platform. It centralizes agent metadata, entitlements, routing, and orchestration logic.
+The Agent Registry provides a single source of truth for all 10 AI agents in the Wisely platform. It centralizes agent metadata, entitlements, routing, and orchestration logic.
 
 ## Features
 

@@ -20,7 +20,7 @@ const tracks = [
 const difficulties = ['beginner', 'intermediate', 'expert']
 
 function showStructure() {
-  console.log('📁 Learning Accelerator - Complete Track Structure')
+  console.log('📁 Wisely - Complete Track Structure')
   console.log('=' .repeat(60))
   
   console.log('\n🎯 Question Banks (33 files)')

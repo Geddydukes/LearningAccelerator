@@ -1,11 +1,11 @@
 #!/bin/bash
 
-# Production Deployment Script for Learning Accelerator
+# Production Deployment Script for Wisely
 # This script deploys all functions and builds the frontend for production
 
 set -e  # Exit on any error
 
-echo "🚀 Starting Production Deployment for Learning Accelerator"
+echo "🚀 Starting Production Deployment for Wisely"
 echo "=================================================="
 
 # Colors for output
@@ -173,7 +173,7 @@ generate_summary() {
     print_status "Generating deployment summary..."
     
     cat > deployment-summary.md << EOF
-# Learning Accelerator - Production Deployment Summary
+# Wisely - Production Deployment Summary
 
 ## Deployment Date
 $(date)
@@ -244,7 +244,7 @@ main() {
     echo "🎉 DEPLOYMENT COMPLETED SUCCESSFULLY!"
     echo "=================================================="
     echo ""
-    echo "Your Learning Accelerator is now production ready!"
+    echo "Your Wisely is now production ready!"
     echo ""
     echo "Next steps:"
     echo "1. Deploy the frontend build to your hosting platform"

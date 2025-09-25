@@ -1,6 +1,6 @@
 # Agent Prompts Directory
 
-This directory contains the immutable, version-locked prompts for the four specialized GPT agents used by the Learning Accelerator platform.
+This directory contains the immutable, version-locked prompts for the four specialized GPT agents used by the Wisely platform.
 
 ## Prompt Files
 

@@ -1,4 +1,4 @@
-# 🚀 Learning Accelerator Orchestrator
+# 🚀 Wisely Orchestrator
 
 A lightweight, event-driven orchestrator built on Supabase that manages agent workflows without external dependencies.
 
@@ -346,4 +346,4 @@ SELECT workflow_key, status, COUNT(*) FROM workflow_runs GROUP BY workflow_key, 
 
 ---
 
-**Built with ❤️ for the Learning Accelerator team** 
+**Built with ❤️ for the Wisely team** 

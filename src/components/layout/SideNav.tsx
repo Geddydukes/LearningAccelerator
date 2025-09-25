@@ -34,7 +34,7 @@ export function SideNav() {
   return (
     <nav className="w-64 min-h-screen bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 p-4">
       <div className="mb-8">
-        <h1 className="text-xl font-bold text-gray-900 dark:text-white">Learning Accelerator</h1>
+        <h1 className="text-xl font-bold text-gray-900 dark:text-white">Wisely</h1>
       </div>
       
       {/* Dashboard Group */}

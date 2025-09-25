@@ -2,7 +2,7 @@
 
 ## Overview
 
-The Learning Accelerator platform implements comprehensive security measures to protect user data, API keys, and system integrity. This document outlines our security policies, implementation details, and monitoring procedures.
+The Wisely platform implements comprehensive security measures to protect user data, API keys, and system integrity. This document outlines our security policies, implementation details, and monitoring procedures.
 
 ## 🔐 Core Security Principles
 
@@ -134,9 +134,9 @@ Every agent call is logged with:
 6. **Post-Incident**: Lessons learned and improvements
 
 ### Contact Information
-- **Security Team**: security@learning-accelerator.com
+- **Security Team**: security@wisely.com
 - **Emergency Response**: Available 24/7
-- **Bug Reports**: security@learning-accelerator.com
+- **Bug Reports**: security@wisely.com
 
 ## 🔍 Security Testing
 

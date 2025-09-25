@@ -27,7 +27,7 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
           </div>
           <div>
             <h1 className="text-xl font-bold text-gray-900 dark:text-white">
-              Learning Accelerator
+              Wisely
             </h1>
             <p className="text-sm text-gray-500 dark:text-gray-400">
               Multi-Agent Learning Platform

@@ -124,7 +124,7 @@ export const CertificateCard: React.FC<CertificateCardProps> = ({ className }) =
 
     const shareData = {
       title: 'Employment-Ready Certificate',
-      text: `I've earned my Employment-Ready Certificate in ${certificate.track} from Learning Accelerator!`,
+      text: `I've earned my Employment-Ready Certificate in ${certificate.track} from Wisely!`,
       url: `${window.location.origin}/api/verify/${certificate.cert_id}`
     }
 

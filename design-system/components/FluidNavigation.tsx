@@ -97,7 +97,7 @@ export function FluidNavigation({
           
           <div>
             <h1 className="text-lg font-semibold text-slate-900 dark:text-white">
-              Learning Accelerator
+              Wisely
             </h1>
             <p className="text-sm text-slate-500 dark:text-slate-400">
               Ripple of Knowledge

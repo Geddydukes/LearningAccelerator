@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document contains the Lighthouse performance audit results for the Learning Accelerator application. Lighthouse audits are run regularly to ensure optimal performance, accessibility, best practices, and SEO.
+This document contains the Lighthouse performance audit results for the Wisely application. Lighthouse audits are run regularly to ensure optimal performance, accessibility, best practices, and SEO.
 
 ## Current Performance Metrics
 
@@ -192,7 +192,7 @@ const SessionTimeline = lazy(() => import('./components/dev/SessionTimeline'));
 
 ## Conclusion
 
-The Learning Accelerator application demonstrates excellent performance characteristics with scores above 90% across all Lighthouse categories. The implementation of modern web technologies, proper optimization techniques, and accessibility features ensures a high-quality user experience.
+The Wisely application demonstrates excellent performance characteristics with scores above 90% across all Lighthouse categories. The implementation of modern web technologies, proper optimization techniques, and accessibility features ensures a high-quality user experience.
 
 Regular monitoring and continuous improvement will maintain these performance standards as the application evolves.
 

@@ -1,4 +1,4 @@
-# Learning Accelerator - Reference Document
+# Wisely - Reference Document
 
 ## 1. ✅ High-Level Architecture
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /**
- * Setup Script for Learning Accelerator Orchestrator
+ * Setup Script for Wisely Orchestrator
  * 
  * This script:
  * 1. Applies the orchestrator database migration
@@ -30,7 +30,7 @@ if (!supabaseUrl || !supabaseServiceKey) {
 const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
 async function setupOrchestrator() {
-  console.log('🚀 Setting up Learning Accelerator Orchestrator...\n');
+  console.log('🚀 Setting up Wisely Orchestrator...\n');
 
   try {
     // Step 1: Create workflows storage bucket

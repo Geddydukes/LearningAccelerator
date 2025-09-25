@@ -1,7 +1,7 @@
 # UI Redesign Plan: Modern shadcn/ui Implementation
 
 ## Overview
-This document outlines the plan to re-imagine the Learning Accelerator frontend using shadcn/ui components and a unified interface approach. The goal is to create a sleek, modern design that consolidates the multi-card dashboard into a single, intelligent workspace.
+This document outlines the plan to re-imagine the Wisely frontend using shadcn/ui components and a unified interface approach. The goal is to create a sleek, modern design that consolidates the multi-card dashboard into a single, intelligent workspace.
 
 ## Current State Analysis
 

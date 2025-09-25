@@ -46,7 +46,7 @@
 ## Figma File Structure
 
 ```
-🎨 Learning Accelerator Design System
+🎨 Wisely Design System
 ├── 📄 Cover & Overview
 ├── 🎯 Design Principles
 ├── 🎨 Color Palette

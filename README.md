@@ -1,4 +1,4 @@
-# Learning Accelerator
+# Wisely
 
 > **AI-powered learning platform where an Education Agent (Guru) orchestrates specialized AI teachers for personalized, instructor-centric learning experiences.**
 
@@ -6,7 +6,7 @@ Multi-agent learning platform with a Supabase-backed orchestrator, PWA frontend,
 
 ## 🎬 Demo
 
-[![Guru V1 Demo](https://img.shields.io/badge/Demo-Guru%20V1-blue)](https://github.com/your-org/learning-accelerator/releases/tag/v0.1.0-edu)
+[![Guru V1 Demo](https://img.shields.io/badge/Demo-Guru%20V1-blue)](https://github.com/your-org/wisely/releases/tag/v0.1.0-edu)
 
 *Watch the 120-second demo showing the complete learning flow from lecture → comprehension check → practice → reflection*
 

@@ -1,8 +1,8 @@
-# 🚀 Learning Accelerator Data Flow v3.0 - Instructor-Centric Learning
+# 🚀 Wisely Data Flow v3.0 - Instructor-Centric Learning
 
 ## Overview
 
-The Learning Accelerator orchestrator system manages the flow of data between users, AI agents, and learning sessions. This document describes the **instructor-centric learning flow** where the Instructor Agent operates as a classroom teacher, delivering lectures, checking comprehension, and preparing students for targeted practice sessions.
+The Wisely orchestrator system manages the flow of data between users, AI agents, and learning sessions. This document describes the **instructor-centric learning flow** where the Instructor Agent operates as a classroom teacher, delivering lectures, checking comprehension, and preparing students for targeted practice sessions.
 
 ## System Architecture - Instructor-Centric Flow
 
@@ -395,4 +395,4 @@ All agent endpoints must:
 
 **Version**: 2.1  
 **Last Updated**: January 2025  
-**Maintainer**: Learning Accelerator Team 
+**Maintainer**: Wisely Team 

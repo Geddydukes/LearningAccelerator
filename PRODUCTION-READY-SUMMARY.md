@@ -1,4 +1,4 @@
-# 🚀 Learning Accelerator - Production Ready Summary
+# 🚀 Wisely - Production Ready Summary
 
 ## ✅ **100% PRODUCTION READY** 
 

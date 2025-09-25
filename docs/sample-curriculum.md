@@ -1,6 +1,6 @@
-# Sample Curricula - Learning Accelerator
+# Sample Curricula - Wisely
 
-This document provides sample curricula that demonstrate the Learning Accelerator's capabilities. These curricula showcase different learning paths and can be used as templates for creating new programs.
+This document provides sample curricula that demonstrate Wisely's capabilities. These curricula showcase different learning paths and can be used as templates for creating new programs.
 
 ## 📚 Available Sample Curricula
 
@@ -413,4 +413,4 @@ This curriculum covers modern full-stack web development using React for the fro
 
 **Last Updated**: December 2024  
 **Next Review**: January 2025  
-**Contributors**: Learning Accelerator Team
+**Contributors**: Wisely Team

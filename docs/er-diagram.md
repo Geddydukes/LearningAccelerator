@@ -1,4 +1,4 @@
-# Learning Accelerator - Entity Relationship Diagram
+# Wisely - Entity Relationship Diagram
 
 ## Database Relationships Overview
 

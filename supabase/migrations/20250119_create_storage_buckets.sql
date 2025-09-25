@@ -1,4 +1,4 @@
--- Create storage buckets for the Learning Accelerator platform
+-- Create storage buckets for the Wisely platform
 -- This migration sets up all required buckets with proper RLS policies
 
 -- Create prompts-compiled bucket (private, user-specific compiled prompts)

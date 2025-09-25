@@ -1,10 +1,10 @@
 openapi: 3.1.0
 info:
-  title: Learning Accelerator API
+  title: Wisely API
   description: Multi-agent AI tutoring platform API
   version: 1.0.0
   contact:
-    name: Learning Accelerator Team
+    name: Wisely Team
     email: api@learningaccelerator.com
   license:
     name: MIT

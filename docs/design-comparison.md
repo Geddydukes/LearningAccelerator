@@ -1,7 +1,7 @@
 # Design Options Comparison
 
 ## Overview
-This document compares the three proposed design approaches for the Learning Accelerator UI redesign. Each option offers a different approach to unifying the multi-agent learning experience.
+This document compares the three proposed design approaches for the Wisely UI redesign. Each option offers a different approach to unifying the multi-agent learning experience.
 
 ## Option 1: Command Palette Interface
 

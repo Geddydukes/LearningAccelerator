@@ -21,7 +21,7 @@ export const CommandPaletteDashboard = () => {
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
               <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                Learning Accelerator
+                Wisely
               </h1>
               <Badge variant="secondary" className="bg-emerald-100 text-emerald-700">
                 Pro
@@ -163,7 +163,7 @@ export const ConversationDashboard = () => {
       <header className="border-b bg-white dark:bg-slate-800 px-6 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">
-            <h1 className="text-xl font-bold">Learning Accelerator</h1>
+            <h1 className="text-xl font-bold">Wisely</h1>
             <Badge variant="outline" className="bg-emerald-50 text-emerald-700">
               Session Active
             </Badge>
@@ -324,7 +324,7 @@ export const AdaptiveWorkspace = () => {
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
-              <h1 className="text-2xl font-bold">Learning Accelerator</h1>
+              <h1 className="text-2xl font-bold">Wisely</h1>
               <Badge variant="outline" className="bg-blue-50 text-blue-700">
                 React Hooks
               </Badge>

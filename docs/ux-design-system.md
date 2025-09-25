@@ -1,4 +1,4 @@
-# Learning Accelerator UX Design System
+# Wisely UX Design System
 
 ## Overview
 Complete UX design system implementing the Ripple-of-Knowledge visual language with responsive, production-ready layouts and component APIs.
@@ -18,7 +18,7 @@ Complete UX design system implementing the Ripple-of-Knowledge visual language w
 ┌─────────────────────────────────────────────────────────┐
 │                 WebGL Water Background                   │
 │                                                         │
-│              🧠 Learning Accelerator                    │
+│              🧠 Wisely                    │
 │               Ripple of Knowledge                       │
 │                                                         │
 │    Experience the future of learning with our          │
@@ -639,4 +639,4 @@ const router = createBrowserRouter([
 
 ---
 
-This comprehensive UX design system provides the foundation for building a production-ready Learning Accelerator platform that embodies the Ripple-of-Knowledge visual language while maintaining excellent accessibility and performance standards.
+This comprehensive UX design system provides the foundation for building a production-ready Wisely platform that embodies the Ripple-of-Knowledge visual language while maintaining excellent accessibility and performance standards.

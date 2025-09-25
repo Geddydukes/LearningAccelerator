@@ -1,14 +1,14 @@
-# System Architecture - Learning Accelerator
+# System Architecture - Wisely
 
 ## C4 System Context Diagram
 
 ```mermaid
 C4Context
-    title Learning Accelerator - System Context
+    title Wisely - System Context
 
     Person(learner, "Learner", "User seeking accelerated learning through AI agents")
     
-    System(la, "Learning Accelerator", "Multi-agent learning orchestration platform")
+    System(la, "Wisely", "Multi-agent learning orchestration platform")
     
     System_Ext(gemini, "Google Gemini", "LLM API for agent intelligence")
     System_Ext(elevenlabs, "ElevenLabs", "Voice synthesis API")
@@ -26,7 +26,7 @@ C4Context
 
 ```mermaid
 C4Container
-    title Learning Accelerator - Container View
+    title Wisely - Container View
 
     Person(learner, "Learner")
     

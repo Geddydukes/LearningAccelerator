@@ -1,4 +1,4 @@
-# Performance & Accessibility Playbook - Learning Accelerator
+# Performance & Accessibility Playbook - Wisely
 
 ## Performance Targets & Budgets
 
@@ -141,7 +141,7 @@ const handleInstallClick = async () => {
 ### Web App Manifest
 ```json
 {
-  "name": "Learning Accelerator",
+  "name": "Wisely",
   "short_name": "LearnAccel",
   "description": "Multi-Agent Learning Platform",
   "start_url": "/",
@@ -365,7 +365,7 @@ const HeroSection = () => {
   if (reducedMotion) {
     return (
       <div className="hero-static bg-gradient-to-b from-blue-600 to-slate-900">
-        <h1>Learning Accelerator</h1>
+        <h1>Wisely</h1>
         <p>Multi-Agent Learning Platform</p>
       </div>
     );

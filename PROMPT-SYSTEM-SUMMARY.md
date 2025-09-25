@@ -170,4 +170,4 @@ psql -f test/telemetry-queries.sql
 - **Monitoring**: ✅ Comprehensive telemetry and alerting
 - **Maintenance**: ✅ Automatic garbage collection and drift detection
 
-The prompt path rippling system is now **production-ready** and provides a robust foundation for the Learning Accelerator's agent orchestration! 🎉
+The prompt path rippling system is now **production-ready** and provides a robust foundation for the Wisely's agent orchestration! 🎉

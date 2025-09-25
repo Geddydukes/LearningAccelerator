@@ -183,7 +183,7 @@ const nextWeekPlan = await cloAgent.generateWeeklyPlan(week + 1, updatedCurricul
 ### Step 1: Install shadcn/ui
 ```bash
 # Navigate to project directory
-cd "/Users/geddydukes/Downloads/Learning Accelerator"
+cd "/Users/geddydukes/Downloads/Wisely"
 
 # Install shadcn/ui
 npx shadcn@latest init
@@ -290,7 +290,7 @@ export const ConversationWorkspace = () => {
       <header className="border-b bg-white dark:bg-slate-800 px-6 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">
-            <h1 className="text-xl font-bold">Learning Accelerator</h1>
+            <h1 className="text-xl font-bold">Wisely</h1>
             <Badge variant="outline" className="bg-emerald-50 text-emerald-700">
               Session Active
             </Badge>
@@ -492,7 +492,7 @@ describe('ConversationWorkspace', () => {
   it('renders conversation interface', () => {
     render(<ConversationWorkspace />)
     
-    expect(screen.getByText('Learning Accelerator')).toBeInTheDocument()
+    expect(screen.getByText('Wisely')).toBeInTheDocument()
     expect(screen.getByPlaceholderText('Type your question or learning goal...')).toBeInTheDocument()
   })
 
