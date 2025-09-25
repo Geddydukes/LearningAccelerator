@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# ⚠️  DEPRECATED: Use `npm run prompt:sync` instead
+# @deprecated Use the unified prompt-sync.ts script instead
+
 # Sync prompts to Supabase storage
 # Usage: bash scripts/sync-prompts.sh
 

@@ -1,3 +1,9 @@
+/**
+ * ⚠️  DEPRECATED: Use `npm run prompt:sync` instead
+ * 
+ * @deprecated Use the unified prompt-sync.ts script instead
+ */
+
 import { createClient } from '@supabase/supabase-js';
 import { readFileSync } from 'fs';
 import { dirname, join } from 'path';

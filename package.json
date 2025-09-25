@@ -14,7 +14,11 @@
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
     "test:e2e": "playwright test",
-    "test:e2e:ui": "playwright test --ui"
+    "test:e2e:ui": "playwright test --ui",
+    "test:mock": "VITE_ENABLE_STUBS=true npm run dev",
+    "prompt:sync": "ts-node --transpile-only scripts/prompt-sync.ts",
+    "prompt:validate": "ts-node --transpile-only scripts/prompt-sync.ts --validate",
+    "prompt:list": "ts-node --transpile-only scripts/prompt-sync.ts --list"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
