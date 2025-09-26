@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Supabase Client Test</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  </head>
+  <body>
+    <h1>Supabase Client Test</h1>
+    <div id="results"></div>
+
+    <script>
+      const resultsDiv = document.getElementById("results");
+
+      async function testSupabase() {
+        try {
+          resultsDiv.innerHTML = "<p>🔄 Testing Supabase client...</p>";
+
+          // Create Supabase client
+          const supabaseUrl = "https://jclgmvbkrlkppecwnljv.supabase.co";
+          const supabaseKey =
+            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpjbGdtdmJrcmxrcHBlY3dubGp2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI5NTU5ODYsImV4cCI6MjA2ODUzMTk4Nn0.BQUBTydxPfOz17ZF-I3P3Xg5qwI9dcs6TDpJHKIhggg";
+
+          const { createClient } = supabase;
+          const client = createClient(supabaseUrl, supabaseKey);
+
+          resultsDiv.innerHTML += "<p>✅ Supabase client created</p>";
+
+          // Test sign in
+          resultsDiv.innerHTML += "<p>🔄 Testing sign in...</p>";
+
+          const { data, error } = await client.auth.signInWithPassword({
+            email: "test@example.com",
+            password: "testpassword123",
+          });
+
+          if (error) {
+            resultsDiv.innerHTML += `<p>❌ Sign in error: ${error.message}</p>`;
+            resultsDiv.innerHTML += `<p>Error code: ${error.status}</p>`;
+          } else {
+            resultsDiv.innerHTML += "<p>✅ Sign in successful!</p>";
+            resultsDiv.innerHTML += `<p>User ID: ${data.user.id}</p>`;
+          }
+        } catch (error) {
+          resultsDiv.innerHTML += `<p>❌ Unexpected error: ${error.message}</p>`;
+          console.error("Full error:", error);
+        }
+      }
+
+      testSupabase();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Supabase Auth Test</title>
+  </head>
+  <body>
+    <h1>Supabase Authentication Test</h1>
+    <div id="results"></div>
+
+    <script type="module">
+      // Test Supabase authentication directly
+      const resultsDiv = document.getElementById("results");
+
+      try {
+        // Import Supabase client
+        const { createClient } = await import(
+          "https://cdn.skypack.dev/@supabase/supabase-js@2"
+        );
+
+        const supabaseUrl = "https://jclgmvbkrlkppecwnljv.supabase.co";
+        const supabaseKey =
+          "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpjbGdtdmJrcmxrcHBlY3dubGp2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI5NTU5ODYsImV4cCI6MjA2ODUzMTk4Nn0.BQUBTydxPfOz17ZF-I3P3Xg5qwI9dcs6TDpJHKIhggg";
+
+        const supabase = createClient(supabaseUrl, supabaseKey);
+
+        resultsDiv.innerHTML = "<p>✅ Supabase client created successfully</p>";
+
+        // Test auth endpoint
+        try {
+          const { data, error } = await supabase.auth.signInWithPassword({
+            email: "test@example.com",
+            password: "testpassword",
+          });
+
+          if (error) {
+            resultsDiv.innerHTML += `<p>✅ Auth endpoint working (expected error): ${error.message}</p>`;
+          } else {
+            resultsDiv.innerHTML +=
+              "<p>✅ Auth endpoint working (unexpected success)</p>";
+          }
+        } catch (authError) {
+          resultsDiv.innerHTML += `<p>❌ Auth endpoint error: ${authError.message}</p>`;
+        }
+      } catch (error) {
+        resultsDiv.innerHTML = `<p>❌ Error: ${error.message}</p>`;
+      }
+    </script>
+  </body>
+</html>

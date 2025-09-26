@@ -1,0 +1,68 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e3]:
+  - button "Back to Landing" [ref=e4] [cursor=pointer]:
+    - img [ref=e5] [cursor=pointer]
+    - text: Back to Landing
+  - generic [ref=e7]:
+    - generic [ref=e9]:
+      - generic [ref=e10]:
+        - generic [ref=e11]:
+          - img [ref=e13]
+          - heading "Wisely" [level=1] [ref=e23]
+        - paragraph [ref=e24]: Excel at Everything
+        - paragraph [ref=e25]: Don't Cheat, Master
+      - generic [ref=e26]:
+        - generic [ref=e27]:
+          - img [ref=e29]
+          - generic [ref=e39]:
+            - heading "AI-Powered Learning" [level=3] [ref=e40]
+            - paragraph [ref=e41]: Personalized curriculum adapted to your style
+        - generic [ref=e42]:
+          - img [ref=e44]
+          - generic [ref=e46]:
+            - heading "Accelerated Progress" [level=3] [ref=e47]
+            - paragraph [ref=e48]: Learn 3x faster with proven methodologies
+        - generic [ref=e49]:
+          - img [ref=e51]
+          - generic [ref=e53]:
+            - heading "Secure & Private" [level=3] [ref=e54]
+            - paragraph [ref=e55]: Your data is protected with enterprise security
+      - generic [ref=e57]:
+        - generic [ref=e58]:
+          - img [ref=e59]
+          - generic [ref=e62]: Trusted by 10K+ learners
+        - paragraph [ref=e63]: Join a community of motivated learners who are transforming their careers and skills.
+    - generic [ref=e65]:
+      - generic [ref=e66]:
+        - img [ref=e68]
+        - generic [ref=e78]:
+          - heading "Welcome Back" [level=3] [ref=e79]
+          - paragraph [ref=e80]: Sign in to continue your progress
+        - generic [ref=e81]: 🚀 AI-Powered Learning
+      - generic [ref=e82]:
+        - generic [ref=e83]:
+          - generic [ref=e84]:
+            - generic [ref=e85]: Email Address
+            - generic [ref=e86]:
+              - img [ref=e87]
+              - textbox "Email Address" [active] [ref=e92]: invalid-email
+          - generic [ref=e93]:
+            - generic [ref=e94]: Password
+            - generic [ref=e95]:
+              - img [ref=e96]
+              - textbox "Password" [ref=e101]
+              - button [ref=e102] [cursor=pointer]:
+                - img [ref=e103] [cursor=pointer]
+          - button "Sign In" [ref=e106] [cursor=pointer]:
+            - generic [ref=e107] [cursor=pointer]:
+              - img [ref=e108] [cursor=pointer]
+              - generic [ref=e110] [cursor=pointer]: Sign In
+        - paragraph [ref=e112]:
+          - text: Don't have an account?
+          - button "Sign Up" [ref=e113] [cursor=pointer]
+        - paragraph [ref=e115]:
+          - img [ref=e116]
+          - text: Secure authentication powered by Supabase
+```

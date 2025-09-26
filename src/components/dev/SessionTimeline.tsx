@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { createClient } from '@supabase/supabase-js';
-import { GlassCard } from '../design-system/GlassCard';
+import React, { useState, useEffect } from "react";
+import { motion } from "framer-motion";
+import { createClient } from "@supabase/supabase-js";
+import { GlassCard } from "../../../design-system/components/GlassCard";
 
 interface AgentEvent {
   id: string;
@@ -13,7 +13,7 @@ interface AgentEvent {
   ended_at: string | null;
   tokens_in: number;
   tokens_out: number;
-  status: 'running' | 'completed' | 'failed';
+  status: "running" | "completed" | "failed";
   cost_estimate: number;
   error_message: string | null;
 }
@@ -22,7 +22,9 @@ interface SessionTimelineProps {
   correlationId: string;
 }
 
-export const SessionTimeline: React.FC<SessionTimelineProps> = ({ correlationId }) => {
+export const SessionTimeline: React.FC<SessionTimelineProps> = ({
+  correlationId,
+}) => {
   const [events, setEvents] = useState<AgentEvent[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -39,10 +41,10 @@ export const SessionTimeline: React.FC<SessionTimelineProps> = ({ correlationId 
       );
 
       const { data, error } = await supabase
-        .from('agent_events')
-        .select('*')
-        .eq('correlation_id', correlationId)
-        .order('started_at', { ascending: true });
+        .from("agent_events")
+        .select("*")
+        .eq("correlation_id", correlationId)
+        .order("started_at", { ascending: true });
 
       if (error) throw error;
 
@@ -55,7 +57,7 @@ export const SessionTimeline: React.FC<SessionTimelineProps> = ({ correlationId 
   };
 
   const getDuration = (startedAt: string, endedAt: string | null) => {
-    if (!endedAt) return 'Running...';
+    if (!endedAt) return "Running...";
     const start = new Date(startedAt);
     const end = new Date(endedAt);
     const duration = end.getTime() - start.getTime();
@@ -64,10 +66,14 @@ export const SessionTimeline: React.FC<SessionTimelineProps> = ({ correlationId 
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'completed': return 'text-green-600 bg-green-100';
-      case 'failed': return 'text-red-600 bg-red-100';
-      case 'running': return 'text-blue-600 bg-blue-100';
-      default: return 'text-gray-600 bg-gray-100';
+      case "completed":
+        return "text-green-600 bg-green-100";
+      case "failed":
+        return "text-red-600 bg-red-100";
+      case "running":
+        return "text-blue-600 bg-blue-100";
+      default:
+        return "text-gray-600 bg-gray-100";
     }
   };
 
@@ -76,8 +82,14 @@ export const SessionTimeline: React.FC<SessionTimelineProps> = ({ correlationId 
   };
 
   const getTotalTokens = () => {
-    const tokensIn = events.reduce((sum, event) => sum + (event.tokens_in || 0), 0);
-    const tokensOut = events.reduce((sum, event) => sum + (event.tokens_out || 0), 0);
+    const tokensIn = events.reduce(
+      (sum, event) => sum + (event.tokens_in || 0),
+      0
+    );
+    const tokensOut = events.reduce(
+      (sum, event) => sum + (event.tokens_out || 0),
+      0
+    );
     return { in: tokensIn, out: tokensOut };
   };
 
@@ -102,7 +114,9 @@ export const SessionTimeline: React.FC<SessionTimelineProps> = ({ correlationId 
   if (events.length === 0) {
     return (
       <div className="p-8 text-center">
-        <div className="text-gray-600">No events found for correlation ID: {correlationId}</div>
+        <div className="text-gray-600">
+          No events found for correlation ID: {correlationId}
+        </div>
       </div>
     );
   }
@@ -111,19 +125,24 @@ export const SessionTimeline: React.FC<SessionTimelineProps> = ({ correlationId 
     <div className="max-w-4xl mx-auto p-6">
       <div className="mb-6">
         <h1 className="text-3xl font-bold mb-2">Session Timeline</h1>
-        <p className="text-gray-600">Correlation ID: <code className="bg-gray-100 px-2 py-1 rounded">{correlationId}</code></p>
+        <p className="text-gray-600">
+          Correlation ID:{" "}
+          <code className="bg-gray-100 px-2 py-1 rounded">{correlationId}</code>
+        </p>
       </div>
 
       {/* Summary Stats */}
       <GlassCard className="p-6 mb-6">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div className="text-center">
-            <div className="text-2xl font-bold text-blue-600">{events.length}</div>
+            <div className="text-2xl font-bold text-blue-600">
+              {events.length}
+            </div>
             <div className="text-sm text-gray-600">Total Events</div>
           </div>
           <div className="text-center">
             <div className="text-2xl font-bold text-green-600">
-              {events.filter(e => e.status === 'completed').length}
+              {events.filter((e) => e.status === "completed").length}
             </div>
             <div className="text-sm text-gray-600">Completed</div>
           </div>
@@ -155,17 +174,25 @@ export const SessionTimeline: React.FC<SessionTimelineProps> = ({ correlationId 
               <div className="flex items-start justify-between">
                 <div className="flex-1">
                   <div className="flex items-center space-x-3 mb-2">
-                    <span className={`px-2 py-1 rounded text-xs font-semibold ${getStatusColor(event.status)}`}>
+                    <span
+                      className={`px-2 py-1 rounded text-xs font-semibold ${getStatusColor(
+                        event.status
+                      )}`}
+                    >
                       {event.status.toUpperCase()}
                     </span>
                     <span className="text-lg font-semibold">{event.agent}</span>
-                    <span className="text-sm text-gray-600">→ {event.tool}</span>
+                    <span className="text-sm text-gray-600">
+                      → {event.tool}
+                    </span>
                   </div>
-                  
+
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                     <div>
                       <div className="text-gray-600">Duration</div>
-                      <div className="font-mono">{getDuration(event.started_at, event.ended_at)}</div>
+                      <div className="font-mono">
+                        {getDuration(event.started_at, event.ended_at)}
+                      </div>
                     </div>
                     <div>
                       <div className="text-gray-600">Tokens In</div>
@@ -177,7 +204,9 @@ export const SessionTimeline: React.FC<SessionTimelineProps> = ({ correlationId 
                     </div>
                     <div>
                       <div className="text-gray-600">Cost</div>
-                      <div className="font-mono">${event.cost_estimate.toFixed(4)}</div>
+                      <div className="font-mono">
+                        ${event.cost_estimate.toFixed(4)}
+                      </div>
                     </div>
                   </div>
 
@@ -214,14 +243,18 @@ export const SessionTimeline: React.FC<SessionTimelineProps> = ({ correlationId 
                 <div className="flex items-center space-x-2">
                   <span className="font-semibold">{event.agent}</span>
                   <span className="text-sm text-gray-600">→ {event.tool}</span>
-                  <span className={`px-2 py-1 rounded text-xs ${getStatusColor(event.status)}`}>
+                  <span
+                    className={`px-2 py-1 rounded text-xs ${getStatusColor(
+                      event.status
+                    )}`}
+                  >
                     {event.status}
                   </span>
                 </div>
                 <div className="text-sm text-gray-600 mt-1">
-                  {getDuration(event.started_at, event.ended_at)} • 
-                  {event.tokens_in + event.tokens_out} tokens • 
-                  ${event.cost_estimate.toFixed(4)}
+                  {getDuration(event.started_at, event.ended_at)} •
+                  {event.tokens_in + event.tokens_out} tokens • $
+                  {event.cost_estimate.toFixed(4)}
                 </div>
               </div>
             </div>
