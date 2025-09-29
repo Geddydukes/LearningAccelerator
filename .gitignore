@@ -28,3 +28,4 @@ dist-ssr
 # prompts
 prompts/base/*
 prompts/base_markdown/*
+prompts/guru_v1.md

@@ -1,70 +1,97 @@
-import React, { useState, useMemo, useCallback, memo } from 'react';
-import { useLocation, useNavigate, Routes, Route, useParams } from 'react-router-dom';
-import { Menu, X, Home, Brain, Users, Briefcase, FileText, ChevronRight, Lock, Crown, CheckCircle, Circle, BookOpen } from 'lucide-react';
-import { PATHS } from '../../routes/paths';
-import { useAuth } from '../../contexts/AuthContext';
-import { useSubscription } from '../../hooks/useSubscription';
-import { CORE_AGENTS, PREMIUM_AGENTS, AGENTS } from '../../lib/agents/registry';
-import HomeDashboard from '../home/HomeDashboard';
-import { UnifiedLearningPlatform } from '../workspace/UnifiedLearningPlatform';
-import { SessionTimeline } from '../dev/SessionTimeline';
-import { 
-  CurrentModule, 
-  SelfGuided, 
-  PastTracks, 
-  CareerPreview, 
-  PortfolioPreview, 
-  Settings 
-} from '../pages';
-import { SideNav } from './SideNav';
+import React, { useState, useMemo, useCallback, memo } from "react";
+import {
+  useLocation,
+  useNavigate,
+  Routes,
+  Route,
+  useParams,
+} from "react-router-dom";
+import {
+  Menu,
+  X,
+  Home,
+  Brain,
+  Users,
+  Briefcase,
+  FileText,
+  ChevronRight,
+  Lock,
+  Crown,
+  CheckCircle,
+  Circle,
+  BookOpen,
+  Bot,
+} from "lucide-react";
+import { PATHS } from "../../routes/paths";
+import { useAuth } from "../../contexts/AuthContext";
+import { useSubscription } from "../../hooks/useSubscription";
+import { CORE_AGENTS, PREMIUM_AGENTS, AGENTS } from "../../lib/agents/registry";
+import HomeDashboard from "../home/HomeDashboard";
+import { UnifiedLearningPlatform } from "../workspace/UnifiedLearningPlatform";
+import { SessionTimeline } from "../dev/SessionTimeline";
+import {
+  CurrentModule,
+  SelfGuided,
+  PastTracks,
+  CareerPreview,
+  PortfolioPreview,
+  Settings,
+} from "../pages";
+import { SideNav } from "./SideNav";
 
 // Navigation items configuration - generated from agent registry
 const NAV_ITEMS = [
   // Core learning items
   {
-    id: 'dashboard',
-    label: 'Dashboard',
+    id: "dashboard",
+    label: "Dashboard",
     path: PATHS.home,
     icon: Home,
-    description: 'Your learning overview',
-    requiresPremium: false
+    description: "Your learning overview",
+    requiresPremium: false,
   },
   {
-    id: 'workspace',
-    label: 'Learning Workspace',
+    id: "workspace",
+    label: "Learning Workspace",
     path: PATHS.workspace,
     icon: BookOpen,
-    description: 'Your active learning session',
-    requiresPremium: false
+    description: "Your active learning session",
+    requiresPremium: false,
   },
   {
-    id: 'past-tracks',
-    label: 'Past Learning Tracks',
+    id: "guru",
+    label: "Guru",
+    path: "/guru",
+    icon: Bot,
+    description: "AI learning assistant",
+    requiresPremium: false,
+  },
+  {
+    id: "past-tracks",
+    label: "Past Learning Tracks",
     path: PATHS.pastTracks,
     icon: FileText,
-    description: 'Your completed tracks',
-    requiresPremium: false
+    description: "Your completed tracks",
+    requiresPremium: false,
   },
   // Core agents (weekly mode)
-  ...CORE_AGENTS
-    .filter(id => AGENTS[id].mode === 'weekly')
-    .map(id => ({
-      id: `agent-${id}`,
-      label: AGENTS[id].title,
-      path: AGENTS[id].route,
-      icon: BookOpen, // Will be replaced with dynamic icon loading
-      description: AGENTS[id].description,
-      requiresPremium: false
-    })),
+  ...CORE_AGENTS.filter((id) => AGENTS[id].mode === "weekly").map((id) => ({
+    id: `agent-${id}`,
+    label: AGENTS[id].title,
+    path: AGENTS[id].route,
+    icon: BookOpen, // Will be replaced with dynamic icon loading
+    description: AGENTS[id].description,
+    requiresPremium: false,
+  })),
   // Premium features
   {
-    id: 'brand-career',
-    label: 'Brand & Career',
-    path: '/home/brand-career',
+    id: "brand-career",
+    label: "Brand & Career",
+    path: "/home/brand-career",
     icon: Briefcase,
-    description: 'Brand strategy and career development (Premium)',
-    requiresPremium: true
-  }
+    description: "Brand strategy and career development (Premium)",
+    requiresPremium: true,
+  },
 ];
 
 // Simple content components for now
@@ -72,22 +99,29 @@ const Dashboard = memo(() => <HomeDashboard />);
 
 const ModuleCurrent = memo(() => (
   <div className="p-6">
-    <h1 className="text-3xl font-medium text-foreground mb-6">📚 Current Module</h1>
+    <h1 className="text-3xl font-medium text-foreground mb-6">
+      📚 Current Module
+    </h1>
     <div className="bg-card border border-border/50 rounded-lg p-6">
-      <p className="text-lg text-muted-foreground">Your current learning module will appear here.</p>
+      <p className="text-lg text-muted-foreground">
+        Your current learning module will appear here.
+      </p>
     </div>
   </div>
 ));
 
 const SelfGuidedLearning = memo(() => (
   <div className="p-6">
-    <h1 className="text-3xl font-medium text-foreground mb-6">🚀 Self-guided Learning</h1>
+    <h1 className="text-3xl font-medium text-foreground mb-6">
+      🚀 Self-guided Learning
+    </h1>
     <div className="bg-card border border-border/50 rounded-lg p-6">
       <p className="text-lg text-muted-foreground mb-4">
-        Start a new learning journey with AI-powered guidance. Choose your focus area and we'll create a personalized learning plan.
+        Start a new learning journey with AI-powered guidance. Choose your focus
+        area and we'll create a personalized learning plan.
       </p>
-      <button 
-        onClick={() => window.location.href = '/home/workspace'}
+      <button
+        onClick={() => (window.location.href = "/home/workspace")}
         className="bg-primary text-primary-foreground hover:bg-primary/90 px-6 py-3 rounded-lg transition-colors"
       >
         Start Learning Journey
@@ -99,27 +133,27 @@ const SelfGuidedLearning = memo(() => (
 const PastLearningTracks = memo(() => {
   const { user } = useAuth();
   const { isPaid } = useSubscription();
-  
+
   // Mock data - replace with real data from your database
   const pastTracks = [
     {
-      id: 'fullstack_web_1',
-      name: 'Full-Stack Web Development',
-      completedAt: '2024-12-15',
+      id: "fullstack_web_1",
+      name: "Full-Stack Web Development",
+      completedAt: "2024-12-15",
       progress: 100,
-      duration: '8 weeks',
-      skills: ['React', 'Node.js', 'MongoDB'],
-      certificate: true
+      duration: "8 weeks",
+      skills: ["React", "Node.js", "MongoDB"],
+      certificate: true,
     },
     {
-      id: 'ai_ml_1',
-      name: 'AI & Machine Learning',
-      completedAt: '2024-11-20',
+      id: "ai_ml_1",
+      name: "AI & Machine Learning",
+      completedAt: "2024-11-20",
       progress: 85,
-      duration: '6 weeks',
-      skills: ['Python', 'TensorFlow', 'Data Analysis'],
-      certificate: false
-    }
+      duration: "6 weeks",
+      skills: ["Python", "TensorFlow", "Data Analysis"],
+      certificate: false,
+    },
   ];
 
   const maxTracks = isPaid ? 10 : 2;
@@ -128,12 +162,15 @@ const PastLearningTracks = memo(() => {
   return (
     <div className="p-6">
       <div className="mb-6">
-        <h1 className="text-3xl font-medium text-foreground mb-2">📚 Past Learning Tracks</h1>
+        <h1 className="text-3xl font-medium text-foreground mb-2">
+          📚 Past Learning Tracks
+        </h1>
         <p className="text-muted-foreground">
           Track your learning journey and review completed courses
           {!isPaid && (
             <span className="text-foreground font-medium">
-              {' '}(Limited to {maxTracks} tracks on basic plan)
+              {" "}
+              (Limited to {maxTracks} tracks on basic plan)
             </span>
           )}
         </p>
@@ -142,12 +179,14 @@ const PastLearningTracks = memo(() => {
       {/* Stats Overview */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
         <div className="bg-card border border-border/50 rounded-lg p-4">
-          <div className="text-2xl font-medium text-foreground">{pastTracks.length}</div>
+          <div className="text-2xl font-medium text-foreground">
+            {pastTracks.length}
+          </div>
           <div className="text-sm text-muted-foreground">Completed Tracks</div>
         </div>
         <div className="bg-card border border-border/50 rounded-lg p-4">
           <div className="text-2xl font-medium text-foreground">
-            {pastTracks.filter(t => t.certificate).length}
+            {pastTracks.filter((t) => t.certificate).length}
           </div>
           <div className="text-sm text-muted-foreground">Certificates</div>
         </div>
@@ -168,10 +207,15 @@ const PastLearningTracks = memo(() => {
       {/* Tracks List */}
       <div className="space-y-4">
         {pastTracks.map((track) => (
-          <div key={track.id} className="bg-card border border-border/50 rounded-lg p-6">
+          <div
+            key={track.id}
+            className="bg-card border border-border/50 rounded-lg p-6"
+          >
             <div className="flex items-start justify-between mb-4">
               <div className="flex-1">
-                <h3 className="text-xl font-medium text-foreground mb-2">{track.name}</h3>
+                <h3 className="text-xl font-medium text-foreground mb-2">
+                  {track.name}
+                </h3>
                 <div className="flex items-center space-x-4 text-sm text-muted-foreground mb-3">
                   <span>Completed: {track.completedAt}</span>
                   <span>Duration: {track.duration}</span>
@@ -189,7 +233,7 @@ const PastLearningTracks = memo(() => {
                     )}
                   </span>
                 </div>
-                
+
                 {/* Progress Bar */}
                 <div className="mb-3">
                   <div className="flex justify-between text-sm text-muted-foreground mb-1">
@@ -197,7 +241,7 @@ const PastLearningTracks = memo(() => {
                     <span>{track.progress}%</span>
                   </div>
                   <div className="w-full bg-muted rounded-full h-2">
-                    <div 
+                    <div
                       className="bg-primary h-2 rounded-full transition-all duration-300"
                       style={{ width: `${track.progress}%` }}
                     />
@@ -207,7 +251,7 @@ const PastLearningTracks = memo(() => {
                 {/* Skills */}
                 <div className="flex flex-wrap gap-2">
                   {track.skills.map((skill, index) => (
-                    <span 
+                    <span
                       key={index}
                       className="px-3 py-1 bg-accent text-foreground text-sm rounded-full"
                     >
@@ -216,7 +260,7 @@ const PastLearningTracks = memo(() => {
                   ))}
                 </div>
               </div>
-              
+
               <div className="ml-4">
                 <button className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors">
                   Review
@@ -242,10 +286,12 @@ const PastLearningTracks = memo(() => {
           <div className="bg-card border border-border/50 rounded-lg p-6 text-center">
             <div className="text-muted-foreground mb-3">
               <Lock className="w-8 h-8 mx-auto mb-2" />
-              <h3 className="text-lg font-medium text-foreground">Track Limit Reached</h3>
+              <h3 className="text-lg font-medium text-foreground">
+                Track Limit Reached
+              </h3>
             </div>
             <p className="text-muted-foreground mb-4">
-              You've reached the limit of {maxTracks} tracks on your basic plan. 
+              You've reached the limit of {maxTracks} tracks on your basic plan.
               Upgrade to premium for unlimited learning tracks!
             </p>
             <button className="px-6 py-3 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors">
@@ -262,7 +308,9 @@ const CareerHub = memo(() => (
   <div className="p-6">
     <h1 className="text-3xl font-medium text-foreground mb-6">💼 Career Hub</h1>
     <div className="bg-card border border-border/50 rounded-lg p-6">
-      <p className="text-lg text-muted-foreground">Career development tools will appear here.</p>
+      <p className="text-lg text-muted-foreground">
+        Career development tools will appear here.
+      </p>
     </div>
   </div>
 ));
@@ -271,7 +319,9 @@ const Portfolio = memo(() => (
   <div className="p-6">
     <h1 className="text-3xl font-medium text-foreground mb-6">📁 Portfolio</h1>
     <div className="bg-card border border-border/50 rounded-lg p-6">
-      <p className="text-lg text-muted-foreground">Your portfolio will appear here.</p>
+      <p className="text-lg text-muted-foreground">
+        Your portfolio will appear here.
+      </p>
     </div>
   </div>
 ));
@@ -280,14 +330,16 @@ const SocraticChat = memo(() => (
   <div className="p-6">
     <h1 className="text-3xl font-bold text-gray-900 mb-6">💬 Socratic Chat</h1>
     <div className="bg-white rounded-lg shadow p-6">
-      <p className="text-lg text-gray-600">Interactive learning chat will appear here.</p>
+      <p className="text-lg text-gray-600">
+        Interactive learning chat will appear here.
+      </p>
     </div>
   </div>
 ));
 
 const TimelineWrapper = memo(() => {
   const { correlationId } = useParams<{ correlationId: string }>();
-  return <SessionTimeline correlationId={correlationId || ''} />;
+  return <SessionTimeline correlationId={correlationId || ""} />;
 });
 
 const AppShell = memo(() => {
@@ -300,14 +352,19 @@ const AppShell = memo(() => {
 
   // Get current active nav item
   const activeNavItem = useMemo(() => {
-    return NAV_ITEMS.find(item => item.path === location.pathname) || NAV_ITEMS[0];
+    return (
+      NAV_ITEMS.find((item) => item.path === location.pathname) || NAV_ITEMS[0]
+    );
   }, [location.pathname]);
 
   // Handle navigation
-  const handleNavigation = useCallback((path: string) => {
-    navigate(path);
-    setIsMobileMenuOpen(false);
-  }, [navigate]);
+  const handleNavigation = useCallback(
+    (path: string) => {
+      navigate(path);
+      setIsMobileMenuOpen(false);
+    },
+    [navigate]
+  );
 
   // Handle sign out
   const handleSignOut = useCallback(async () => {
@@ -315,11 +372,9 @@ const AppShell = memo(() => {
       await signOut();
       navigate(PATHS.landing);
     } catch (error) {
-      console.error('Sign out error:', error);
+      console.error("Sign out error:", error);
     }
   }, [signOut, navigate]);
-
-
 
   return (
     <div className="flex h-screen bg-background">
@@ -338,9 +393,7 @@ const AppShell = memo(() => {
           <div className="fixed left-0 top-0 h-full w-80 bg-card shadow-xl">
             {/* Mobile Header */}
             <div className="flex items-center justify-between p-4 border-b border-border/50">
-              <h1 className="text-xl font-medium text-foreground">
-                Wisely
-              </h1>
+              <h1 className="text-xl font-medium text-foreground">Wisely</h1>
               <button
                 onClick={() => setIsMobileMenuOpen(false)}
                 className="p-2 hover:bg-accent rounded-lg transition-colors"
@@ -355,14 +408,16 @@ const AppShell = memo(() => {
                 const Icon = item.icon;
                 const isActive = location.pathname === item.path;
                 const isPremium = item.requiresPremium && !isPaid;
-                
+
                 return (
                   <button
                     key={item.id}
                     onClick={() => {
                       if (isPremium) {
                         // Show upgrade prompt for premium features
-                        alert('This feature requires a premium subscription. Please upgrade to access.');
+                        alert(
+                          "This feature requires a premium subscription. Please upgrade to access."
+                        );
                         return;
                       }
                       handleNavigation(item.path);
@@ -370,16 +425,22 @@ const AppShell = memo(() => {
                     }}
                     className={`w-full flex items-center p-3 rounded-lg transition-all duration-200 ${
                       isActive
-                        ? 'bg-primary text-primary-foreground'
+                        ? "bg-primary text-primary-foreground"
                         : isPremium
-                        ? 'text-muted-foreground cursor-not-allowed'
-                        : 'text-foreground hover:bg-accent'
+                        ? "text-muted-foreground cursor-not-allowed"
+                        : "text-foreground hover:bg-accent"
                     }`}
                     disabled={isPremium}
                   >
-                    <Icon className={`w-5 h-5 ${
-                      isActive ? 'text-primary-foreground' : isPremium ? 'text-muted-foreground' : 'text-muted-foreground'
-                    }`} />
+                    <Icon
+                      className={`w-5 h-5 ${
+                        isActive
+                          ? "text-primary-foreground"
+                          : isPremium
+                          ? "text-muted-foreground"
+                          : "text-muted-foreground"
+                      }`}
+                    />
                     <div className="ml-3 text-left flex-1">
                       <div className="font-medium flex items-center justify-between">
                         {item.label}
@@ -401,12 +462,12 @@ const AppShell = memo(() => {
               <div className="flex items-center space-x-3 mb-3">
                 <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
                   <span className="text-primary-foreground font-medium text-sm">
-                    {user?.email?.charAt(0).toUpperCase() || 'U'}
+                    {user?.email?.charAt(0).toUpperCase() || "U"}
                   </span>
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-foreground truncate">
-                    {user?.email || 'User'}
+                    {user?.email || "User"}
                   </p>
                 </div>
               </div>
@@ -436,14 +497,31 @@ const AppShell = memo(() => {
         <div className="h-full">
           <Routes>
             <Route path="/" element={<HomeDashboard />} />
-            <Route path="/module/current" element={<CurrentModule trackLabel="AI/ML Engineering" />} />
+            <Route
+              path="/module/current"
+              element={<CurrentModule trackLabel="AI/ML Engineering" />}
+            />
             <Route path="/self-guided" element={<SelfGuided />} />
             <Route path="/past-tracks" element={<PastTracks />} />
             <Route path="/workspace" element={<UnifiedLearningPlatform />} />
-            <Route path="/dev/timeline/:correlationId" element={<TimelineWrapper />} />
-            <Route path="/career" element={<CareerPreview userTier={isPaid ? 'premium' : 'free'} />} />
-            <Route path="/portfolio" element={<PortfolioPreview userTier={isPaid ? 'premium' : 'free'} />} />
-            <Route path="/settings" element={<Settings userTier={isPaid ? 'premium' : 'free'} />} />
+            <Route
+              path="/dev/timeline/:correlationId"
+              element={<TimelineWrapper />}
+            />
+            <Route
+              path="/career"
+              element={<CareerPreview userTier={isPaid ? "premium" : "free"} />}
+            />
+            <Route
+              path="/portfolio"
+              element={
+                <PortfolioPreview userTier={isPaid ? "premium" : "free"} />
+              }
+            />
+            <Route
+              path="/settings"
+              element={<Settings userTier={isPaid ? "premium" : "free"} />}
+            />
             <Route path="*" element={<HomeDashboard />} />
           </Routes>
         </div>
@@ -452,6 +530,6 @@ const AppShell = memo(() => {
   );
 });
 
-AppShell.displayName = 'AppShell';
+AppShell.displayName = "AppShell";
 
-export default AppShell; 
+export default AppShell;

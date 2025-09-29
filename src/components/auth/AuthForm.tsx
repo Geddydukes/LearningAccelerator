@@ -23,13 +23,15 @@ import {
   CheckCircle,
   AlertCircle,
 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 import { PATHS } from "../../routes/paths";
 import { useUserStats, formatUserCount } from "../../hooks/useUserStats";
 
 export function AuthForm() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const redirectTo = searchParams.get("redirect") || PATHS.workspace;
   const { signIn, signUp, user, loading } = useAuth();
   const { totalUsers, loading: statsLoading } = useUserStats();
   const [isSignUp, setIsSignUp] = useState(false);
@@ -94,7 +96,7 @@ export function AuthForm() {
       }
 
       // Navigate to main workspace on successful auth
-      navigate(PATHS.workspace, { replace: true });
+      navigate(redirectTo, { replace: true });
     } catch (error) {
       console.error("Auth error:", error);
       setErrors({ general: "Authentication failed. Please try again." });
@@ -106,7 +108,7 @@ export function AuthForm() {
   // If already authenticated, redirect away from auth page
   useEffect(() => {
     if (!loading && user) {
-      navigate(PATHS.workspace, { replace: true });
+      navigate(redirectTo, { replace: true });
     }
   }, [loading, user, navigate]);
 
