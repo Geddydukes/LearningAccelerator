@@ -63,11 +63,7 @@ export class DatabaseService {
     const highestWeek = data && data.length > 0 ? data[0].week_number : 0;
     const nextWeek = highestWeek + 1;
     
-    console.log('📊 Week calculation:', { 
-      existingWeeks: data?.length || 0, 
-      highestWeek, 
-      nextWeek 
-    });
+    // Week calculation completed
     
     return nextWeek;
   }
@@ -90,7 +86,7 @@ export class DatabaseService {
     const currentWeekNumber = await this.getNextWeekNumber(userId) - 1;
     if (currentWeekNumber < 1) return null;
     
-    console.log('Getting current week:', currentWeekNumber);
+    // Getting current week
 
     const { data, error } = await supabase
       .from('weekly_notes')
@@ -108,7 +104,7 @@ export class DatabaseService {
     weekNumber: number,
     updates: Partial<WeeklyNote>
   ): Promise<WeeklyNote> {
-    console.log('Creating/updating weekly note for week:', weekNumber, 'with updates:', updates);
+    // Creating/updating weekly note
     const { data, error } = await supabase
       .from('weekly_notes')
       .upsert({
@@ -123,7 +119,7 @@ export class DatabaseService {
       .single();
 
     if (error) throw error;
-    console.log('Weekly note saved:', data);
+    // Weekly note saved successfully
     return data;
   }
 

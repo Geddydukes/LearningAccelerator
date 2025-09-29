@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { User as SupabaseUser } from '@supabase/supabase-js';
 import { auth } from '../lib/supabase';
 import { User } from '../types';
@@ -48,7 +48,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return () => subscription.unsubscribe();
   }, []);
 
-  const transformSupabaseUser = (supabaseUser: SupabaseUser): User => ({
+  const transformSupabaseUser = useCallback((supabaseUser: SupabaseUser): User => ({
     id: supabaseUser.id,
     email: supabaseUser.email || '',
     name: supabaseUser.user_metadata?.name || supabaseUser.email?.split('@')[0] || '',
@@ -57,7 +57,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     learning_preferences: supabaseUser.user_metadata?.learning_preferences,
     created_at: supabaseUser.created_at,
     updated_at: supabaseUser.updated_at || supabaseUser.created_at,
-  });
+  }), []);
 
   const signIn = async (email: string, password: string) => {
     console.log('Attempting sign in with:', { email, password: '***' });

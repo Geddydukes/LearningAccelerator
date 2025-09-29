@@ -1,4 +1,4 @@
-# Operations Runbook - Learning Accelerator
+# Operations Runbook - Wisely
 
 ## Deployment Flow
 
@@ -14,7 +14,7 @@
 #### Frontend (Vercel)
 ```bash
 # List recent deployments
-vercel ls learning-accelerator
+vercel ls wisely
 
 # Promote previous deployment
 vercel promote <deployment-url> --scope=<team>

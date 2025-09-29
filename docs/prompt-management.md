@@ -1,8 +1,8 @@
-# Prompt Management - Learning Accelerator
+# Prompt Management - Wisely
 
 ## Overview
 
-The Learning Accelerator platform uses four specialized, version-locked GPT agent prompts that are treated as **immutable external dependencies**. These prompts are never modified by the application and are stored securely on the server-side.
+The Wisely platform uses four specialized, version-locked GPT agent prompts that are treated as **immutable external dependencies**. These prompts are never modified by the application and are stored securely on the server-side.
 
 ## Prompt Specifications
 

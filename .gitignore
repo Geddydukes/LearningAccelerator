@@ -27,3 +27,4 @@ dist-ssr
 
 # prompts
 prompts/base/*
+prompts/base_markdown/*

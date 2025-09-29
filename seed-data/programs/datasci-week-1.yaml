@@ -1,0 +1,129 @@
+id: datasci-week-1
+title: "Data Science Fundamentals - Week 1"
+description: "Introduction to data science concepts, Python basics, and statistical foundations"
+duration_weeks: 4
+difficulty: "beginner"
+focus_areas:
+  - "Python Programming"
+  - "Statistics Fundamentals"
+  - "Data Visualization"
+  - "Pandas Basics"
+
+learning_objectives:
+  - "Understand core data science concepts and workflow"
+  - "Master Python basics for data analysis"
+  - "Learn fundamental statistical concepts"
+  - "Create basic data visualizations"
+  - "Work with Pandas DataFrames"
+
+weekly_structure:
+  week_1:
+    title: "Introduction to Data Science"
+    topics:
+      - "What is Data Science?"
+      - "Python Environment Setup"
+      - "Basic Python Syntax"
+      - "Introduction to Jupyter Notebooks"
+    skills:
+      - "Python variables and data types"
+      - "Basic Python functions"
+      - "Jupyter notebook usage"
+    projects:
+      - "Hello Data Science - First Python script"
+      - "Data Types Exploration - Working with different data types"
+  
+  week_2:
+    title: "Statistical Foundations"
+    topics:
+      - "Descriptive Statistics"
+      - "Probability Basics"
+      - "Data Distributions"
+      - "Central Limit Theorem"
+    skills:
+      - "Mean, median, mode calculations"
+      - "Standard deviation and variance"
+      - "Basic probability concepts"
+    projects:
+      - "Statistical Analysis of Sample Data"
+      - "Probability Simulation"
+  
+  week_3:
+    title: "Data Visualization"
+    topics:
+      - "Matplotlib Basics"
+      - "Seaborn Introduction"
+      - "Chart Types and When to Use Them"
+      - "Data Storytelling"
+    skills:
+      - "Creating basic plots"
+      - "Customizing visualizations"
+      - "Choosing appropriate chart types"
+    projects:
+      - "Sales Data Visualization"
+      - "Population Demographics Charts"
+  
+  week_4:
+    title: "Pandas DataFrames"
+    topics:
+      - "Introduction to Pandas"
+      - "DataFrame Operations"
+      - "Data Cleaning Basics"
+      - "Data Aggregation"
+    skills:
+      - "Creating and manipulating DataFrames"
+      - "Data filtering and selection"
+      - "Basic data cleaning techniques"
+    projects:
+      - "Customer Data Analysis"
+      - "Sales Report Generation"
+
+assessment_criteria:
+  coding_projects:
+    weight: 0.4
+    criteria:
+      - "Code functionality and correctness"
+      - "Code readability and documentation"
+      - "Problem-solving approach"
+      - "Use of appropriate libraries"
+  
+  conceptual_understanding:
+    weight: 0.3
+    criteria:
+      - "Understanding of data science concepts"
+      - "Ability to explain statistical concepts"
+      - "Data interpretation skills"
+      - "Critical thinking in data analysis"
+  
+  practical_application:
+    weight: 0.3
+    criteria:
+      - "Data visualization quality"
+      - "Data cleaning effectiveness"
+      - "Analysis insights and conclusions"
+      - "Presentation and communication"
+
+prerequisites:
+  - "Basic computer literacy"
+  - "High school mathematics"
+  - "No prior programming experience required"
+
+resources:
+  textbooks:
+    - "Python for Data Analysis by Wes McKinney"
+    - "Think Stats by Allen Downey"
+  
+  online_courses:
+    - "Python for Data Science (Coursera)"
+    - "Statistics for Data Science (edX)"
+  
+  tools:
+    - "Jupyter Notebook"
+    - "Python 3.8+"
+    - "Pandas, NumPy, Matplotlib, Seaborn"
+
+success_metrics:
+  - "Complete all weekly projects with 80%+ accuracy"
+  - "Demonstrate understanding through comprehension checks"
+  - "Create at least 3 meaningful data visualizations"
+  - "Successfully analyze a real dataset using Pandas"
+  - "Explain statistical concepts in own words"

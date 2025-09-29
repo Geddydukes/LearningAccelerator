@@ -1,0 +1,72 @@
+{
+  "clo": {
+    "id": "clo",
+    "promptPath": "clo_v3.yml",
+    "defaultPromptVersion": "3.0",
+    "entitlement": "core",
+    "mode": "weekly"
+  },
+  "socratic": {
+    "id": "socratic",
+    "promptPath": "socratic_v3.yml",
+    "defaultPromptVersion": "3.0",
+    "entitlement": "core",
+    "mode": "weekly"
+  },
+  "alex": {
+    "id": "alex",
+    "promptPath": "alex_v3.yml",
+    "defaultPromptVersion": "3.0",
+    "entitlement": "core",
+    "mode": "weekly"
+  },
+  "brand": {
+    "id": "brand",
+    "promptPath": "brand_strategist_v3.yml",
+    "defaultPromptVersion": "3.0",
+    "entitlement": "premium",
+    "mode": "weekly"
+  },
+  "onboarder": {
+    "id": "onboarder",
+    "promptPath": "onboarder_v2.yml",
+    "defaultPromptVersion": "2.0",
+    "entitlement": "core",
+    "mode": "adhoc"
+  },
+  "ta": {
+    "id": "ta",
+    "promptPath": "taagent_v1_4.yml",
+    "defaultPromptVersion": "1.4",
+    "entitlement": "core",
+    "mode": "weekly"
+  },
+  "career_match": {
+    "id": "career_match",
+    "promptPath": "career_match_v1_3.yml",
+    "defaultPromptVersion": "1.3",
+    "entitlement": "premium",
+    "mode": "adhoc"
+  },
+  "portfolio_curator": {
+    "id": "portfolio_curator",
+    "promptPath": "portfolio_v1_8.yml",
+    "defaultPromptVersion": "1.8",
+    "entitlement": "premium",
+    "mode": "adhoc"
+  },
+  "instructor": {
+    "id": "instructor",
+    "promptPath": "instructor_v2_1.yml",
+    "defaultPromptVersion": "2.1",
+    "entitlement": "core",
+    "mode": "weekly"
+  },
+  "clarifier": {
+    "id": "clarifier",
+    "promptPath": "clarifier_v3.yml",
+    "defaultPromptVersion": "3.0",
+    "entitlement": "core",
+    "mode": "adhoc"
+  }
+}

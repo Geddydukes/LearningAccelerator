@@ -1,4 +1,4 @@
-# Risk Register - Learning Accelerator
+# Risk Register - Wisely
 
 ## High-Priority Risks
 

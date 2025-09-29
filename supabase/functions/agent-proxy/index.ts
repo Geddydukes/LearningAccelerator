@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.192.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import { GoogleGenerativeAI } from "https://esm.sh/@google/generative-ai@0.24.1"
+import { resolvePromptSpec } from '../_shared/manifest.ts'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -8,11 +9,14 @@ const corsHeaders = {
 }
 
 interface AgentRequest {
-  agent: 'clo' | 'socratic' | 'alex' | 'brand';
+  agent: 'clo' | 'socratic' | 'alex' | 'brand' | 'ta' | 'instructor' | 'clarifier' | 'onboarder' | 'career_match' | 'portfolio_curator';
   action: string;
   payload: any;
   userId: string;
   weekNumber?: number;
+  compiled_url?: string;
+  compiled_object_path?: string;
+  compiled_inline?: string;
 }
 
 interface AgentResponse {
@@ -28,7 +32,7 @@ serve(async (req) => {
   }
 
   try {
-    const { agent, action, payload, userId, weekNumber }: AgentRequest = await req.json()
+    const { agent, action, payload, userId, weekNumber, compiled_url, compiled_object_path, compiled_inline }: AgentRequest = await req.json()
 
     // Validate required fields
     if (!agent || !userId) {
@@ -41,10 +45,70 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     )
 
-    // Load agent prompt from storage
-    const promptText = await fetchPromptFromStorage(supabaseClient, agent)
-    if (!promptText) {
-      throw new Error(`Failed to load prompt for ${agent}`)
+    // Check entitlement for premium agents
+    const promptSpec = await resolvePromptSpec(agent)
+    if (promptSpec.entitlement === 'premium') {
+      const userTier = await getUserTier(supabaseClient, userId)
+      if (userTier !== 'enterprise' && userTier !== 'premium') {
+        console.log(`🔒 entitlement_check_failed: ${agent} requires premium, user has ${userTier}`)
+        return new Response(
+          JSON.stringify({ 
+            success: false, 
+            error: `Agent '${agent}' requires premium subscription`,
+            entitlement_required: 'premium',
+            user_tier: userTier
+          }),
+          {
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+            status: 403,
+          },
+        )
+      }
+      console.log(`✅ entitlement_check_passed: ${agent} for ${userTier} user`)
+    }
+
+    // Get compiled prompt text
+    let promptText: string;
+    
+    if (compiled_url) {
+      // Use compiled prompt from signed URL
+      const response = await fetch(compiled_url);
+      if (!response.ok) {
+        // If signed URL expired, try to re-sign using object path
+        if (response.status === 403 && compiled_object_path) {
+          console.log(`🔄 signed_url_expired, re-signing: ${agent}`);
+          const { data: newSignedUrl, error: resignError } = await supabaseClient.storage
+            .from('prompts-compiled')
+            .createSignedUrl(compiled_object_path, 60);
+            
+          if (resignError) {
+            throw new Error(`Failed to re-sign URL: ${resignError.message}`);
+          }
+          
+          const retryResponse = await fetch(newSignedUrl.signedUrl);
+          if (!retryResponse.ok) {
+            throw new Error(`Failed to fetch compiled prompt after re-signing: ${retryResponse.status}`);
+          }
+          promptText = await retryResponse.text();
+          console.log(`📄 prompt_loaded_from_resigned_url: ${agent} (${promptText.length} chars)`);
+        } else {
+          throw new Error(`Failed to fetch compiled prompt from ${compiled_url}: ${response.status}`)
+        }
+      } else {
+        promptText = await response.text();
+        console.log(`📄 prompt_loaded_from_url: ${agent} (${promptText.length} chars)`);
+      }
+    } else if (compiled_inline) {
+      // Use inline compiled prompt
+      promptText = compiled_inline;
+      console.log(`📄 prompt_loaded_inline: ${agent} (${promptText.length} chars)`);
+    } else {
+      // Fallback: load from storage (legacy support)
+      promptText = await fetchPromptFromStorage(supabaseClient, agent);
+      if (!promptText) {
+        throw new Error(`Failed to load prompt for ${agent}`)
+      }
+      console.log(`📄 prompt_loaded_legacy: ${agent} (${promptText.length} chars)`);
     }
 
     // Initialize Gemini API
@@ -81,6 +145,9 @@ serve(async (req) => {
     if (result.success && result.data && shouldPersistAgentResult(agent, action)) {
       await persistAgentResult(supabaseClient, userId, agent, result.data, weekNumber)
     }
+
+    // Log prompt invocation telemetry
+    await logPromptInvocation(supabaseClient, userId, agent, 'gemini', result.success, error?.message)
 
     return new Response(
       JSON.stringify(result),
@@ -439,5 +506,57 @@ async function persistAgentResult(
   } catch (error) {
     console.error('Error persisting agent result:', error)
     throw error
+  }
+}
+
+async function logPromptInvocation(
+  supabaseClient: any,
+  userId: string,
+  agentId: string,
+  model: string,
+  success: boolean,
+  errorCode?: string
+): Promise<void> {
+  try {
+    const startTime = Date.now();
+    
+    await supabaseClient
+      .from('prompt_invocations')
+      .insert({
+        user_id: userId,
+        agent_id: agentId,
+        hash: 'legacy', // Will be updated when we have hash tracking
+        model,
+        input_tokens: 0, // Will be updated when we have token counting
+        output_tokens: 0, // Will be updated when we have token counting
+        latency_ms: Date.now() - startTime,
+        success_bool: success,
+        error_code: errorCode
+      });
+      
+    console.log(`📊 prompt_invocation_logged: ${agentId} -> ${success ? 'success' : 'error'}`);
+  } catch (error) {
+    console.warn('⚠️ Failed to log prompt invocation:', error);
+  }
+}
+
+async function getUserTier(supabaseClient: any, userId: string): Promise<string> {
+  try {
+    // Query user's subscription tier
+    const { data: user, error } = await supabaseClient
+      .from('users')
+      .select('subscription_tier')
+      .eq('id', userId)
+      .single();
+      
+    if (error) {
+      console.warn(`⚠️ Failed to fetch user tier: ${error.message}`);
+      return 'basic'; // Default to basic if we can't determine
+    }
+    
+    return user?.subscription_tier || 'basic';
+  } catch (error) {
+    console.warn('⚠️ Error checking user tier:', error);
+    return 'basic';
   }
 }

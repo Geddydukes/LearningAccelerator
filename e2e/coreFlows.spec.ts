@@ -6,7 +6,7 @@ test.describe('Core User Flows', () => {
   });
 
   test('Landing page loads correctly', async ({ page }) => {
-    await expect(page.locator('h1')).toContainText('Learning Accelerator');
+    await expect(page.locator('h1')).toContainText('Wisely');
     await expect(page.locator('text=Ripple of Knowledge')).toBeVisible();
   });
 

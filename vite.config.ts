@@ -12,7 +12,7 @@ export default defineConfig({
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
         runtimeCaching: [
           {
-            urlPattern: /^https:\/\/api\.learningaccelerator\.com\/agent\/.*/i,
+            urlPattern: /^https:\/\/api\.wisely\.com\/agent\/.*/i,
             handler: 'StaleWhileRevalidate',
             options: {
               cacheName: 'agent-notes-v1',
@@ -37,8 +37,8 @@ export default defineConfig({
       },
       includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'masked-icon.svg'],
       manifest: {
-        name: 'Learning Accelerator - Multi-Agent Learning Platform',
-        short_name: 'Learning Accelerator',
+        name: 'Wisely - Multi-Agent Learning Platform',
+        short_name: 'Wisely',
         description: 'Experience the future of learning with our multi-agent AI platform',
         theme_color: '#3b82f6',
         background_color: '#0f172a',

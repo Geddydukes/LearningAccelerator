@@ -293,7 +293,7 @@ function WaterFallback({ className }: { className: string }) {
         ))}
       </div>
       
-      <style jsx>{`
+      <style>{`
         @keyframes waterLines {
           0%, 100% { transform: translateX(0px); opacity: 0.2; }
           50% { transform: translateX(15px); opacity: 0.4; }

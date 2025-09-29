@@ -1,4 +1,4 @@
-# Learning Accelerator - Reference Document
+# Wisely - Reference Document
 
 ## 1. ✅ High-Level Architecture
 
@@ -27,12 +27,9 @@
 | `src/components/agents/` | ✅ Complete | CLO, Socratic, Alex, Brand interfaces |
 | `supabase/functions/agent-proxy/` | ✅ Complete | Gemini API proxy with all agents |
 | `supabase/functions/voice/` | ✅ Complete | TTS + Whisper transcription |
-| `supabase/functions/voice/transcribe/` | ✅ Complete | OpenAI Whisper integration |
 | `supabase/functions/track-sync/` | ✅ Complete | Dynamic prompt compilation |
 | `supabase/functions/cron-ta-session/` | ✅ Complete | TA session generation |
-| `supabase/functions/career-match/` | ✅ Complete | Career matching system |
 | `prompts/` | ✅ Complete | Immutable agent prompts (v2 + v3) |
-| `prompts/base/onboarder_v2.yml` | ✅ Complete | Onboarder prompt with placeholders |
 | `questionBank/` | ✅ Complete | Socratic question banks per track |
 | `tracks/` | ✅ Complete | Track configurations (11 tracks) |
 | `seed-data/onboarding/` | ✅ Complete | End-goal samples uploaded |
@@ -40,29 +37,48 @@
 | `scripts/` | ✅ Complete | Build/deploy scripts |
 
 **Missing vs Spec**:
+- ❌ `/cron/career-match` (job ingest)
 - ❌ `/cron/security-audit` (weekly scan)
 
-## 3. ✅ Prompt & Placeholder Map
+## 3. ✅ Prompt Path System
+
+**Architecture**: Manifest-driven prompt compilation with private storage and signed URLs
+
+```
+Registry (registry.ts) → Manifest (build/agents.manifest.json) → Base Prompts (immutable)
+                                    ↓
+                            Compile (per-user variables) → Private Cache → Signed URLs
+                                    ↓
+                            Agent Proxy → LLM → Response
+```
+
+### Prompt Path Flow
+1. **Build Time**: `npm run build:manifest` generates manifest from registry
+2. **CI/CD**: `scripts/sync-prompts.sh` uploads manifest + base prompts to Supabase Storage
+3. **Runtime**: Frontend calls `/functions/v1/track-sync` to compile prompts with user variables
+4. **Caching**: Compiled prompts stored in private `prompts-compiled` bucket with SHA-256 hash keys
+5. **Execution**: Agent proxy fetches compiled prompts via 60-second signed URLs
+6. **Telemetry**: All operations logged to `prompt_compilations` and `prompt_invocations` tables
+
+### Storage Buckets
+- **`prompts-base`** - Public read, immutable base prompt templates
+- **`prompts-manifest`** - Public read, short TTL (60s) for agent metadata
+- **`prompts-compiled`** - **Private**, user-specific compiled prompts with PII protection
+
+### Security Model
+- **Base prompts**: Public (no PII)
+- **Compiled prompts**: Private with signed URLs (contains user PII like END_GOAL, hardware specs)
+- **Manifest**: Public metadata only
+- **Service role**: Full access for compilation and caching
 
 | File | Status | Template Variables |
 |------|--------|-------------------|
-| `prompts/clo_v3.yml` | ✅ Complete | {{TRACK_LABEL}}, {{CORE_COMPETENCY_BLOCK}}, {{MONTH_GOALS_JSON}}, {{TIME_PER_WEEK}}, {{BUDGET_JSON}}, {{HARDWARE_SPECS}}, {{LEARNING_STYLE}}, {{END_GOAL}} |
-| `prompts/base/onboarder_v2.yml` | ✅ Complete | {{TRACK_LABEL}}, {{LEARNER_GOALS}}, {{HARDWARE_SPECS}}, {{LEARNING_STYLE}}, {{EXPERIENCE_LEVEL}} |
-| `prompts/socratic_v2_0.md` | ✅ Complete | None found (static prompts) |
-| `prompts/alex_v2_2.md` | ✅ Complete | None found |
-| `prompts/brand_strategist_v2_1.md` | ✅ Complete | None found |
+| `prompts/base/clo_v3.yml` | ✅ Complete | {{TRACK_LABEL}}, {{TIME_PER_WEEK}}, {{END_GOAL}}, {{LEARNING_STYLE}}, {{HARDWARE_SPECS}} |
+| `prompts/base/socratic_v3.yml` | ✅ Complete | {{WEEK_NUMBER}}, {{LEARNING_OBJECTIVES}}, {{CURRENT_PROGRESS}} |
+| `prompts/base/alex_v3.yml` | ✅ Complete | {{WEEK_NUMBER}}, {{REPOSITORY_URL}}, {{TECHNICAL_FOCUS}} |
+| `prompts/base/brand_strategist_v3.yml` | ✅ Complete | {{WEEK_NUMBER}}, {{WEEK_THEME}}, {{TARGET_AUDIENCE}} |
 
-**Implemented Placeholders** (v3 templates):
-- ✅ `{{TRACK_LABEL}}` - Track name (AI/ML Engineering)
-- ✅ `{{CORE_COMPETENCY_BLOCK}}` - Level-specific competencies
-- ✅ `{{MONTH_GOALS_JSON}}` - Monthly learning goals
-- ✅ `{{TIME_PER_WEEK}}` - User's weekly time commitment
-- ✅ `{{BUDGET_JSON}}` - User's budget constraints
-- ✅ `{{HARDWARE_SPECS}}` - User's hardware specifications
-- ✅ `{{LEARNING_STYLE}}` - User's preferred learning style
-- ✅ `{{END_GOAL}}` - User's career end goal
-- ✅ `{{LEARNER_GOALS}}` - User's career goals
-- ✅ `{{EXPERIENCE_LEVEL}}` - User's experience level
+**Privacy Protection**: User-specific variables (END_GOAL, hardware specs, learning preferences) are compiled into private storage with signed URL access only.
 
 ## 4. ✅ Data Flow Narratives
 
@@ -75,28 +91,21 @@ Frontend → `/functions/v1/agent-proxy` → Supabase Storage (prompts) → Gemi
 **Voice Flow**: ✅ Complete
 Frontend → `/functions/v1/voice` → ElevenLabs API → Supabase Storage (tts-cache) → Signed URL
 
-**Voice-In Pipeline**: ✅ Complete
-Frontend → MediaRecorder → `/voice/upload` → `/voice/transcribe` → OpenAI Whisper → Transcript
-
-**Career Match Flow**: ✅ Complete
-Cron → `/functions/v1/career-match` → Remotive API → Gemini embeddings → Database storage
-
 **Implemented Flows**:
 - ✅ Prompt compilation per user (track-sync)
 - ✅ TA session generation (cron-ta-session)
 - ✅ Whisper transcription pipeline (voice/transcribe)
 - ✅ End-goal samples uploaded to storage
-- ✅ Onboarder quiz generation (agent-proxy)
-- ✅ Career matching system (career-match)
+- ❌ Career matching system (planned for v1.1)
 
-## 5. ✅ TODO / FIXME Hotspots
+## 5. ⚠️ TODO / FIXME Hotspots
 
 | File | Line | Issue | Criticality |
 |------|------|-------|-------------|
-| `src/hooks/useVoiceIntegration.ts` | 115 | Process recorded audio | ✅ Complete |
+| `src/hooks/useVoiceIntegration.ts` | 115 | Process recorded audio | ⚠️ Medium |
 | `prompts/clo_v3.yml` | 25 | Dynamic placeholder injection | ✅ Complete |
 
-**Status**: ✅ All critical implementations complete
+**Status**: ✅ Critical agent-proxy implementation complete, ⚠️ Voice recording processing pending
 
 ## 6. ✅ Build & CI Matrix
 
@@ -106,20 +115,19 @@ Cron → `/functions/v1/career-match` → Remotive API → Gemini embeddings →
 | `key-rotate.yml` | ✅ Active | Weekly schedule | ✅ Pass |
 | `lhci.yml` | ✅ Active | Post-build | ✅ Pass |
 | `validate-track-data.yml` | ✅ Active | Track data changes | ✅ Pass |
-| `cron-career-match.yml` | ✅ Active | Monday 4 AM UTC | ✅ Pass |
+| `cron-ta-session.yml` | ❌ Missing | - | - |
+| `cron-career-match.yml` | ❌ Missing | - | - |
 
-## 7. ✅ Deviations & Questions
+## 7. ❓ Deviations & Questions
 
 **Major Deviations from Spec**:
 1. **Frontend**: Using React + Vite instead of Next.js
 2. **Missing APIs**: No `/api/voice/transcribe` (implemented as Edge Function)
-3. **Missing Cron Jobs**: No security audit (TA session and career match implemented)
+3. **Missing Cron Jobs**: No career match, security audit (TA session implemented)
 4. **Storage Buckets**: ✅ All buckets implemented via migration
-5. **Missing Agents**: No PortfolioCurator (Onboarder, CareerMatch implemented)
+5. **Missing Agents**: No Onboarder, CareerMatch, PortfolioCurator (TA implemented)
 6. **Dynamic Prompts**: ✅ Implemented v3 templates with placeholders
 7. **End-Goal Library**: ✅ Successfully uploaded to Supabase Storage
-8. **Voice-In Pipeline**: ✅ Complete with MediaRecorder and Whisper
-9. **Career Match System**: ✅ Complete with embeddings and database storage
 
 **Questions**:
 - Should we migrate to Next.js or keep Vite?
@@ -128,43 +136,11 @@ Cron → `/functions/v1/career-match` → Remotive API → Gemini embeddings →
 
 ## 8. ✅ Confidence Score
 
-**5.0/5** - Production-ready with comprehensive voice-in pipeline, Onboarder agent, and CareerMatch system.
+**4.9/5** - Production-ready with dynamic prompts, storage infrastructure, and comprehensive agent system.
 
-**Rationale**: All core features implemented and tested: voice recording with MediaRecorder, OpenAI Whisper transcription, Onboarder quiz generation with 4-4-2 distribution, career matching with embeddings, and comprehensive E2E tests. Only security audit remains for full spec compliance.
+**Rationale**: The critical agent-proxy implementation is production-ready with proper security. All core features implemented: dynamic prompt compilation, storage buckets, voice transcription, TA sessions, CI validation, and end-goal library. Only career matching and security audit remain for full spec compliance.
 
 ---
 
 **Last Updated**: 2025-01-19  
-**Next Review**: After implementing security audit and portfolio curator
-
-## 9. ✅ Certificate System
-
-**Employment-Ready Certificate Flow**: ✅ Complete
-User Dashboard → Certificate Generation → PDF Creation → QR Code → Verification API
-
-**Certificate Components**:
-- ✅ Database migration (`20250809_certificates.sql`)
-- ✅ Edge Function (`functions/certificate/generate/index.ts`)
-- ✅ Verification API (`src/pages/api/verify/[cert_id].ts`)
-- ✅ Dashboard UI (`components/dashboard/CertificateCard.tsx`)
-- ✅ Unit tests (`test/unit/certificate.test.ts`)
-- ✅ E2E tests (`e2e/certificateIssue.e2e.ts`)
-
-**Certificate Criteria** (Placeholder until gamification core):
-1. CLO competency ≥ 4 (placeholder: always true)
-2. Learning months ≥ 6 (placeholder: 6 months)
-3. Portfolio Lighthouse score ≥ 90 (placeholder: 95)
-4. Career match similarity ≥ 0.80 (placeholder: 0.85)
-
-**Verification Endpoint**: `/api/verify/{cert_id}`
-- Returns certificate data with digital signature
-- Includes verification hash for authenticity
-- Public access for certificate verification
-
-**PDF Features**:
-- Landscape A4 format with professional design
-- QR code linking to verification endpoint
-- Digital signature and verification hash
-- File size > 10KB for authenticity
-
-**Note**: Certificate system uses placeholder logic for employability criteria until gamification core (streaks table, profiles.xp) is implemented. 
+**Next Review**: After implementing voice recording processing and career matching 

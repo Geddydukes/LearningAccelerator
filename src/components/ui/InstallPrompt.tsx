@@ -51,7 +51,7 @@ export const InstallPrompt: React.FC = () => {
               
               <div className="flex-1 min-w-0">
                 <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
-                  Install Learning Accelerator
+                  Install Wisely
                 </h3>
                 <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
                   Get faster access and offline support

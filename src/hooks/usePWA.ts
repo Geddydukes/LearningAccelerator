@@ -33,7 +33,7 @@ export const usePWA = () => {
       setIsInstalled(true);
       setIsInstallable(false);
       setDeferredPrompt(null);
-      toast.success('Learning Accelerator installed successfully!');
+      toast.success('Wisely installed successfully!');
     };
 
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt as EventListener);

@@ -1,0 +1,40 @@
+key: weekly_seed_v1
+trigger:
+  type: cron
+  cron: "0 18 * * SUN"
+steps:
+  - id: clo_begin_week
+    call: "/functions/v1/agent-proxy/clo/begin-week"
+    method: "POST"
+    timeout_ms: 30000
+    retry:
+      max_attempts: 3
+      backoff: "exp"
+      base_ms: 2000
+  - id: ta_generate_week
+    call: "/functions/v1/agent-proxy/ta/generate-week"
+    method: "POST"
+    timeout_ms: 25000
+    depends_on: [ "clo_begin_week" ]
+    retry:
+      max_attempts: 3
+      backoff: "exp"
+      base_ms: 2000
+  - id: socratic_seed
+    call: "/functions/v1/agent-proxy/socratic/seed"
+    method: "POST"
+    timeout_ms: 20000
+    depends_on: [ "clo_begin_week" ]
+    retry:
+      max_attempts: 3
+      backoff: "exp"
+      base_ms: 2000
+  - id: brand_ingest
+    call: "/functions/v1/agent-proxy/brand/update-briefing"
+    method: "POST"
+    timeout_ms: 15000
+    depends_on: [ "ta_generate_week", "socratic_seed" ]
+    retry:
+      max_attempts: 2
+      backoff: "exp"
+      base_ms: 1000 

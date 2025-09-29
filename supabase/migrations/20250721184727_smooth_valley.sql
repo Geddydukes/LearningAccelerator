@@ -1,4 +1,4 @@
--- Learning Accelerator Database Schema
+-- Wisely Database Schema
 -- PostgreSQL with Supabase extensions
 
 -- Enable necessary extensions
