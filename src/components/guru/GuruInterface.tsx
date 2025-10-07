@@ -139,10 +139,10 @@ export const GuruInterface: React.FC = () => {
             objectives: [
               `Understand the fundamentals of ${userInput}`,
               `Apply ${userInput} concepts in practice`,
-              `Build confidence with ${userInput}`
-            ]
-          }
-        }
+              `Build confidence with ${userInput}`,
+            ],
+          },
+        },
       };
 
       setCurrentSession({
