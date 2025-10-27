@@ -1,17 +1,29 @@
-# Product Mgmt - Intermediate Question Bank
-# This file will be populated with structured questions for the Socratic agent
-# Format: YAML with categories and difficulty levels
+- id: pmgt-I1
+  type: mcq
+  prompt: "KANO model’s ‘Delighters’ are features that:"
+  choices: ["Users expect by default", "Cause dissatisfaction if missing", "Provide unexpected joy and can differentiate product", "Lower development velocity"]
+  answer: "Provide unexpected joy and can differentiate product"
 
-questions:
-  - category: "advanced_product_concepts"
-    difficulty: "intermediate"
-    questions: []
-    # Will be populated with actual questions
-  - category: "data_analytics"
-    difficulty: "intermediate"
-    questions: []
-    # Will be populated with actual questions
-  - category: "stakeholder_management"
-    difficulty: "intermediate"
-    questions: []
-    # Will be populated with actual questions
+- id: pmgt-I2
+  type: mcq
+  prompt: "A well-formed OKR comprises:"
+  choices: ["One Objective, many Key Results with metrics", "Many Objectives, one Key Result", "Tasks only", "Vision statements"]
+  answer: "One Objective, many Key Results with metrics"
+
+- id: pmgt-I3
+  type: mcq
+  prompt: "Story points are used PRIMARILY to estimate:"
+  choices: ["Exact hours of work", "Relative complexity and effort", "Financial ROI", "Latency budgets"]
+  answer: "Relative complexity and effort"
+
+- id: pmgt-I4
+  type: mcq
+  prompt: "Product/Market Fit is commonly measured by: “% of users who would be ___ without the product.”"
+  choices: ["indifferent", "very disappointed", "somewhat annoyed", "thrilled"]
+  answer: "very disappointed"
+
+- id: pmgt-I5
+  type: mcq
+  prompt: "The HEART framework metrics include: Happiness, Engagement, Adoption, Retention and:"
+  choices: ["Trial", "Task Success", "Referrals", "Revenue"]
+  answer: "Task Success"

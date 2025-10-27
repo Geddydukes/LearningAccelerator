@@ -1,17 +1,29 @@
-# Data Eng - Intermediate Question Bank
-# This file will be populated with structured questions for the Socratic agent
-# Format: YAML with categories and difficulty levels
+- id: deng-I1
+  type: mcq
+  prompt: "Partition pruning in BigQuery is triggered when WHERE filters use:"
+  choices: ["Non-partitioned field", "Partition column with literal or parameter", "Wildcard dataset names", "ORDER BY clauses"]
+  answer: "Partition column with literal or parameter"
 
-questions:
-  - category: "advanced_data_concepts"
-    difficulty: "intermediate"
-    questions: []
-    # Will be populated with actual questions
-  - category: "data_pipelines"
-    difficulty: "intermediate"
-    questions: []
-    # Will be populated with actual questions
-  - category: "cloud_platforms"
-    difficulty: "intermediate"
-    questions: []
-    # Will be populated with actual questions
+- id: deng-I2
+  type: mcq
+  prompt: "`spark.sql.shuffle.partitions` controls:"
+  choices: ["Number of executor cores", "Hash-partition count after wide transforms", "Memory per task", "Checkpoint frequency"]
+  answer: "Hash-partition count after wide transforms"
+
+- id: deng-I3
+  type: mcq
+  prompt: "Airflow task **idempotency** means:"
+  choices: ["Runs only once per DAG run even if retried", "Return value cached forever", "Task can be re-run without side effects", "Task always fails on duplication"]
+  answer: "Task can be re-run without side effects"
+
+- id: deng-I4
+  type: mcq
+  prompt: "Great Expectations `expect_column_values_to_be_between` fails when:"
+  choices: ["Any value outside min/max", "Mean exceeds threshold", "Null count > 0", "Row count mismatch"]
+  answer: "Any value outside min/max"
+
+- id: deng-I5
+  type: mcq
+  prompt: "Streaming joins in Flink/Kafka Streams require setting:"
+  choices: ["Windowing semantics", "Watermark lag = 0", "Restart strategy to fixed delay", "Global table replication"]
+  answer: "Windowing semantics"

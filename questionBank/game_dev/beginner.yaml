@@ -1,17 +1,29 @@
-# Game Dev - Beginner Question Bank
-# This file will be populated with structured questions for the Socratic agent
-# Format: YAML with categories and difficulty levels
+- id: gdev-B1
+  type: mcq
+  prompt: "In Unity, which component controls physics-based movement?"
+  choices: ["Transform", "Rigidbody", "Animator", "AudioSource"]
+  answer: "Rigidbody"
 
-questions:
-  - category: "game_fundamentals"
-    difficulty: "beginner"
-    questions: []
-    # Will be populated with actual questions
-  - category: "programming_basics"
-    difficulty: "beginner"
-    questions: []
-    # Will be populated with actual questions
-  - category: "game_design_principles"
-    difficulty: "beginner"
-    questions: []
-    # Will be populated with actual questions
+- id: gdev-B2
+  type: mcq
+  prompt: "Frames per second (FPS) target for a smooth experience is GENERALLY:"
+  choices: ["15", "24", "30", "60"]
+  answer: "60"
+
+- id: gdev-B3
+  type: mcq
+  prompt: "Which scripting language is used primarily in Unity?"
+  choices: ["JavaScript", "C#", "Python", "Lua"]
+  answer: "C#"
+
+- id: gdev-B4
+  type: mcq
+  prompt: "Prefab in Unity refers to:"
+  choices: ["Compiled shader", "Reusable asset template with components", "External DLL", "Scene lighting"]
+  answer: "Reusable asset template with components"
+
+- id: gdev-B5
+  type: mcq
+  prompt: "The game loop concept describes:"
+  choices: ["One-time level load", "Repeated cycle: update → render → sleep", "GPU ray-tracing", "Thread scheduling"]
+  answer: "Repeated cycle: update → render → sleep"

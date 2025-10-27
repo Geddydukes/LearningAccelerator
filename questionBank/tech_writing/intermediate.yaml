@@ -1,17 +1,29 @@
-# Tech Writing - Intermediate Question Bank
-# This file will be populated with structured questions for the Socratic agent
-# Format: YAML with categories and difficulty levels
+- id: techw-I1
+  type: mcq
+  prompt: "In Markdown-based docs sites, ‘front-matter’ is used to:"
+  choices: ["Embed JSON-LD", "Store metadata like title, description, slug", "Encrypt the file", "Generate UML diagrams"]
+  answer: "Store metadata like title, description, slug"
 
-questions:
-  - category: "advanced_writing_concepts"
-    difficulty: "intermediate"
-    questions: []
-    # Will be populated with actual questions
-  - category: "content_strategy"
-    difficulty: "intermediate"
-    questions: []
-    # Will be populated with actual questions
-  - category: "user_experience_writing"
-    difficulty: "intermediate"
-    questions: []
-    # Will be populated with actual questions
+- id: techw-I2
+  type: mcq
+  prompt: "Which readability metric outputs a US grade level?"
+  choices: ["Flesch Reading Ease", "Flesch-Kincaid Grade Level", "SMOG Index", "Coleman-Liau Index"]
+  answer: "Flesch-Kincaid Grade Level"
+
+- id: techw-I3
+  type: mcq
+  prompt: "A DITA ‘map’ is used to:"
+  choices: ["Render HTML", "Organise topics into hierarchy for publication", "Generate SQL schema", "Lint code blocks"]
+  answer: "Organise topics into hierarchy for publication"
+
+- id: techw-I4
+  type: mcq
+  prompt: "Vale styles can be enforced CI-side via:"
+  choices: ["GitHub Action vale-linter", "npm run serve", "Docker Compose", "SVN hook"]
+  answer: "GitHub Action vale-linter"
+
+- id: techw-I5
+  type: mcq
+  prompt: "The **Diataxis** framework categories are: Tutorials, How-To Guides, Reference, and:"
+  choices: ["Overview", "Explanation", "FAQ", "Examples"]
+  answer: "Explanation"
