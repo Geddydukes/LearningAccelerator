@@ -24,6 +24,8 @@ export type Entitlement = "core" | "premium";
  */
 export type OrchestrationMode = "weekly" | "adhoc";
 
+import type { FeatherPhaseId } from '../feather-agent';
+
 export type AgentMeta = {
   id: AgentId;
   title: string;                 // Short human label
@@ -38,6 +40,7 @@ export type AgentMeta = {
   persistsTo: "agent_results" | "weekly_notes" | "both";
   rateLimitPerMin?: number;      // Soft client limit
   displayOrder: number;          // For menus/grids
+  phases?: FeatherPhaseId[];     // Feather-agent phase identifiers
 };
 
 export const AGENTS: Record<AgentId, AgentMeta> = {
@@ -54,7 +57,8 @@ export const AGENTS: Record<AgentId, AgentMeta> = {
     defaultPromptVersion: "3.1",
     persistsTo: "both",
     rateLimitPerMin: 4,
-    displayOrder: 10
+    displayOrder: 10,
+    phases: ["lecture", "comprehension", "practice"],
   },
   socratic: {
     id: "socratic",
@@ -69,7 +73,8 @@ export const AGENTS: Record<AgentId, AgentMeta> = {
     defaultPromptVersion: "3.1",
     persistsTo: "both",
     rateLimitPerMin: 8,
-    displayOrder: 20
+    displayOrder: 20,
+    phases: ["comprehension", "reflection"],
   },
   alex: {
     id: "alex",
@@ -129,7 +134,8 @@ export const AGENTS: Record<AgentId, AgentMeta> = {
     defaultPromptVersion: "1.5",
     persistsTo: "both",
     rateLimitPerMin: 6,
-    displayOrder: 40
+    displayOrder: 40,
+    phases: ["practice", "reflection"],
   },
   career_match: {
     id: "career_match",
@@ -174,7 +180,8 @@ export const AGENTS: Record<AgentId, AgentMeta> = {
     defaultPromptVersion: "2.2",
     persistsTo: "agent_results",
     rateLimitPerMin: 4,
-    displayOrder: 15
+    displayOrder: 15,
+    phases: ["lecture", "comprehension", "practice"],
   },
   clarifier: {
     id: "clarifier",

@@ -23,7 +23,7 @@ interface Message {
 }
 
 export const SocraticChat: React.FC = () => {
-  const { user } = useDatabase();
+  const { user, currentWeek } = useDatabase();
   const { hasFeature, isPaid } = useSubscription();
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState('');
@@ -51,13 +51,21 @@ export const SocraticChat: React.FC = () => {
     }
   }, [user]);
 
+  const resolveWeekNumber = () => {
+    if (currentWeek?.week_number) {
+      return currentWeek.week_number;
+    }
+    const start = new Date('2024-01-01').getTime();
+    return Math.max(1, Math.ceil((Date.now() - start) / (7 * 24 * 60 * 60 * 1000)));
+  };
+
   const initializeSession = async () => {
     if (!user) return;
-    
+
     try {
       const session = await DatabaseService.createSocraticSession(user.id);
       setSessionId(session.id);
-      
+
       // Load existing messages
       const existingMessages = await DatabaseService.getSessionMessages(session.id);
       setMessages(existingMessages.map(msg => ({
@@ -67,11 +75,48 @@ export const SocraticChat: React.FC = () => {
         timestamp: new Date(msg.timestamp),
         audioUrl: msg.audio_url
       })));
+
+      if (existingMessages.length === 0) {
+        await primeInitialPrompt(session.id);
+      }
     } catch (error) {
       console.error('Failed to initialize session:', error);
       toast.error('Failed to start conversation');
     }
   };
+  const primeInitialPrompt = async (session: string) => {
+    if (!user) return;
+
+    try {
+      const weekNumber = resolveWeekNumber();
+      const response = await AgentOrchestrator.callSocraticAgent(
+        user.id,
+        'START_SESSION',
+        weekNumber,
+        {
+          sessionId: session,
+          topic: currentWeek?.clo_briefing_note?.module_title || 'Learning focus',
+        },
+      );
+
+      if (response.success && response.data?.question) {
+        const agentMessage: Message = {
+          id: crypto.randomUUID(),
+          type: 'agent',
+          content: response.data.question,
+          timestamp: new Date(),
+        };
+        setMessages(prev => [...prev, agentMessage]);
+
+        if (voice.hasVoiceSupport) {
+          await voice.synthesizeAndPlay(response.data.question);
+        }
+      }
+    } catch (error) {
+      console.error('Failed to load initial Socratic prompt:', error);
+    }
+  };
+
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
@@ -90,12 +135,17 @@ export const SocraticChat: React.FC = () => {
     setInputValue('');
 
     await sendMessageOperation.execute(async () => {
-      const conversationHistory = messages.map(m => `${m.type}: ${m.content}`);
+      const conversationHistory = [...messages, userMessage].map(m => `${m.type}: ${m.content}`);
+      const weekNumber = resolveWeekNumber();
       const response = await AgentOrchestrator.callSocraticAgent(
         user.id,
-        sessionId,
-        inputValue,
-        conversationHistory
+        'CONTINUE_SESSION',
+        weekNumber,
+        {
+          sessionId,
+          message: userMessage.content,
+          conversationHistory,
+        }
       );
 
       if (response.success && response.data) {
