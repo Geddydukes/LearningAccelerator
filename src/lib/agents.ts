@@ -1,5 +1,7 @@
 import { DatabaseService } from './database';
-import { AGENTS, AgentId, isPremium } from './agents/registry';
+import { AGENTS } from './agents/registry';
+import { FeatherAgentClient, extractPhaseArtifact } from './feather-agent';
+import type { FeatherRun } from './feather-agent';
 
 // Simple in-flight request deduplication and short-lived cache
 type AgentCacheEntry = { expiresAt: number; result: any };
@@ -7,106 +9,132 @@ const INFLIGHT_REQUESTS: Map<string, Promise<any>> = new Map();
 const RESPONSE_CACHE: Map<string, AgentCacheEntry> = new Map();
 const CACHE_TTL_MS = 30_000; // 30 seconds
 
-function makeRequestKey(userId: string, action: string, weekNumber: number): string {
-	return `${userId}:${action}:${weekNumber}`;
+function hashPayload(payload: unknown): string {
+  if (payload === null || payload === undefined) return '';
+
+  try {
+    const json = JSON.stringify(payload, (_key, value) => {
+      if (typeof value === 'function') {
+        return `[function ${value.name || 'anonymous'}]`;
+      }
+      return value;
+    });
+
+    let hash = 0;
+    for (let i = 0; i < json.length; i += 1) {
+      hash = (hash * 31 + json.charCodeAt(i)) | 0;
+    }
+
+    return `:${Math.abs(hash).toString(16)}`;
+  } catch {
+    return ':payload';
+  }
+}
+
+function makeRequestKey(
+  userId: string,
+  action: string,
+  weekNumber: number | string | null | undefined,
+  payload?: unknown,
+): string {
+  const normalizedWeek =
+    typeof weekNumber === 'number' || typeof weekNumber === 'string'
+      ? weekNumber
+      : 'na';
+
+  return `${userId}:${action}:${normalizedWeek}${hashPayload(payload)}`;
 }
 
 export class AgentOrchestrator {
-	static async callCLOAgent(userId: string, action: string, weekNumber: number, payload?: any) {
-		try {
-			console.log('🎯 CLO Agent called for user:', userId, 'action:', action, 'week:', weekNumber, 'payload:', payload);
-			const key = makeRequestKey(userId, action, weekNumber);
+        private static featherClient: FeatherAgentClient | null = null;
 
-			// Serve from short-lived cache if available
-			const cached = RESPONSE_CACHE.get(key);
-			if (cached && cached.expiresAt > Date.now()) {
-				console.log('🗄️ Returning cached CLO result for', key);
-				return cached.result;
-			}
+        private static getFeatherClient() {
+                if (!this.featherClient) {
+                        if (!import.meta.env.VITE_SUPABASE_URL || !import.meta.env.VITE_SUPABASE_ANON_KEY) {
+                                throw new Error('Supabase configuration missing for Feather Agent client');
+                        }
 
-			// De-duplicate concurrent requests
-			if (INFLIGHT_REQUESTS.has(key)) {
-				console.log('🧵 Joining in-flight CLO request for', key);
-				return await INFLIGHT_REQUESTS.get(key)!;
-			}
+                        this.featherClient = new FeatherAgentClient({
+                                baseUrl: import.meta.env.VITE_SUPABASE_URL,
+                                anonKey: import.meta.env.VITE_SUPABASE_ANON_KEY,
+                        });
+                }
 
-			const requestPromise = (async () => {
-				// Call the dedicated CLO agent function
-				const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/clo-agent`, {
-					method: 'POST',
-					headers: {
-						'Content-Type': 'application/json',
-						'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
-					},
-					body: JSON.stringify({
-						action: action,
-						payload: { weekNumber, timePerWeek: 5, ...payload },
-						userId: userId
-					})
-				});
-				
-				const result = await response.json();
-				
-				if (result.success && result.data) {
-					// Handle different response types
-					if (result.data.text_response) {
-						// CLO is requesting something (like AGREE_PARAMS)
-						console.log('📝 CLO text response:', result.data.text_response);
-						const finalResult = { success: true, data: { text_response: result.data.text_response } };
-						RESPONSE_CACHE.set(key, { expiresAt: Date.now() + CACHE_TTL_MS, result: finalResult });
-						return finalResult;
-					} else {
-						// Save structured data to database with completion status
-						console.log('💾 Saving CLO module data for week:', weekNumber);
-						
-						// Flatten the CLO_Briefing_Note and CLO_Assessor_Directive for easier access
-						const flattenedData = {
-							...result.data,
-							// If we have nested structure, flatten it
-							...(result.data.CLO_Briefing_Note || {}),
-							...(result.data.CLO_Assessor_Directive || {}),
-							// Store the full response text for complete module display  
-							full_content: result.data.full_response_text,
-							raw_response: result.data.raw_response
-						};
-						
-						// Build completion status dynamically from registry
-						const completionStatus: any = {};
-						Object.keys(AGENTS).forEach(agentId => {
-							completionStatus[`${agentId}_completed`] = false;
-						});
-						completionStatus.overall_progress = 0;
-						
-						await DatabaseService.createOrUpdateWeeklyNote(userId, weekNumber, {
-							clo_briefing_note: flattenedData,
-							completion_status: completionStatus
-						});
-						
-						const finalResult = { success: true, data: flattenedData };
-						RESPONSE_CACHE.set(key, { expiresAt: Date.now() + CACHE_TTL_MS, result: finalResult });
-						return finalResult;
-					}
-				}
-				
-				return result;
-			})();
+                return this.featherClient;
+        }
 
-			INFLIGHT_REQUESTS.set(key, requestPromise);
-			try {
-				return await requestPromise;
-			} finally {
-				INFLIGHT_REQUESTS.delete(key);
-			}
-		} catch (error) {
-			console.error('❌ CLO Agent error:', error);
-			return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
-		}
-	}
+        static async callCLOAgent(userId: string, action: string, weekNumber: number, payload?: any) {
+                try {
+                        console.log('🎯 CLO Agent called for user:', userId, 'action:', action, 'week:', weekNumber, 'payload:', payload);
+                        const key = makeRequestKey(userId, action, weekNumber, payload);
 
-	static async callSocraticAgent(userId: string, action: string, weekNumber: number, payload?: any) {
-		try {
-			console.log('🧠 Socratic Agent called for user:', userId, 'action:', action, 'week:', weekNumber, 'payload:', payload);
-			const key = makeRequestKey(userId, `socratic_${action}`, weekNumber);
+                        const cached = RESPONSE_CACHE.get(key);
+                        if (cached && cached.expiresAt > Date.now()) {
+                                console.log('🗄️ Returning cached CLO result for', key);
+                                return cached.result;
+                        }
+
+                        if (INFLIGHT_REQUESTS.has(key)) {
+                                console.log('🧵 Joining in-flight CLO request for', key);
+                                return await INFLIGHT_REQUESTS.get(key)!;
+                        }
+
+                        const client = this.getFeatherClient();
+                        const requestPromise = (async () => {
+                                const response = await client.run('clo-agent', {
+                                        userId,
+                                        action,
+                                        payload: { weekNumber, timePerWeek: 5, ...payload },
+                                });
+
+                                if (!response.success || !response.data) {
+                                        return response;
+                                }
+
+                                const run = response.data as FeatherRun;
+                                const lecture = extractPhaseArtifact<any>(run, 'lecture');
+                                const comprehension = extractPhaseArtifact<any>(run, 'comprehension');
+                                const practice = extractPhaseArtifact<any>(run, 'practice');
+
+                                const flattenedData = {
+                                        ...(lecture || {}),
+                                        comprehension_check: comprehension,
+                                        practice_directives: practice,
+                                        run,
+                                };
+
+                                const completionStatus: any = {};
+                                Object.keys(AGENTS).forEach(agentId => {
+                                        completionStatus[`${agentId}_completed`] = false;
+                                });
+                                completionStatus.overall_progress = 0;
+
+                                await DatabaseService.createOrUpdateWeeklyNote(userId, weekNumber, {
+                                        clo_briefing_note: flattenedData,
+                                        completion_status: completionStatus,
+                                });
+
+                                const finalResult = { success: true, data: flattenedData };
+                                RESPONSE_CACHE.set(key, { expiresAt: Date.now() + CACHE_TTL_MS, result: finalResult });
+                                return finalResult;
+                        })();
+
+                        INFLIGHT_REQUESTS.set(key, requestPromise);
+                        try {
+                                return await requestPromise;
+                        } finally {
+                                INFLIGHT_REQUESTS.delete(key);
+                        }
+                } catch (error) {
+                        console.error('❌ CLO Agent error:', error);
+                        return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
+                }
+        }
+
+        static async callSocraticAgent(userId: string, action: string, weekNumber: number, payload?: any) {
+                try {
+                        console.log('🧠 Socratic Agent called for user:', userId, 'action:', action, 'week:', weekNumber, 'payload:', payload);
+                        const key = makeRequestKey(userId, `socratic_${action}`, weekNumber, payload);
 
 			// Serve from short-lived cache if available
 			const cached = RESPONSE_CACHE.get(key);
@@ -121,36 +149,38 @@ export class AgentOrchestrator {
 				return await INFLIGHT_REQUESTS.get(key)!;
 			}
 
-			const requestPromise = (async () => {
-				// Call the dedicated Socratic agent function
-				const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/socratic-agent`, {
-					method: 'POST',
-					headers: {
-						'Content-Type': 'application/json',
-						'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
-					},
-					body: JSON.stringify({
-						action: action,
-						payload: { weekNumber, ...payload },
-						userId: userId
-					})
-				});
-				
-				const result = await response.json();
-				
-				if (result.success) {
-					const finalResult = { success: true, data: result.data };
-					RESPONSE_CACHE.set(key, { expiresAt: Date.now() + CACHE_TTL_MS, result: finalResult });
-					return finalResult;
-				}
-				
-				return result;
-			})();
+                        const client = this.getFeatherClient();
+                        const requestPromise = (async () => {
+                                const response = await client.run('socratic-agent', {
+                                        userId,
+                                        action,
+                                        payload: { weekNumber, ...payload },
+                                        instructorModifications: payload?.instructorModifications,
+                                });
 
-			INFLIGHT_REQUESTS.set(key, requestPromise);
-			try {
-				return await requestPromise;
-			} finally {
+                                if (!response.success || !response.data) {
+                                        return response;
+                                }
+
+                                const run = response.data as FeatherRun;
+                                const question = extractPhaseArtifact<any>(run, 'comprehension');
+                                const summary = extractPhaseArtifact<any>(run, 'reflection');
+
+                                const finalPayload = {
+                                        ...(question || {}),
+                                        summary,
+                                        run,
+                                };
+
+                                const finalResult = { success: true, data: finalPayload };
+                                RESPONSE_CACHE.set(key, { expiresAt: Date.now() + CACHE_TTL_MS, result: finalResult });
+                                return finalResult;
+                        })();
+
+                        INFLIGHT_REQUESTS.set(key, requestPromise);
+                        try {
+                                return await requestPromise;
+                        } finally {
 				INFLIGHT_REQUESTS.delete(key);
 			}
 		} catch (error) {
@@ -285,79 +315,88 @@ export class AgentOrchestrator {
 		}
 	}
 
-	static async callInstructorAgent(
-		userId: string, 
-		action: string, 
-		payload: any, 
-		weekNumber?: number
-	) {
-		try {
-			console.log('👨‍🏫 Instructor Agent called for user:', userId, 'action:', action, 'week:', weekNumber);
-			const key = makeRequestKey(userId, `instructor_${action}`, weekNumber || 1);
+        static async callInstructorAgent(
+                userId: string,
+                action: string,
+                payload: any,
+                weekNumber?: number
+        ) {
+                try {
+                        console.log('👨‍🏫 Instructor Agent called for user:', userId, 'action:', action, 'week:', weekNumber);
+                        const key = makeRequestKey(userId, `instructor_${action}`, weekNumber || 1, payload);
 
-			// Serve from short-lived cache if available
-			const cached = RESPONSE_CACHE.get(key);
-			if (cached && cached.expiresAt > Date.now()) {
-				console.log('🗄️ Returning cached Instructor result for', key);
-				return cached.result;
-			}
+                        // Serve from short-lived cache if available
+                        const cached = RESPONSE_CACHE.get(key);
+                        if (cached && cached.expiresAt > Date.now()) {
+                                console.log('🗄️ Returning cached Instructor result for', key);
+                                return cached.result;
+                        }
 
-			// De-duplicate concurrent requests
-			if (INFLIGHT_REQUESTS.has(key)) {
-				console.log('🧵 Joining in-flight Instructor request for', key);
-				return await INFLIGHT_REQUESTS.get(key)!;
-			}
+                        // De-duplicate concurrent requests
+                        if (INFLIGHT_REQUESTS.has(key)) {
+                                console.log('🧵 Joining in-flight Instructor request for', key);
+                                return await INFLIGHT_REQUESTS.get(key)!;
+                        }
 
-			const requestPromise = (async () => {
-				// Call the dedicated Instructor agent function
-				const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/instructor-agent`, {
-					method: 'POST',
-					headers: {
-						'Content-Type': 'application/json',
-						'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
-					},
-					body: JSON.stringify({
-						action: action,
-						payload: { ...payload, weekNumber: weekNumber || 1 },
-						userId: userId
-					})
-				});
-				
-				const result = await response.json();
-				
-				if (result.success && result.data) {
-					// Save structured data to database
-					console.log('💾 Saving Instructor data for week:', weekNumber || 1);
-					
-					await DatabaseService.createOrUpdateWeeklyNote(userId, weekNumber || 1, {
-						instructor_lesson: result.data,
-						completion_status: {
-							clo_completed: false,
-							socratic_completed: false,
-							instructor_completed: true,
-							ta_completed: false,
-							alex_completed: false,
-							brand_completed: false,
-							clarifier_completed: false,
-							onboarder_completed: false,
-							career_match_completed: false,
-							portfolio_completed: false,
-							overall_progress: 17
-						}
-					});
-					
-					const finalResult = { success: true, data: result.data };
-					RESPONSE_CACHE.set(key, { expiresAt: Date.now() + CACHE_TTL_MS, result: finalResult });
-					return finalResult;
-				}
-				
-				return result;
-			})();
+                        const client = this.getFeatherClient();
+                        const requestPromise = (async () => {
+                                const response = await client.run('instructor-agent', {
+                                        userId,
+                                        action,
+                                        payload: { ...payload, weekNumber: weekNumber || 1 },
+                                });
 
-			INFLIGHT_REQUESTS.set(key, requestPromise);
-			try {
-				return await requestPromise;
-			} finally {
+                                if (!response.success || !response.data) {
+                                        return response;
+                                }
+
+                                const run = response.data as FeatherRun;
+                                const lecture = extractPhaseArtifact<any>(run, 'lecture');
+                                const comprehension = extractPhaseArtifact<any>(run, 'comprehension');
+                                const practice = extractPhaseArtifact<any>(run, 'practice');
+
+                                const instructorPackage = {
+                                        lecture,
+                                        comprehension,
+                                        practice,
+                                        run,
+                                };
+
+                                let responsePayload: Record<string, unknown> | typeof instructorPackage = instructorPackage;
+                                if (action === 'DELIVER_LECTURE') {
+                                        responsePayload = lecture ? { ...lecture, __featherRun: run } : { __featherRun: run };
+                                } else if (action === 'CHECK_COMPREHENSION') {
+                                        responsePayload = comprehension ? { ...comprehension, __featherRun: run } : { __featherRun: run };
+                                } else if (action === 'MODIFY_PRACTICE_PROMPTS') {
+                                        responsePayload = practice ? { ...practice, __featherRun: run } : { __featherRun: run };
+                                }
+
+                                await DatabaseService.createOrUpdateWeeklyNote(userId, weekNumber || 1, {
+                                        instructor_lesson: instructorPackage,
+                                        completion_status: {
+                                                clo_completed: false,
+                                                socratic_completed: false,
+                                                instructor_completed: true,
+                                                ta_completed: false,
+                                                alex_completed: false,
+                                                brand_completed: false,
+                                                clarifier_completed: false,
+                                                onboarder_completed: false,
+                                                career_match_completed: false,
+                                                portfolio_completed: false,
+                                                overall_progress: 17,
+                                        },
+                                });
+
+                                const finalResult = { success: true, data: responsePayload };
+                                RESPONSE_CACHE.set(key, { expiresAt: Date.now() + CACHE_TTL_MS, result: finalResult });
+                                return finalResult;
+                        })();
+
+                        INFLIGHT_REQUESTS.set(key, requestPromise);
+                        try {
+                                return await requestPromise;
+                        } finally {
 				INFLIGHT_REQUESTS.delete(key);
 			}
 		} catch (error) {
@@ -366,10 +405,10 @@ export class AgentOrchestrator {
 		}
 	}
 
-	static async callTAAgent(userId: string, action: string, weekNumber: number, payload?: any) {
-		try {
-			console.log('📝 TA Agent called for user:', userId, 'action:', action, 'week:', weekNumber, 'payload:', payload);
-			const key = makeRequestKey(userId, `ta_${action}`, weekNumber);
+        static async callTAAgent(userId: string, action: string, weekNumber: number, payload?: any) {
+                try {
+                        console.log('📝 TA Agent called for user:', userId, 'action:', action, 'week:', weekNumber, 'payload:', payload);
+                        const key = makeRequestKey(userId, `ta_${action}`, weekNumber, payload);
 
 			// Serve from short-lived cache if available
 			const cached = RESPONSE_CACHE.get(key);
@@ -384,36 +423,38 @@ export class AgentOrchestrator {
 				return await INFLIGHT_REQUESTS.get(key)!;
 			}
 
-			const requestPromise = (async () => {
-				// Call the dedicated TA agent function
-				const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ta-agent`, {
-					method: 'POST',
-					headers: {
-						'Content-Type': 'application/json',
-						'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
-					},
-					body: JSON.stringify({
-						action: action,
-						payload: { weekNumber, ...payload },
-						userId: userId
-					})
-				});
-				
-				const result = await response.json();
-				
-				if (result.success) {
-					const finalResult = { success: true, data: result.data };
-					RESPONSE_CACHE.set(key, { expiresAt: Date.now() + CACHE_TTL_MS, result: finalResult });
-					return finalResult;
-				}
-				
-				return result;
-			})();
+                        const client = this.getFeatherClient();
+                        const requestPromise = (async () => {
+                                const response = await client.run('ta-agent', {
+                                        userId,
+                                        action,
+                                        payload: { weekNumber, ...payload },
+                                        instructorModifications: payload?.instructorModifications,
+                                });
 
-			INFLIGHT_REQUESTS.set(key, requestPromise);
-			try {
-				return await requestPromise;
-			} finally {
+                                if (!response.success || !response.data) {
+                                        return response;
+                                }
+
+                                const run = response.data as FeatherRun;
+                                const guidance = extractPhaseArtifact<any>(run, 'practice');
+                                const summary = extractPhaseArtifact<any>(run, 'reflection');
+
+                                const finalPayload = {
+                                        ...(guidance || {}),
+                                        summary,
+                                        run,
+                                };
+
+                                const finalResult = { success: true, data: finalPayload };
+                                RESPONSE_CACHE.set(key, { expiresAt: Date.now() + CACHE_TTL_MS, result: finalResult });
+                                return finalResult;
+                        })();
+
+                        INFLIGHT_REQUESTS.set(key, requestPromise);
+                        try {
+                                return await requestPromise;
+                        } finally {
 				INFLIGHT_REQUESTS.delete(key);
 			}
 		} catch (error) {
@@ -430,7 +471,7 @@ export class AgentOrchestrator {
 	) {
 		try {
 			console.log('🔍 Clarifier Agent called for user:', userId, 'action:', action, 'week:', weekNumber);
-			const key = makeRequestKey(userId, `clarifier_${action}`, weekNumber);
+			const key = makeRequestKey(userId, `clarifier_${action}`, weekNumber, payload);
 
 			// Serve from short-lived cache if available
 			const cached = RESPONSE_CACHE.get(key);
@@ -511,7 +552,7 @@ export class AgentOrchestrator {
 	) {
 		try {
 			console.log('🚀 Onboarder Agent called for user:', userId, 'action:', action, 'week:', weekNumber);
-			const key = makeRequestKey(userId, `onboarder_${action}`, weekNumber);
+			const key = makeRequestKey(userId, `onboarder_${action}`, weekNumber, payload);
 
 			// Serve from short-lived cache if available
 			const cached = RESPONSE_CACHE.get(key);
@@ -592,7 +633,7 @@ export class AgentOrchestrator {
 	) {
 		try {
 			console.log('💼 Career Match Agent called for user:', userId, 'action:', action, 'week:', weekNumber);
-			const key = makeRequestKey(userId, `career_match_${action}`, weekNumber);
+			const key = makeRequestKey(userId, `career_match_${action}`, weekNumber, payload);
 
 			// Serve from short-lived cache if available
 			const cached = RESPONSE_CACHE.get(key);
@@ -673,7 +714,7 @@ export class AgentOrchestrator {
 	) {
 		try {
 			console.log('📁 Portfolio Agent called for user:', userId, 'action:', action, 'week:', weekNumber);
-			const key = makeRequestKey(userId, `portfolio_${action}`, weekNumber);
+			const key = makeRequestKey(userId, `portfolio_${action}`, weekNumber, payload);
 
 			// Serve from short-lived cache if available
 			const cached = RESPONSE_CACHE.get(key);
@@ -755,7 +796,7 @@ export class AgentOrchestrator {
 	) {
 		try {
 			console.log(`🤖 Agent Proxy called for ${agent} agent:`, { userId, action, weekNumber });
-			const key = makeRequestKey(userId, `proxy_${agent}_${action}`, weekNumber);
+			const key = makeRequestKey(userId, `proxy_${agent}_${action}`, weekNumber, payload);
 
 			// Serve from short-lived cache if available
 			const cached = RESPONSE_CACHE.get(key);
