@@ -1,457 +1,312 @@
-import React, { useState, useMemo, useCallback, memo } from 'react';
-import { useLocation, useNavigate, Routes, Route, useParams } from 'react-router-dom';
-import { Menu, X, Home, Brain, Users, Briefcase, FileText, ChevronRight, Lock, Crown, CheckCircle, Circle, BookOpen } from 'lucide-react';
+import React, { useMemo, useState } from 'react';
+import { NavLink, Navigate, Route, Routes, useLocation } from 'react-router-dom';
+import {
+  BarChart3,
+  BrainCircuit,
+  ChevronRight,
+  LayoutDashboard,
+  Menu,
+  ShieldCheck,
+  Sparkles,
+  Target,
+  Users,
+  X,
+} from 'lucide-react';
 import { PATHS } from '../../routes/paths';
 import { useAuth } from '../../contexts/AuthContext';
-import { useSubscription } from '../../hooks/useSubscription';
-import { CORE_AGENTS, PREMIUM_AGENTS, AGENTS } from '../../lib/agents/registry';
-import HomeDashboard from '../home/HomeDashboard';
-import { UnifiedLearningPlatform } from '../workspace/UnifiedLearningPlatform';
-import { SessionTimeline } from '../dev/SessionTimeline';
-import { 
-  CurrentModule, 
-  SelfGuided, 
-  PastTracks, 
-  CareerPreview, 
-  PortfolioPreview, 
-  Settings 
-} from '../pages';
-import { SideNav } from './SideNav';
+import { useTheme } from '../../contexts/ThemeContext';
+import { useAccessibility, type FontScale } from '../../contexts/AccessibilityContext';
+import { LearningOverview } from '../views/LearningOverview';
+import { MissionControl } from '../views/MissionControl';
+import { TrackExplorer } from '../views/TrackExplorer';
+import { InsightHub } from '../views/InsightHub';
+import { CommunityPulse } from '../views/CommunityPulse';
+import { LearnerSettings } from '../views/LearnerSettings';
+import { GuidedWorkspace } from '../views/GuidedWorkspace';
+import { Button } from '../ui/Button';
+import { Card } from '../ui/Card';
 
-// Navigation items configuration - generated from agent registry
-const NAV_ITEMS = [
-  // Core learning items
+interface NavItem {
+  id: string;
+  label: string;
+  description: string;
+  path: string;
+  icon: React.ComponentType<{ className?: string }>;
+}
+
+const NAVIGATION: NavItem[] = [
   {
-    id: 'dashboard',
-    label: 'Dashboard',
-    path: PATHS.home,
-    icon: Home,
-    description: 'Your learning overview',
-    requiresPremium: false
+    id: 'overview',
+    label: 'Learning Overview',
+    description: 'Progress, momentum, and next actions',
+    path: 'overview',
+    icon: LayoutDashboard,
   },
   {
     id: 'workspace',
-    label: 'Learning Workspace',
-    path: PATHS.workspace,
-    icon: BookOpen,
-    description: 'Your active learning session',
-    requiresPremium: false
+    label: 'Guided Workspace',
+    description: 'Active session with agents and resources',
+    path: 'workspace',
+    icon: BrainCircuit,
   },
   {
-    id: 'past-tracks',
-    label: 'Past Learning Tracks',
-    path: PATHS.pastTracks,
-    icon: FileText,
-    description: 'Your completed tracks',
-    requiresPremium: false
+    id: 'missions',
+    label: 'Mission Control',
+    description: 'Gamified learning quests and streaks',
+    path: 'missions',
+    icon: Target,
   },
-  // Core agents (weekly mode)
-  ...CORE_AGENTS
-    .filter(id => AGENTS[id].mode === 'weekly')
-    .map(id => ({
-      id: `agent-${id}`,
-      label: AGENTS[id].title,
-      path: AGENTS[id].route,
-      icon: BookOpen, // Will be replaced with dynamic icon loading
-      description: AGENTS[id].description,
-      requiresPremium: false
-    })),
-  // Premium features
   {
-    id: 'brand-career',
-    label: 'Brand & Career',
-    path: '/home/brand-career',
-    icon: Briefcase,
-    description: 'Brand strategy and career development (Premium)',
-    requiresPremium: true
-  }
+    id: 'tracks',
+    label: 'Track Explorer',
+    description: 'Modules, resources, and hybrid activities',
+    path: 'tracks',
+    icon: ShieldCheck,
+  },
+  {
+    id: 'analytics',
+    label: 'Insight Hub',
+    description: 'Performance analytics and feedback loops',
+    path: 'analytics',
+    icon: BarChart3,
+  },
+  {
+    id: 'community',
+    label: 'Community Pulse',
+    description: 'Collaborate with peers and mentors',
+    path: 'community',
+    icon: Users,
+  },
+  {
+    id: 'settings',
+    label: 'Learning Settings',
+    description: 'Preferences, accessibility, and theme',
+    path: 'settings',
+    icon: Sparkles,
+  },
 ];
 
-// Simple content components for now
-const Dashboard = memo(() => <HomeDashboard />);
-
-const ModuleCurrent = memo(() => (
-  <div className="p-6">
-    <h1 className="text-3xl font-medium text-foreground mb-6">📚 Current Module</h1>
-    <div className="bg-card border border-border/50 rounded-lg p-6">
-      <p className="text-lg text-muted-foreground">Your current learning module will appear here.</p>
-    </div>
-  </div>
-));
-
-const SelfGuidedLearning = memo(() => (
-  <div className="p-6">
-    <h1 className="text-3xl font-medium text-foreground mb-6">🚀 Self-guided Learning</h1>
-    <div className="bg-card border border-border/50 rounded-lg p-6">
-      <p className="text-lg text-muted-foreground mb-4">
-        Start a new learning journey with AI-powered guidance. Choose your focus area and we'll create a personalized learning plan.
-      </p>
-      <button 
-        onClick={() => window.location.href = '/home/workspace'}
-        className="bg-primary text-primary-foreground hover:bg-primary/90 px-6 py-3 rounded-lg transition-colors"
-      >
-        Start Learning Journey
-      </button>
-    </div>
-  </div>
-));
-
-const PastLearningTracks = memo(() => {
-  const { user } = useAuth();
-  const { isPaid } = useSubscription();
-  
-  // Mock data - replace with real data from your database
-  const pastTracks = [
-    {
-      id: 'fullstack_web_1',
-      name: 'Full-Stack Web Development',
-      completedAt: '2024-12-15',
-      progress: 100,
-      duration: '8 weeks',
-      skills: ['React', 'Node.js', 'MongoDB'],
-      certificate: true
-    },
-    {
-      id: 'ai_ml_1',
-      name: 'AI & Machine Learning',
-      completedAt: '2024-11-20',
-      progress: 85,
-      duration: '6 weeks',
-      skills: ['Python', 'TensorFlow', 'Data Analysis'],
-      certificate: false
-    }
+const FontScaleToggle: React.FC = () => {
+  const { fontScale, setFontScale } = useAccessibility();
+  const options: { id: FontScale; label: string }[] = [
+    { id: 'base', label: 'A' },
+    { id: 'large', label: 'A+' },
+    { id: 'xlarge', label: 'A++' },
   ];
 
-  const maxTracks = isPaid ? 10 : 2;
-  const canAddMore = pastTracks.length < maxTracks;
-
   return (
-    <div className="p-6">
-      <div className="mb-6">
-        <h1 className="text-3xl font-medium text-foreground mb-2">📚 Past Learning Tracks</h1>
-        <p className="text-muted-foreground">
-          Track your learning journey and review completed courses
-          {!isPaid && (
-            <span className="text-foreground font-medium">
-              {' '}(Limited to {maxTracks} tracks on basic plan)
-            </span>
-          )}
-        </p>
-      </div>
-
-      {/* Stats Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-        <div className="bg-card border border-border/50 rounded-lg p-4">
-          <div className="text-2xl font-medium text-foreground">{pastTracks.length}</div>
-          <div className="text-sm text-muted-foreground">Completed Tracks</div>
-        </div>
-        <div className="bg-card border border-border/50 rounded-lg p-4">
-          <div className="text-2xl font-medium text-foreground">
-            {pastTracks.filter(t => t.certificate).length}
-          </div>
-          <div className="text-sm text-muted-foreground">Certificates</div>
-        </div>
-        <div className="bg-card border border-border/50 rounded-lg p-4">
-          <div className="text-2xl font-medium text-foreground">
-            {pastTracks.reduce((acc, t) => acc + t.skills.length, 0)}
-          </div>
-          <div className="text-sm text-muted-foreground">Skills Learned</div>
-        </div>
-        <div className="bg-card border border-border/50 rounded-lg p-4">
-          <div className="text-2xl font-medium text-foreground">
-            {pastTracks.reduce((acc, t) => acc + parseInt(t.duration), 0)} weeks
-          </div>
-          <div className="text-sm text-muted-foreground">Total Time</div>
-        </div>
-      </div>
-
-      {/* Tracks List */}
-      <div className="space-y-4">
-        {pastTracks.map((track) => (
-          <div key={track.id} className="bg-card border border-border/50 rounded-lg p-6">
-            <div className="flex items-start justify-between mb-4">
-              <div className="flex-1">
-                <h3 className="text-xl font-medium text-foreground mb-2">{track.name}</h3>
-                <div className="flex items-center space-x-4 text-sm text-muted-foreground mb-3">
-                  <span>Completed: {track.completedAt}</span>
-                  <span>Duration: {track.duration}</span>
-                  <span className="flex items-center">
-                    {track.certificate ? (
-                      <>
-                        <CheckCircle className="w-4 h-4 text-green-600 mr-1" />
-                        Certificate Earned
-                      </>
-                    ) : (
-                      <>
-                        <Circle className="w-4 h-4 text-muted-foreground mr-1" />
-                        No Certificate
-                      </>
-                    )}
-                  </span>
-                </div>
-                
-                {/* Progress Bar */}
-                <div className="mb-3">
-                  <div className="flex justify-between text-sm text-muted-foreground mb-1">
-                    <span>Progress</span>
-                    <span>{track.progress}%</span>
-                  </div>
-                  <div className="w-full bg-muted rounded-full h-2">
-                    <div 
-                      className="bg-primary h-2 rounded-full transition-all duration-300"
-                      style={{ width: `${track.progress}%` }}
-                    />
-                  </div>
-                </div>
-
-                {/* Skills */}
-                <div className="flex flex-wrap gap-2">
-                  {track.skills.map((skill, index) => (
-                    <span 
-                      key={index}
-                      className="px-3 py-1 bg-accent text-foreground text-sm rounded-full"
-                    >
-                      {skill}
-                    </span>
-                  ))}
-                </div>
-              </div>
-              
-              <div className="ml-4">
-                <button className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors">
-                  Review
-                </button>
-              </div>
-            </div>
-          </div>
-        ))}
-
-        {/* Add New Track Button */}
-        {canAddMore && (
-          <div className="bg-muted/50 border-2 border-dashed border-border rounded-lg p-6 text-center">
-            <button className="px-6 py-3 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors">
-              + Start New Learning Track
-            </button>
-            <p className="text-sm text-muted-foreground mt-2">
-              Begin a new learning journey
-            </p>
-          </div>
-        )}
-
-        {!canAddMore && !isPaid && (
-          <div className="bg-card border border-border/50 rounded-lg p-6 text-center">
-            <div className="text-muted-foreground mb-3">
-              <Lock className="w-8 h-8 mx-auto mb-2" />
-              <h3 className="text-lg font-medium text-foreground">Track Limit Reached</h3>
-            </div>
-            <p className="text-muted-foreground mb-4">
-              You've reached the limit of {maxTracks} tracks on your basic plan. 
-              Upgrade to premium for unlimited learning tracks!
-            </p>
-            <button className="px-6 py-3 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors">
-              Upgrade to Premium
-            </button>
-          </div>
-        )}
-      </div>
+    <div className="flex items-center gap-1" aria-label="Adjust font size">
+      {options.map(option => (
+        <button
+          key={option.id}
+          type="button"
+          onClick={() => setFontScale(option.id)}
+          className={`rounded-md px-2 py-1 text-sm font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 ${
+            fontScale === option.id
+              ? 'bg-primary text-primary-foreground'
+              : 'bg-muted text-muted-foreground hover:bg-muted/80'
+          }`}
+          aria-pressed={fontScale === option.id}
+        >
+          {option.label}
+        </button>
+      ))}
     </div>
   );
-});
+};
 
-const CareerHub = memo(() => (
-  <div className="p-6">
-    <h1 className="text-3xl font-medium text-foreground mb-6">💼 Career Hub</h1>
-    <div className="bg-card border border-border/50 rounded-lg p-6">
-      <p className="text-lg text-muted-foreground">Career development tools will appear here.</p>
-    </div>
-  </div>
-));
+const HighContrastToggle: React.FC = () => {
+  const { highContrast, toggleHighContrast } = useAccessibility();
+  return (
+    <button
+      type="button"
+      onClick={toggleHighContrast}
+      className="rounded-md border border-border px-3 py-1 text-sm font-medium text-foreground transition hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2"
+      aria-pressed={highContrast}
+    >
+      {highContrast ? 'Disable high contrast' : 'High contrast'}
+    </button>
+  );
+};
 
-const Portfolio = memo(() => (
-  <div className="p-6">
-    <h1 className="text-3xl font-medium text-foreground mb-6">📁 Portfolio</h1>
-    <div className="bg-card border border-border/50 rounded-lg p-6">
-      <p className="text-lg text-muted-foreground">Your portfolio will appear here.</p>
-    </div>
-  </div>
-));
-
-const SocraticChat = memo(() => (
-  <div className="p-6">
-    <h1 className="text-3xl font-bold text-gray-900 mb-6">💬 Socratic Chat</h1>
-    <div className="bg-white rounded-lg shadow p-6">
-      <p className="text-lg text-gray-600">Interactive learning chat will appear here.</p>
-    </div>
-  </div>
-));
-
-const TimelineWrapper = memo(() => {
-  const { correlationId } = useParams<{ correlationId: string }>();
-  return <SessionTimeline correlationId={correlationId || ''} />;
-});
-
-const AppShell = memo(() => {
+export default function AppShell() {
   const location = useLocation();
-  const navigate = useNavigate();
   const { user, signOut } = useAuth();
-  const { isPaid } = useSubscription();
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const { toggleTheme, theme } = useTheme();
+  const [mobileOpen, setMobileOpen] = useState(false);
 
-  // Get current active nav item
-  const activeNavItem = useMemo(() => {
-    return NAV_ITEMS.find(item => item.path === location.pathname) || NAV_ITEMS[0];
+  const activeItem = useMemo(() => {
+    const found = NAVIGATION.find(item => location.pathname.includes(item.path));
+    return found?.id ?? 'overview';
   }, [location.pathname]);
 
-  // Handle navigation
-  const handleNavigation = useCallback((path: string) => {
-    navigate(path);
-    setIsMobileMenuOpen(false);
-  }, [navigate]);
+  const userInitials = user?.name
+    ?.split(' ')
+    .map(part => part.charAt(0).toUpperCase())
+    .slice(0, 2)
+    .join('') ?? 'WL';
 
-  // Handle sign out
-  const handleSignOut = useCallback(async () => {
-    try {
-      await signOut();
-      navigate(PATHS.landing);
-    } catch (error) {
-      console.error('Sign out error:', error);
-    }
-  }, [signOut, navigate]);
+  const renderNavLinks = (onNavigate?: () => void) => (
+    <ul className="space-y-1" role="list">
+      {NAVIGATION.map(item => {
+        const Icon = item.icon;
+        const isActive = activeItem === item.id;
 
-
+        return (
+          <li key={item.id}>
+            <NavLink
+              to={item.path}
+              onClick={() => {
+                if (onNavigate) onNavigate();
+              }}
+              className={({ isActive: routeActive }) =>
+                `group flex w-full flex-col rounded-lg border border-transparent p-3 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 ${
+                  routeActive || isActive
+                    ? 'bg-primary text-primary-foreground shadow-sm'
+                    : 'bg-background text-foreground hover:border-border hover:bg-muted/60'
+                }`
+              }
+            >
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <span className={`flex h-9 w-9 items-center justify-center rounded-md ${
+                    isActive
+                      ? 'bg-primary-foreground/10 text-primary-foreground'
+                      : 'bg-muted text-muted-foreground'
+                  }`}>
+                    <Icon className="h-5 w-5" aria-hidden="true" />
+                  </span>
+                  <div>
+                    <p className="text-sm font-semibold leading-none">{item.label}</p>
+                    <p className={`mt-1 text-xs ${isActive ? 'text-primary-foreground/80' : 'text-muted-foreground'}`}>
+                      {item.description}
+                    </p>
+                  </div>
+                </div>
+                <ChevronRight className={`h-5 w-5 ${isActive ? 'text-primary-foreground' : 'text-muted-foreground'}`} aria-hidden="true" />
+              </div>
+            </NavLink>
+          </li>
+        );
+      })}
+    </ul>
+  );
 
   return (
-    <div className="flex h-screen bg-background">
-      {/* Desktop Sidebar */}
-      <div className="hidden lg:flex">
-        <SideNav />
-      </div>
+    <div className="flex min-h-screen bg-background text-foreground">
+      {/* Desktop navigation */}
+      <aside className="hidden w-[320px] flex-shrink-0 border-r border-border/60 bg-sidebar/80 px-6 py-8 lg:block" aria-label="Primary navigation">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-xs uppercase tracking-wider text-muted-foreground">Learning Accelerator</p>
+            <h1 className="mt-1 text-lg font-semibold">Wisely Nexus</h1>
+          </div>
+          <span className="flex h-10 w-10 items-center justify-center rounded-full bg-primary text-primary-foreground text-sm font-semibold">
+            {userInitials}
+          </span>
+        </div>
+        <p className="mt-6 text-sm text-muted-foreground">
+          Navigate learning spaces that mirror the pedagogy of your track. Everything you need is structured around action.
+        </p>
+        <nav className="mt-8 space-y-8" aria-label="Main">
+          {renderNavLinks()}
+        </nav>
+      </aside>
 
-      {/* Mobile Menu Overlay */}
-      {isMobileMenuOpen && (
-        <div className="fixed inset-0 z-40 lg:hidden">
-          <div
-            className="fixed inset-0 bg-black bg-opacity-50"
-            onClick={() => setIsMobileMenuOpen(false)}
-          />
-          <div className="fixed left-0 top-0 h-full w-80 bg-card shadow-xl">
-            {/* Mobile Header */}
-            <div className="flex items-center justify-between p-4 border-b border-border/50">
-              <h1 className="text-xl font-medium text-foreground">
-                Wisely
-              </h1>
-              <button
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="p-2 hover:bg-accent rounded-lg transition-colors"
-              >
-                <X className="w-5 h-5 text-muted-foreground" />
-              </button>
-            </div>
-
-            {/* Mobile Navigation */}
-            <nav className="p-4 space-y-2">
-              {NAV_ITEMS.map((item) => {
-                const Icon = item.icon;
-                const isActive = location.pathname === item.path;
-                const isPremium = item.requiresPremium && !isPaid;
-                
-                return (
-                  <button
-                    key={item.id}
-                    onClick={() => {
-                      if (isPremium) {
-                        // Show upgrade prompt for premium features
-                        alert('This feature requires a premium subscription. Please upgrade to access.');
-                        return;
-                      }
-                      handleNavigation(item.path);
-                      setIsMobileMenuOpen(false);
-                    }}
-                    className={`w-full flex items-center p-3 rounded-lg transition-all duration-200 ${
-                      isActive
-                        ? 'bg-primary text-primary-foreground'
-                        : isPremium
-                        ? 'text-muted-foreground cursor-not-allowed'
-                        : 'text-foreground hover:bg-accent'
-                    }`}
-                    disabled={isPremium}
-                  >
-                    <Icon className={`w-5 h-5 ${
-                      isActive ? 'text-primary-foreground' : isPremium ? 'text-muted-foreground' : 'text-muted-foreground'
-                    }`} />
-                    <div className="ml-3 text-left flex-1">
-                      <div className="font-medium flex items-center justify-between">
-                        {item.label}
-                        {isPremium && (
-                          <Lock className="w-4 h-4 text-muted-foreground" />
-                        )}
-                      </div>
-                      <div className="text-xs text-muted-foreground">
-                        {item.description}
-                      </div>
-                    </div>
-                  </button>
-                );
-              })}
-            </nav>
-
-            {/* Mobile User Section */}
-            <div className="p-4 border-t border-border/50 mt-auto">
-              <div className="flex items-center space-x-3 mb-3">
-                <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
-                  <span className="text-primary-foreground font-medium text-sm">
-                    {user?.email?.charAt(0).toUpperCase() || 'U'}
-                  </span>
+      {/* Mobile navigation */}
+      <div className="lg:hidden">
+        <button
+          type="button"
+          className="fixed bottom-6 right-6 z-40 inline-flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2"
+          onClick={() => setMobileOpen(true)}
+          aria-label="Open navigation"
+        >
+          <Menu className="h-6 w-6" aria-hidden="true" />
+        </button>
+        {mobileOpen && (
+          <div className="fixed inset-0 z-50 bg-black/40" role="dialog" aria-modal="true">
+            <div className="absolute inset-y-0 right-0 w-80 bg-background p-6 shadow-xl">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-lg font-semibold">Navigate</h2>
+                  <p className="text-sm text-muted-foreground">Choose your learning space</p>
                 </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-foreground truncate">
-                    {user?.email || 'User'}
-                  </p>
-                </div>
+                <button
+                  type="button"
+                  onClick={() => setMobileOpen(false)}
+                  className="rounded-full p-2 text-muted-foreground hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2"
+                  aria-label="Close navigation"
+                >
+                  <X className="h-5 w-5" aria-hidden="true" />
+                </button>
               </div>
-              <button
-                onClick={handleSignOut}
-                className="w-full px-3 py-2 text-sm border border-border rounded-md hover:bg-accent transition-colors"
-              >
-                Sign Out
-              </button>
+              <div className="mt-6 max-h-[calc(100vh-8rem)] overflow-y-auto pr-2">
+                {renderNavLinks(() => setMobileOpen(false))}
+              </div>
             </div>
           </div>
-        </div>
-      )}
-
-      {/* Mobile Menu Button */}
-      <div className="lg:hidden fixed top-4 left-4 z-30">
-        <button
-          onClick={() => setIsMobileMenuOpen(true)}
-          className="p-2 bg-card border border-border/50 rounded-lg shadow-lg"
-        >
-          <Menu className="w-5 h-5 text-foreground" />
-        </button>
+        )}
       </div>
 
-      {/* Main Content Area */}
-      <div className="flex-1 overflow-auto bg-background">
-        <div className="h-full">
+      <div className="flex min-h-screen flex-1 flex-col">
+        <header className="border-b border-border/60 bg-background/95 px-4 py-4 backdrop-blur supports-[backdrop-filter]:bg-background/60 lg:px-8">
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <div className="space-y-1">
+              <p className="text-sm text-muted-foreground">{new Date().toLocaleDateString(undefined, { weekday: 'long', month: 'short', day: 'numeric' })}</p>
+              <h2 className="text-2xl font-semibold leading-tight">{NAVIGATION.find(item => item.id === activeItem)?.label ?? 'Learning Overview'}</h2>
+            </div>
+            <div className="flex flex-wrap items-center gap-3">
+              <FontScaleToggle />
+              <HighContrastToggle />
+              <Button
+                variant="outline"
+                onClick={toggleTheme}
+                className="border-border text-sm"
+                aria-label="Toggle theme"
+              >
+                Switch to {theme === 'light' ? 'dark' : 'light'} mode
+              </Button>
+              <Button
+                variant="ghost"
+                onClick={signOut}
+                className="text-sm text-muted-foreground hover:text-destructive"
+              >
+                Sign out
+              </Button>
+            </div>
+          </div>
+
+          <div className="mt-6 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {[
+              { title: 'Streak active', value: '12 days', context: 'Learning momentum', accent: 'bg-primary/10 text-primary' },
+              { title: 'Focus for today', value: 'Project checkpoint', context: 'Hybrid: build & reflect', accent: 'bg-secondary text-secondary-foreground' },
+              { title: 'Feedback loops', value: '2 pending reviews', context: 'Socratic + TA', accent: 'bg-accent text-accent-foreground' },
+            ].map((item) => (
+              <Card key={item.title} className="border-border/60">
+                <div className={`rounded-lg ${item.accent} px-3 py-2 text-xs font-semibold uppercase tracking-wide`}>{item.context}</div>
+                <div className="px-3 pb-4 pt-3">
+                  <p className="text-sm text-muted-foreground">{item.title}</p>
+                  <p className="mt-1 text-xl font-semibold">{item.value}</p>
+                </div>
+              </Card>
+            ))}
+          </div>
+        </header>
+
+        <main className="flex-1 overflow-y-auto bg-background px-4 py-8 lg:px-8">
           <Routes>
-            <Route path="/" element={<HomeDashboard />} />
-            <Route path="/module/current" element={<CurrentModule trackLabel="AI/ML Engineering" />} />
-            <Route path="/self-guided" element={<SelfGuided />} />
-            <Route path="/past-tracks" element={<PastTracks />} />
-            <Route path="/workspace" element={<UnifiedLearningPlatform />} />
-            <Route path="/dev/timeline/:correlationId" element={<TimelineWrapper />} />
-            <Route path="/career" element={<CareerPreview userTier={isPaid ? 'premium' : 'free'} />} />
-            <Route path="/portfolio" element={<PortfolioPreview userTier={isPaid ? 'premium' : 'free'} />} />
-            <Route path="/settings" element={<Settings userTier={isPaid ? 'premium' : 'free'} />} />
-            <Route path="*" element={<HomeDashboard />} />
+            <Route index element={<Navigate to={PATHS.overview.replace('/home/', '')} replace />} />
+            <Route path="overview" element={<LearningOverview />} />
+            <Route path="workspace" element={<GuidedWorkspace />} />
+            <Route path="missions" element={<MissionControl />} />
+            <Route path="tracks" element={<TrackExplorer />} />
+            <Route path="analytics" element={<InsightHub />} />
+            <Route path="community" element={<CommunityPulse />} />
+            <Route path="settings" element={<LearnerSettings />} />
+            <Route path="*" element={<Navigate to="overview" replace />} />
           </Routes>
-        </div>
+        </main>
       </div>
     </div>
   );
-});
-
-AppShell.displayName = 'AppShell';
-
-export default AppShell; 
+}

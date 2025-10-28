@@ -1,11 +1,10 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { AuthProvider } from './contexts/AuthContext';
+import { AccessibilityProvider } from './contexts/AccessibilityContext';
 import { LandingPage } from './components/landing/LandingPage';
 import { AuthForm } from './components/auth/AuthForm';
 import AppShell from './components/layout/AppShell';
-import { SimpleAppShell } from './components/layout/SimpleAppShell';
-import { UnifiedLearningPlatform } from './components/workspace/UnifiedLearningPlatform';
 import { ErrorBoundary } from './components/ui/ErrorBoundary';
 import { useEffect } from 'react';
 
@@ -72,9 +71,11 @@ function App() {
   return (
     <ErrorBoundary>
       <ThemeProvider>
-        <AuthProvider>
-          <AppContent />
-        </AuthProvider>
+        <AccessibilityProvider>
+          <AuthProvider>
+            <AppContent />
+          </AuthProvider>
+        </AccessibilityProvider>
       </ThemeProvider>
     </ErrorBoundary>
   );
