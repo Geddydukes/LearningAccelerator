@@ -1,5 +1,17 @@
 import { supabase } from './supabase';
-import { User, WeeklyNote, CLOBriefingNote, SocraticSession, Message } from '../types';
+import {
+  User,
+  WeeklyNote,
+  CLOBriefingNote,
+  SocraticSession,
+  Message,
+  EducationSession,
+  WeeklyPlan,
+  ProgramPlan,
+  KPIMetricRecord,
+  StreakRecord,
+} from '../types';
+import type { ModuleInstance } from '../types/progression';
 
 export class DatabaseService {
   // User management
@@ -16,7 +28,13 @@ export class DatabaseService {
           difficulty_level: 'intermediate',
           focus_areas: ['full-stack-development', 'react', 'typescript'],
           learning_pace: 'normal',
-          preferred_interaction_style: 'mixed'
+          preferred_interaction_style: 'mixed',
+          notification_preferences: {
+            mentor_feedback: true,
+            mission_reminders: true,
+            community_digest: false,
+          },
+          hybrid_frequency: 'weekly',
         }
       })
       .select()
@@ -209,7 +227,7 @@ export class DatabaseService {
 
   static async recordTTSUsage(userId: string): Promise<void> {
     const today = new Date().toISOString().split('T')[0];
-    
+
     const { error } = await supabase
       .from('tts_usage')
       .upsert({
@@ -220,6 +238,92 @@ export class DatabaseService {
       });
 
     if (error) throw error;
+  }
+
+  static async getEducationSessions(userId: string): Promise<EducationSession[]> {
+    const { data, error } = await supabase
+      .from('education_sessions')
+      .select('*')
+      .eq('user_id', userId)
+      .order('week', { ascending: true })
+      .order('day', { ascending: true });
+
+    if (error && error.code !== '42P01') throw error;
+    return data || [];
+  }
+
+  static async getWeeklyPlans(userId: string): Promise<WeeklyPlan[]> {
+    const { data, error } = await supabase
+      .from('weekly_plans')
+      .select('*')
+      .eq('user_id', userId)
+      .order('week', { ascending: true });
+
+    if (error && error.code !== '42P01') throw error;
+    return data || [];
+  }
+
+  static async getProgramPlans(userId: string): Promise<ProgramPlan[]> {
+    const { data, error } = await supabase
+      .from('program_plans')
+      .select('*')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false });
+
+    if (error && error.code !== '42P01') throw error;
+    return data || [];
+  }
+
+  static async getSocraticSessions(userId: string, limit = 5): Promise<SocraticSession[]> {
+    const { data, error } = await supabase
+      .from('socratic_sessions')
+      .select('*')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false })
+      .limit(limit);
+
+    if (error && error.code !== '42P01') throw error;
+    return data || [];
+  }
+
+  static async getModuleInstances(trackId: string): Promise<ModuleInstance[]> {
+    const { data, error } = await supabase
+      .from('module_instances')
+      .select('*')
+      .eq('learner_track_id', trackId)
+      .order('week', { ascending: true })
+      .order('day', { ascending: true });
+
+    if (error && error.code !== '42P01') throw error;
+    return data || [];
+  }
+
+  static async getKPIMetrics(userId: string, limit = 4): Promise<KPIMetricRecord[]> {
+    const { data, error } = await supabase
+      .from('kpi_metrics')
+      .select('*')
+      .eq('user_id', userId)
+      .order('recorded_at', { ascending: false })
+      .limit(limit);
+
+    if (error && error.code !== '42P01') throw error;
+    return data || [];
+  }
+
+  static async getStreakActivity(userId: string, days = 7): Promise<StreakRecord[]> {
+    const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000)
+      .toISOString()
+      .split('T')[0];
+
+    const { data, error } = await supabase
+      .from('streaks')
+      .select('*')
+      .eq('user_id', userId)
+      .gte('activity_date', since)
+      .order('activity_date', { ascending: false });
+
+    if (error && error.code !== '42P01') throw error;
+    return data || [];
   }
 
   // Delete weekly note

@@ -15,6 +15,12 @@ export interface LearningPreferences {
   focus_areas: string[];
   learning_pace: 'slow' | 'normal' | 'fast';
   preferred_interaction_style: 'text' | 'voice' | 'mixed';
+  notification_preferences?: {
+    mentor_feedback: boolean;
+    mission_reminders: boolean;
+    community_digest: boolean;
+  };
+  hybrid_frequency?: 'weekly' | 'biweekly' | 'flex';
 }
 
 export interface WeeklyNote {
@@ -158,6 +164,83 @@ export interface SocraticMessage {
   content: string;
   audio_url?: string;
   timestamp: string;
+}
+
+export interface Message {
+  id: string;
+  session_id: string;
+  role: 'user' | 'assistant';
+  content: string;
+  audio_url?: string;
+  metadata?: Record<string, any>;
+  timestamp: string;
+  created_at?: string;
+}
+
+export interface SocraticSession {
+  id: string;
+  user_id: string;
+  week_id?: string | null;
+  topic?: string | null;
+  voice_enabled: boolean;
+  session_metadata: Record<string, any>;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface EducationSession {
+  id: string;
+  user_id: string;
+  week: number;
+  day: number;
+  phase: 'planning' | 'lecture' | 'check' | 'practice_prep' | 'practice' | 'reflect' | 'completed';
+  artifacts: Record<string, any>;
+  etag: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ProgramPlan {
+  id: string;
+  user_id: string;
+  version: string;
+  program_plan: Record<string, any>;
+  accepted: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface WeeklyPlan {
+  id: string;
+  user_id: string;
+  program_plan_id?: string | null;
+  week: number;
+  weekly_plan: Record<string, any>;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface KPIMetricRecord {
+  id: string;
+  week_id?: string | null;
+  user_id: string;
+  metric_name: string;
+  metric_category?: string | null;
+  current_value: number;
+  target_value?: number | null;
+  previous_value?: number | null;
+  delta?: number | null;
+  trend?: 'up' | 'down' | 'stable' | null;
+  unit?: string | null;
+  recorded_at: string;
+  created_at: string;
+}
+
+export interface StreakRecord {
+  user_id: string;
+  agent: string;
+  activity_date: string;
+  created_at: string;
 }
 
 export interface LeadEngineerBriefingNote {

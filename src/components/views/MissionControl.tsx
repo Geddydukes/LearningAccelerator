@@ -1,7 +1,17 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Brain, CheckSquare, Compass, Flag, ListChecks, Shield, Trophy } from 'lucide-react';
 import { Card } from '../ui/Card';
 import { Progress } from '../ui/Progress';
+import { Button } from '../ui/Button';
+import { useProgression } from '../../hooks/useProgression';
+import { useDatabase } from '../../hooks/useDatabase';
+import { DatabaseService } from '../../lib/database';
+import { calculateModuleProgress } from '../../lib/progression';
+import type { ModuleInstance } from '../../types/progression';
+import { XP_REWARDS } from '../../lib/gamify/logStreak';
+import toast from 'react-hot-toast';
+
+const DEFAULT_TRACK_LABEL = 'AI/ML Engineering';
 
 interface Mission {
   id: string;
@@ -14,88 +24,140 @@ interface Mission {
   accessibilityLabel: string;
 }
 
-const difficultyColor: Record<Mission['difficulty'], string> = {
-  foundation: 'bg-secondary text-secondary-foreground',
-  challenge: 'bg-primary text-primary-foreground',
-  capstone: 'bg-amber-500 text-black',
+const DIFFICULTY_XP: Record<Mission['difficulty'], number> = {
+  foundation: XP_REWARDS.DAILY_LOGIN * 20,
+  challenge: XP_REWARDS.TA_COMPLETION * 12,
+  capstone: XP_REWARDS.PORTFOLIO_GIT_PUSH + XP_REWARDS.MONTHLY_ACHIEVEMENT,
+};
+
+const determineDifficulty = (week: number): Mission['difficulty'] => {
+  if (week <= 1) return 'foundation';
+  if (week <= 3) return 'challenge';
+  return 'capstone';
 };
 
 export const MissionControl: React.FC = () => {
+  const { weeks } = useDatabase();
+  const { progressState, loading: progressionLoading } = useProgression(DEFAULT_TRACK_LABEL);
+  const [moduleInstances, setModuleInstances] = useState<ModuleInstance[]>([]);
   const [selectedDifficulty, setSelectedDifficulty] = useState<Mission['difficulty'] | 'all'>('all');
 
-  const missions = useMemo<Mission[]>(
-    () => [
-      {
-        id: 'mission-1',
-        title: 'Design critique relay',
-        description: 'Partner with an AI critic and a peer to iterate on a concept in three rounds.',
-        difficulty: 'foundation',
-        xp: 80,
-        progress: 60,
-        hybridCue: 'Share a quick sketch photo before round 2 begins.',
-        accessibilityLabel: 'Design critique relay mission, foundation difficulty, 60 percent complete',
-      },
-      {
-        id: 'mission-2',
-        title: 'Agent pairing lab',
-        description: 'Co-design a Socratic prompt and transfer the insight to your TA workspace.',
-        difficulty: 'challenge',
-        xp: 120,
-        progress: 25,
-        hybridCue: 'Record a voice reflection after completing the insight transfer.',
-        accessibilityLabel: 'Agent pairing lab mission, challenge difficulty, 25 percent complete',
-      },
-      {
-        id: 'mission-3',
-        title: 'Community impact pitch',
-        description: 'Prototype a learning activity that extends into your local community hub.',
-        difficulty: 'capstone',
-        xp: 200,
-        progress: 10,
-        hybridCue: 'Collect two peer signatures during the community showcase.',
-        accessibilityLabel: 'Community impact pitch mission, capstone difficulty, 10 percent complete',
-      },
-    ],
-    []
-  );
+  useEffect(() => {
+    const trackId = progressState?.track?.id;
+    if (!trackId) {
+      setModuleInstances([]);
+      return;
+    }
 
-  const filtered = selectedDifficulty === 'all'
+    let active = true;
+    DatabaseService.getModuleInstances(trackId)
+      .then(instances => {
+        if (active) setModuleInstances(instances);
+      })
+      .catch(error => {
+        console.warn('Failed to load module instances', error);
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [progressState?.track?.id]);
+
+  const missions = useMemo<Mission[]>(() => {
+    return moduleInstances.map(instance => {
+      const difficulty = determineDifficulty(instance.week);
+      const progress = calculateModuleProgress(instance);
+      const weekNote = weeks.find(week => week.week_number === instance.week);
+      const hybridCue =
+        weekNote?.brand_strategy_package?.engagement_strategies?.[0] ||
+        weekNote?.lead_engineer_briefing_note?.recommendations?.[0]?.description ||
+        'Capture a real-world observation and sync it with your mission.';
+
+      return {
+        id: instance.id,
+        title: `Mission • Week ${instance.week} Day ${instance.day}`,
+        description:
+          (instance.completion_json?.summary as string | undefined) ||
+          weekNote?.clo_briefing_note?.weekly_theme ||
+          'Combine digital work and hybrid experimentation to unlock your badge.',
+        difficulty,
+        xp: DIFFICULTY_XP[difficulty],
+        progress,
+        hybridCue,
+        accessibilityLabel: `Mission for week ${instance.week} day ${instance.day} is ${progress}% complete`,
+      };
+    });
+  }, [moduleInstances, weeks]);
+
+  const filteredMissions = selectedDifficulty === 'all'
     ? missions
     : missions.filter(mission => mission.difficulty === selectedDifficulty);
 
+  const cadenceCount = missions.length;
+  const hybridMoments = weeks.reduce((count, week) => {
+    const hasHybrid = Boolean(week.brand_strategy_package?.engagement_strategies?.length);
+    return count + (hasHybrid ? 1 : 0);
+  }, 0);
+  const mentorReady = progressState?.canAdvance ?? false;
+
+  const handleLaunch = (mission: Mission) => {
+    toast.success(`Mission “${mission.title}” loaded into your workspace`);
+  };
+
   return (
-    <div className="space-y-8" aria-labelledby="mission-control-title">
+    <div className="space-y-8" aria-labelledby="mission-control-title" aria-busy={progressionLoading}>
       <header className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div>
-          <h2 id="mission-control-title" className="text-xl font-semibold">Mission control</h2>
-          <p className="text-sm text-muted-foreground">Gamify your learning plan with quests that blend digital and physical experiences.</p>
+          <h2 id="mission-control-title" className="text-xl font-semibold">
+            Mission control
+          </h2>
+          <p className="text-sm text-muted-foreground">
+            Gamify your learning plan with quests that blend digital and physical experiences.
+          </p>
         </div>
         <div className="flex flex-wrap items-center gap-2" role="group" aria-label="Filter missions by difficulty">
-          {([{ id: 'all', label: 'All' }, { id: 'foundation', label: 'Foundation' }, { id: 'challenge', label: 'Challenge' }, { id: 'capstone', label: 'Capstone' }] as const)
-            .map(({ id, label }) => (
-              <button
-                key={id}
-                type="button"
-                onClick={() => setSelectedDifficulty(id as Mission['difficulty'] | 'all')}
-                className={`rounded-full px-4 py-2 text-sm font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 ${
-                  selectedDifficulty === id
-                    ? 'bg-primary text-primary-foreground'
-                    : 'bg-muted text-muted-foreground hover:bg-muted/80'
-                }`}
-                aria-pressed={selectedDifficulty === id}
-              >
-                {label}
-              </button>
-            ))}
+          {([
+            { id: 'all', label: 'All' },
+            { id: 'foundation', label: 'Foundation' },
+            { id: 'challenge', label: 'Challenge' },
+            { id: 'capstone', label: 'Capstone' },
+          ] as const).map(({ id, label }) => (
+            <button
+              key={id}
+              type="button"
+              onClick={() => setSelectedDifficulty(id as Mission['difficulty'] | 'all')}
+              className={`rounded-full px-4 py-2 text-sm font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 ${
+                selectedDifficulty === id
+                  ? 'bg-primary text-primary-foreground'
+                  : 'bg-muted text-muted-foreground hover:bg-muted/80'
+              }`}
+              aria-pressed={selectedDifficulty === id}
+            >
+              {label}
+            </button>
+          ))}
         </div>
       </header>
 
       <section className="grid gap-6 lg:grid-cols-3" aria-label="Mission list">
-        {filtered.map(mission => (
+        {filteredMissions.length === 0 && (
+          <Card className="border-border/60 p-6 text-sm text-muted-foreground">
+            No missions yet—complete your onboarding prompts and weekly notes to populate this space.
+          </Card>
+        )}
+        {filteredMissions.map(mission => (
           <Card key={mission.id} className="border-border/60 p-6" aria-label={mission.accessibilityLabel}>
             <div className="flex items-start justify-between gap-4">
               <div>
-                <p className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wide ${difficultyColor[mission.difficulty]}`}>
+                <p
+                  className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wide ${
+                    mission.difficulty === 'foundation'
+                      ? 'bg-secondary text-secondary-foreground'
+                      : mission.difficulty === 'challenge'
+                        ? 'bg-primary text-primary-foreground'
+                        : 'bg-amber-500 text-black'
+                  }`}
+                >
                   {mission.difficulty}
                 </p>
                 <h3 className="mt-3 text-lg font-semibold">{mission.title}</h3>
@@ -115,13 +177,14 @@ export const MissionControl: React.FC = () => {
             </div>
             <Progress value={mission.progress} className="mt-4" aria-hidden="true" />
             <p className="mt-2 text-sm text-muted-foreground">Progress: {mission.progress}%</p>
-            <button
+            <Button
               type="button"
-              className="mt-4 inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-sm transition hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2"
+              className="mt-4 inline-flex items-center gap-2"
+              onClick={() => handleLaunch(mission)}
             >
               <Brain className="h-4 w-4" aria-hidden="true" />
               Launch mission
-            </button>
+            </Button>
           </Card>
         ))}
       </section>
@@ -130,21 +193,23 @@ export const MissionControl: React.FC = () => {
         {[{
           id: 'weekly',
           label: 'Weekly cadence',
-          value: '3 missions',
+          value: `${cadenceCount} missions`,
           icon: CheckSquare,
-          description: 'Complete at least three missions for your streak bonus.',
+          description: 'Complete the current week’s missions to unlock your streak bonus.',
         }, {
           id: 'hybrid',
           label: 'Hybrid engagement',
-          value: '2 physical checkpoints',
+          value: `${hybridMoments} hybrid touchpoints`,
           icon: Flag,
-          description: 'Document real-world experimentation with quick uploads.',
+          description: 'Document real-world experimentation alongside digital deliverables.',
         }, {
           id: 'safety',
           label: 'Learning safety net',
-          value: 'TA mentor standby',
+          value: mentorReady ? 'Ready to advance' : 'Agent support pending',
           icon: Shield,
-          description: 'Request guidance if a mission feels blocked for more than 30 minutes.',
+          description: mentorReady
+            ? 'All required agents have signed off—advance when you are ready.'
+            : 'Work with Socratic, TA, and Alex agents to unlock the next phase.',
         }].map(({ id, label, value, icon: Icon, description }) => (
           <Card key={id} className="border-border/60 p-6">
             <div className="flex items-center gap-3">

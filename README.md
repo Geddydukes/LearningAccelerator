@@ -147,15 +147,14 @@ supabase functions deploy cron-orchestrator
 src/
 ├── components/            # UI modules and pages
 ├── contexts/              # Auth, theme, app state
-├── hooks/                 # Reusable hooks
+├── hooks/                 # Reusable hooks (database, gamification, etc.)
 ├── lib/                   # Supabase, LLM client, utilities
+├── components/views/      # Dashboard surfaces powered by Supabase
 ├── routes/                # App route config
 ├── App.tsx                # Root app
 supabase/
 ├── functions/             # Edge functions (TS)
 ├── migrations/            # SQL migrations
-design-system/             # Reusable DS and tokens
-docs/                      # Architecture, SLOs, guides
 scripts/                   # Orchestrator, prompts, seeding
 src/components/education/  # Education Agent UI (unified)
 src/components/coding/     # In-browser coding workspace

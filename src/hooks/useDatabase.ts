@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { DatabaseService } from '../lib/database';
 import { User, WeeklyNote } from '../types';
@@ -8,6 +8,7 @@ export const useDatabase = () => {
   const { user: authUser } = useAuth();
   const [user, setUser] = useState<User | null>(null);
   const [currentWeek, setCurrentWeek] = useState<WeeklyNote | null>(null);
+  const [weeks, setWeeks] = useState<WeeklyNote[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -16,14 +17,15 @@ export const useDatabase = () => {
     } else {
       setUser(null);
       setCurrentWeek(null);
+      setWeeks([]);
       setLoading(false);
     }
-  }, [authUser]);
+  }, [authUser, initializeUser]);
 
-  const initializeUser = async () => {
+  const initializeUser = useCallback(async () => {
     try {
       setLoading(true);
-      
+
       // Get or create user profile
       let userProfile = await DatabaseService.getUser(authUser!.id);
       if (!userProfile) {
@@ -36,13 +38,17 @@ export const useDatabase = () => {
       const week = await DatabaseService.getCurrentWeek(authUser!.id);
       setCurrentWeek(week);
 
+      // Load full history for aggregated views
+      const allWeeks = await DatabaseService.getUserWeeks(authUser!.id);
+      setWeeks(allWeeks);
+
     } catch (error) {
       console.error('Failed to initialize user:', error);
       toast.error('Failed to load user data');
     } finally {
       setLoading(false);
     }
-  };
+  }, [authUser]);
 
   const updateUserProfile = async (updates: Partial<User>) => {
     if (!authUser) return;
@@ -71,6 +77,15 @@ export const useDatabase = () => {
         updates
       );
       setCurrentWeek(updatedWeek);
+      setWeeks(prev => {
+        const existingIndex = prev.findIndex(week => week.week_number === updatedWeek.week_number);
+        if (existingIndex >= 0) {
+          const next = [...prev];
+          next[existingIndex] = updatedWeek;
+          return next;
+        }
+        return [...prev, updatedWeek].sort((a, b) => a.week_number - b.week_number);
+      });
       return updatedWeek;
     } catch (error) {
       console.error('Failed to update week:', error);
@@ -81,6 +96,7 @@ export const useDatabase = () => {
   return {
     user,
     currentWeek,
+    weeks,
     loading,
     updateUserProfile,
     createOrUpdateWeek,
