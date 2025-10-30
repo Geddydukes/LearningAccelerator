@@ -12,15 +12,15 @@ import { Progress } from "../ui/Progress";
 
 export function SixPrinciples() {
   return (
-    <section id="how-it-works" className="py-0">
-      <div className="text-center py-16 bg-background">
-        <div className="max-w-6xl mx-auto px-6">
-          <h2 className="text-3xl font-medium mb-4">
+    <section id="how-it-works" className="relative py-12">
+      <div className="absolute inset-x-0 top-0 -z-10 h-64 bg-gradient-to-b from-primary/20 via-primary/5 to-transparent blur-3xl" />
+      <div className="bg-background/60 py-16 text-center backdrop-blur">
+        <div className="mx-auto max-w-6xl px-6">
+          <h2 className="mb-4 text-3xl font-semibold tracking-tight">
             Six principles that work
           </h2>
-          <p className="text-muted-foreground max-w-2xl mx-auto">
-            Our AI agents implement proven learning science to
-            build real expertise faster
+          <p className="mx-auto max-w-2xl text-lg text-muted-foreground">
+            Our AI agents operationalize proven learning science so every session compounds toward mastery.
           </p>
         </div>
       </div>
@@ -38,11 +38,11 @@ export function SixPrinciples() {
           textOnRight={false}
           proofElement={
             <div className="space-y-4">
-              <div className="flex justify-between items-center">
+              <div className="flex items-center justify-between">
                 <span className="text-foreground">
                   Weekly Mastery Check
                 </span>
-                <Badge variant="secondary">87% Complete</Badge>
+                <Badge className="bg-primary/20 text-primary">87% Complete</Badge>
               </div>
               <div className="space-y-2">
                 <div className="flex justify-between text-sm text-foreground">
@@ -74,21 +74,19 @@ export function SixPrinciples() {
           textOnRight={true}
           proofElement={
             <div className="space-y-3">
-              <div className="bg-gray-800 p-3 rounded text-white">
-                <p className="text-sm">
-                  <strong>Socrates:</strong> Why do you think
-                  React re-renders components?
+              <div className="rounded-2xl border border-white/10 bg-white/10 p-4 text-left text-sm text-white shadow-lg shadow-black/20">
+                <p>
+                  <strong>Socrates:</strong> Why do you think React re-renders components?
                 </p>
               </div>
-              <div className="bg-gray-700 p-3 rounded text-white">
-                <p className="text-sm">
+              <div className="rounded-2xl border border-white/10 bg-white/5 p-4 text-left text-sm text-white/90 shadow-lg shadow-black/20">
+                <p>
                   <strong>You:</strong> When state changes?
                 </p>
               </div>
-              <div className="bg-gray-800 p-3 rounded text-white">
-                <p className="text-sm">
-                  <strong>Socrates:</strong> What about props
-                  changes? Walk me through what happens...
+              <div className="rounded-2xl border border-white/10 bg-white/10 p-4 text-left text-sm text-white shadow-lg shadow-black/20">
+                <p>
+                  <strong>Socrates:</strong> What about props changes? Walk me through what happens...
                 </p>
               </div>
             </div>
@@ -111,32 +109,26 @@ export function SixPrinciples() {
                 Today's Micro-Tasks
               </h4>
               <div className="space-y-2">
-                <div className="flex items-center space-x-2">
-                  <input
-                    type="checkbox"
-                    checked
-                    className="rounded"
-                  />
-                  <span className="text-sm text-foreground">
-                    Build a custom hook (12 min)
-                  </span>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <input
-                    type="checkbox"
-                    checked
-                    className="rounded"
-                  />
-                  <span className="text-sm text-foreground">
-                    Debug async issue (8 min)
-                  </span>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <input type="checkbox" className="rounded" />
-                  <span className="text-sm text-foreground">
-                    Optimize render (15 min)
-                  </span>
-                </div>
+                {[
+                  { label: 'Build a custom hook (12 min)', checked: true },
+                  { label: 'Debug async issue (8 min)', checked: true },
+                  { label: 'Optimize render (15 min)', checked: false }
+                ].map(item => (
+                  <label
+                    key={item.label}
+                    className={`flex items-center gap-3 rounded-xl border border-border/30 bg-background/70 p-3 text-sm shadow-sm shadow-primary/10 ${
+                      item.checked ? 'ring-1 ring-primary/40' : ''
+                    }`}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={item.checked}
+                      readOnly
+                      className="h-4 w-4 rounded border-border text-primary focus:ring-primary"
+                    />
+                    <span className="text-foreground">{item.label}</span>
+                  </label>
+                ))}
               </div>
             </div>
           }
@@ -157,19 +149,17 @@ export function SixPrinciples() {
               <h4 className="font-medium text-white">
                 Today's 45-Minute Focus
               </h4>
-              <div className="space-y-2 text-sm text-gray-300">
-                <div className="flex justify-between">
-                  <span>• Review useEffect patterns</span>
-                  <span>10 min</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>• Build cleanup example</span>
-                  <span>25 min</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>• Quiz dependency arrays</span>
-                  <span>10 min</span>
-                </div>
+              <div className="space-y-2 text-sm text-white/80">
+                {[
+                  { label: 'Review useEffect patterns', time: '10 min' },
+                  { label: 'Build cleanup example', time: '25 min' },
+                  { label: 'Quiz dependency arrays', time: '10 min' }
+                ].map(item => (
+                  <div key={item.label} className="flex items-center justify-between rounded-xl bg-white/10 px-4 py-3 shadow-inner shadow-black/30">
+                    <span>• {item.label}</span>
+                    <span className="text-xs uppercase tracking-wide text-white/70">{item.time}</span>
+                  </div>
+                ))}
               </div>
             </div>
           }
@@ -186,17 +176,11 @@ export function SixPrinciples() {
           darkBackground={false}
           textOnRight={false}
           proofElement={
-            <div className="bg-gray-900 p-4 rounded font-mono text-sm space-y-2">
-              <div className="text-green-400">
-                + const [data, setData] = useState(null)
-              </div>
-              <div className="text-red-400">
-                - const [data, setData] = useState()
-              </div>
-              <div className="text-gray-300 mt-2">
-                💡 <strong>Alex:</strong> Initialize with null
-                for better type safety. TypeScript will thank
-                you.
+            <div className="space-y-2 rounded-2xl bg-slate-950/80 p-5 font-mono text-sm text-slate-200 shadow-2xl shadow-primary/20">
+              <div className="text-emerald-400">+ const [data, setData] = useState(null)</div>
+              <div className="text-rose-400">- const [data, setData] = useState()</div>
+              <div className="mt-3 text-slate-300">
+                💡 <strong>Alex:</strong> Initialize with null for better type safety. TypeScript will thank you.
               </div>
             </div>
           }
@@ -215,21 +199,17 @@ export function SixPrinciples() {
           proofElement={
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <span className="text-white">
-                  Current Streak
-                </span>
-                <span className="text-2xl font-medium text-white">
-                  47 days
-                </span>
+                <span className="text-white">Current Streak</span>
+                <span className="text-2xl font-semibold text-white">47 days</span>
               </div>
-              <div className="space-y-2">
-                <div className="flex justify-between text-sm text-gray-300">
+              <div className="space-y-3">
+                <div className="flex items-center justify-between text-sm text-white/80">
                   <span>Skills Mastered</span>
                   <span>12/20</span>
                 </div>
                 <Progress value={60} className="h-2" />
               </div>
-              <div className="text-center text-sm text-gray-300">
+              <div className="rounded-full bg-white/10 px-4 py-2 text-center text-xs font-semibold uppercase tracking-wide text-white/80">
                 3 skills away from hireable
               </div>
             </div>

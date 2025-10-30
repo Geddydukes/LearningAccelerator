@@ -122,28 +122,30 @@ export function AuthForm() {
   ];
 
   return (
-    <div className="min-h-screen bg-white text-black dark:bg-black dark:text-white relative flex items-center justify-center p-6">
+    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-gradient-to-br from-background via-primary/10 to-secondary/20 p-6 text-foreground">
+      <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(circle_at_top,_rgba(59,130,246,0.18),_transparent_55%)] dark:bg-[radial-gradient(circle_at_top,_rgba(129,140,248,0.25),_transparent_60%)]" />
+      <div className="pointer-events-none absolute -right-24 bottom-0 -z-10 h-96 w-96 rounded-full bg-secondary/30 blur-3xl" />
 
       {/* Back to landing button */}
       <Button
         variant="ghost"
-        className="absolute top-6 left-6 text-black hover:bg-black/5 dark:text-white dark:hover:bg-white/5"
+        className="absolute left-6 top-6 text-foreground/80 hover:bg-primary/10"
         onClick={() => navigate(PATHS.landing)}
       >
         <ArrowLeft className="w-4 h-4 mr-2" />
         Back to Landing
       </Button>
 
-      <div className="relative z-10 w-full max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+      <div className="relative z-10 grid w-full max-w-6xl grid-cols-1 items-center gap-12 rounded-[2.5rem] border border-white/20 bg-background/70 p-10 shadow-2xl shadow-primary/10 backdrop-blur-lg lg:grid-cols-2">
         {/* Left side - Features */}
         <div className="hidden lg:block">
           <div className="space-y-8">
             <div className="space-y-4">
               <div className="flex items-center space-x-3">
-                <div className="w-12 h-12 rounded-xl flex items-center justify-center border border-slate-200 dark:border-slate-800">
-                  <Brain className="w-6 h-6" />
+                <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-primary/30 bg-primary/10">
+                  <Brain className="h-6 w-6 text-primary" />
                 </div>
-                <h1 className="text-4xl font-bold">Wisely</h1>
+                <h1 className="text-4xl font-bold text-primary">Wisely</h1>
               </div>
               <p className="text-xl text-slate-600 dark:text-slate-300 leading-relaxed">
                 Excel at Everything
@@ -157,9 +159,9 @@ export function AuthForm() {
               {features.map((feature, index) => {
                 const Icon = feature.icon;
                 return (
-                  <div key={index} className="flex items-start space-x-4">
-                    <div className="w-10 h-10 rounded-lg flex items-center justify-center border border-slate-200 dark:border-slate-800">
-                      <Icon className="w-5 h-5" />
+                  <div key={index} className="flex items-start space-x-4 rounded-2xl border border-primary/20 bg-primary/5 p-4">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-lg border border-primary/30 bg-primary/10">
+                      <Icon className="h-5 w-5 text-primary" />
                     </div>
                     <div>
                       <h3 className="text-lg font-semibold mb-1">
@@ -175,12 +177,12 @@ export function AuthForm() {
             </div>
 
             <div className="pt-8">
-              <div className="rounded-2xl p-6 border border-slate-200 dark:border-slate-800 bg-white dark:bg-black">
-                <div className="flex items-center space-x-3 mb-4">
-                  <CheckCircle className="w-5 h-5" />
-                  <span className="font-semibold">Trusted by 10K+ learners</span>
+              <div className="rounded-2xl border border-primary/30 bg-primary/10 p-6 text-primary-foreground shadow-lg shadow-primary/20">
+                <div className="mb-4 flex items-center space-x-3">
+                  <CheckCircle className="h-5 w-5 text-primary" />
+                  <span className="font-semibold text-primary">Trusted by 10K+ learners</span>
                 </div>
-                <p className="text-slate-600 dark:text-slate-300 text-sm">
+                <p className="text-sm text-primary/80">
                   Join a community of motivated learners who are transforming their careers and skills.
                 </p>
               </div>
@@ -190,12 +192,12 @@ export function AuthForm() {
 
         {/* Right side - Auth Form */}
         <div className="flex justify-center">
-          <Card className="w-full max-w-md bg-white dark:bg-black border border-slate-200 dark:border-slate-800 shadow-depth-2">
-            <CardHeader className="text-center space-y-4">
-              <div className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto border border-slate-200 dark:border-slate-800">
-                <Brain className="w-8 h-8" />
+          <Card className="w-full max-w-md rounded-3xl border border-primary/30 bg-background/80 shadow-xl shadow-primary/10 backdrop-blur">
+            <CardHeader className="space-y-4 text-center">
+              <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl border border-primary/30 bg-primary/10">
+                <Brain className="h-8 w-8 text-primary" />
               </div>
-              
+
               <div>
                 <CardTitle className="text-2xl font-bold">
                   {isSignUp ? 'Create Account' : 'Welcome Back'}
@@ -208,7 +210,7 @@ export function AuthForm() {
                 </CardDescription>
               </div>
 
-              <Badge className="w-fit mx-auto bg-black text-white dark:bg-white dark:text-black border border-slate-200 dark:border-slate-800">
+              <Badge className="mx-auto w-fit border border-primary/30 bg-primary/10 text-primary">
                 🚀 AI-Powered Learning
               </Badge>
             </CardHeader>
@@ -228,8 +230,8 @@ export function AuthForm() {
                         placeholder="Enter your full name"
                         value={formData.name}
                         onChange={(e) => handleInputChange('name', e.target.value)}
-                        className={`bg-white dark:bg-black border-slate-200 dark:border-slate-800 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-black dark:focus:border-white ${
-                          errors.name ? 'border-red-400' : ''
+                        className={`border border-primary/20 bg-background/70 placeholder:text-muted-foreground focus:border-primary ${
+                          errors.name ? 'border-red-400 focus:border-red-400' : ''
                         }`}
                       />
                     </div>
@@ -255,8 +257,8 @@ export function AuthForm() {
                       placeholder="Enter your email"
                       value={formData.email}
                       onChange={(e) => handleInputChange('email', e.target.value)}
-                      className={`pl-10 bg-white dark:bg-black border-slate-200 dark:border-slate-800 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-black dark:focus:border-white ${
-                        errors.email ? 'border-red-400' : ''
+                      className={`pl-10 border border-primary/20 bg-background/70 placeholder:text-muted-foreground focus:border-primary ${
+                        errors.email ? 'border-red-400 focus:border-red-400' : ''
                       }`}
                     />
                   </div>
@@ -281,15 +283,15 @@ export function AuthForm() {
                       placeholder="Enter your password"
                       value={formData.password}
                       onChange={(e) => handleInputChange('password', e.target.value)}
-                      className={`pl-10 pr-10 bg-white dark:bg-black border-slate-200 dark:border-slate-800 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-black dark:focus:border-white ${
-                        errors.password ? 'border-red-400' : ''
+                      className={`pl-10 pr-10 border border-primary/20 bg-background/70 placeholder:text-muted-foreground focus:border-primary ${
+                        errors.password ? 'border-red-400 focus:border-red-400' : ''
                       }`}
                     />
                     <Button
                       type="button"
                       variant="ghost"
                       size="sm"
-                      className="absolute right-2 top-1/2 transform -translate-y-1/2 h-8 w-8 p-0 text-slate-400 hover:text-black hover:bg-black/5 dark:hover:text-white dark:hover:bg-white/5"
+                      className="absolute right-2 top-1/2 h-8 w-8 -translate-y-1/2 transform p-0 text-muted-foreground hover:bg-primary/10 hover:text-primary"
                       onClick={() => setShowPassword(!showPassword)}
                     >
                       {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -317,8 +319,8 @@ export function AuthForm() {
                         placeholder="Confirm your password"
                         value={formData.confirmPassword}
                         onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
-                        className={`pl-10 bg-white dark:bg-black border-slate-200 dark:border-slate-800 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-black dark:focus:border-white ${
-                          errors.confirmPassword ? 'border-red-400' : ''
+                        className={`pl-10 border border-primary/20 bg-background/70 placeholder:text-muted-foreground focus:border-primary ${
+                          errors.confirmPassword ? 'border-red-400 focus:border-red-400' : ''
                         }`}
                       />
                     </div>
@@ -342,32 +344,32 @@ export function AuthForm() {
                 {/* Submit Button */}
                 <Button
                   type="submit"
-                  className="w-full bg-black text-white hover:bg-black/90 dark:bg-white dark:text-black dark:hover:bg-white/90 border border-slate-200 dark:border-slate-800"
+                  className="w-full border border-primary/30 bg-gradient-to-r from-primary via-secondary to-primary text-primary-foreground shadow-lg shadow-primary/20 transition hover:shadow-primary/40"
                   disabled={isLoading}
                 >
                   {isLoading ? (
                     <div className="flex items-center space-x-2">
-                      <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary-foreground/40 border-t-primary-foreground" />
                       <span>Processing...</span>
                     </div>
                   ) : (
                     <div className="flex items-center space-x-2">
-                      <Zap className="w-4 h-4" />
+                      <Zap className="h-4 w-4" />
                       <span>{isSignUp ? 'Create Account' : 'Sign In'}</span>
                     </div>
                   )}
                 </Button>
               </form>
 
-              <Separator className="bg-slate-200 dark:bg-slate-800" />
+              <Separator className="bg-primary/20" />
 
               {/* Toggle Sign In/Sign Up */}
               <div className="text-center">
-                <p className="text-slate-600 dark:text-slate-300">
+                <p className="text-muted-foreground">
                   {isSignUp ? 'Already have an account?' : "Don't have an account?"}
                   <Button
                     variant="link"
-                    className="text-black hover:underline p-0 h-auto font-semibold ml-2 dark:text-white"
+                    className="ml-2 h-auto p-0 font-semibold text-primary hover:text-primary/80"
                     onClick={() => setIsSignUp(!isSignUp)}
                   >
                     {isSignUp ? 'Sign In' : 'Sign Up'}
@@ -376,9 +378,9 @@ export function AuthForm() {
               </div>
 
               {/* Production Notice */}
-              <div className="border border-slate-200 dark:border-slate-800 rounded-lg p-4 text-center bg-white dark:bg-black">
-                <p className="text-slate-600 dark:text-slate-300 text-sm">
-                  <Shield className="w-4 h-4 inline mr-2" />
+              <div className="rounded-lg border border-primary/20 bg-primary/5 p-4 text-center">
+                <p className="text-sm text-primary/80">
+                  <Shield className="mr-2 inline h-4 w-4" />
                   Secure authentication powered by Supabase
                 </p>
               </div>

@@ -193,9 +193,14 @@ export default function AppShell() {
   );
 
   return (
-    <div className="flex min-h-screen bg-background text-foreground">
+    <div className="relative flex min-h-screen overflow-hidden text-foreground">
+      <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(circle_at_top,_rgba(59,130,246,0.15),_transparent_55%)] dark:bg-[radial-gradient(circle_at_top,_rgba(96,165,250,0.25),_transparent_60%)]" />
+      <div className="pointer-events-none absolute -left-1/3 top-1/4 -z-10 h-[520px] w-[520px] rounded-full bg-primary/10 blur-3xl dark:bg-primary/20" />
       {/* Desktop navigation */}
-      <aside className="hidden w-[320px] flex-shrink-0 border-r border-border/60 bg-sidebar/80 px-6 py-8 lg:block" aria-label="Primary navigation">
+      <aside
+        className="hidden w-[320px] flex-shrink-0 border-r border-border/60 bg-gradient-to-b from-sidebar via-background/90 to-sidebar px-6 py-8 backdrop-blur lg:block"
+        aria-label="Primary navigation"
+      >
         <div className="flex items-center justify-between">
           <div>
             <p className="text-xs uppercase tracking-wider text-muted-foreground">Learning Accelerator</p>
@@ -248,8 +253,9 @@ export default function AppShell() {
         )}
       </div>
 
-      <div className="flex min-h-screen flex-1 flex-col">
-        <header className="border-b border-border/60 bg-background/95 px-4 py-4 backdrop-blur supports-[backdrop-filter]:bg-background/60 lg:px-8">
+      <div className="relative flex min-h-screen flex-1 flex-col bg-gradient-to-br from-background/95 via-background to-primary/5 supports-[backdrop-filter]:backdrop-blur">
+        <div className="pointer-events-none absolute -top-32 right-0 z-0 h-72 w-72 rounded-full bg-secondary/40 blur-3xl dark:bg-secondary/25" />
+        <header className="relative z-10 border-b border-border/60 bg-gradient-to-r from-background/90 via-primary/5 to-background/60 px-4 py-4 backdrop-blur lg:px-8">
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div className="space-y-1">
               <p className="text-sm text-muted-foreground">{new Date().toLocaleDateString(undefined, { weekday: 'long', month: 'short', day: 'numeric' })}</p>
@@ -282,7 +288,7 @@ export default function AppShell() {
               { title: 'Focus for today', value: 'Project checkpoint', context: 'Hybrid: build & reflect', accent: 'bg-secondary text-secondary-foreground' },
               { title: 'Feedback loops', value: '2 pending reviews', context: 'Socratic + TA', accent: 'bg-accent text-accent-foreground' },
             ].map((item) => (
-              <Card key={item.title} className="border-border/60">
+              <Card key={item.title} className="border-border/60 bg-background/80 shadow-lg shadow-primary/5">
                 <div className={`rounded-lg ${item.accent} px-3 py-2 text-xs font-semibold uppercase tracking-wide`}>{item.context}</div>
                 <div className="px-3 pb-4 pt-3">
                   <p className="text-sm text-muted-foreground">{item.title}</p>
@@ -293,7 +299,7 @@ export default function AppShell() {
           </div>
         </header>
 
-        <main className="flex-1 overflow-y-auto bg-background px-4 py-8 lg:px-8">
+        <main className="relative z-10 flex-1 overflow-y-auto px-4 py-8 lg:px-8">
           <Routes>
             <Route index element={<Navigate to={PATHS.overview.replace('/home/', '')} replace />} />
             <Route path="overview" element={<LearningOverview />} />
